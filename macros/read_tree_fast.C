@@ -58,8 +58,6 @@ void read_tree_fast() {
     TH2F *histMassR2EP = new TH2F("histMassR2EP", "", nMassBins, minMassRange, maxMassRange, 200, -1, 1);
     TH2F *histMassC2DP = new TH2F("histMassC2DP", "", nMassBins, minMassRange, maxMassRange, 200, -1, 1);
     TH2F *histMassR2SP = new TH2F("histMassR2SP", "", nMassBins, minMassRange, maxMassRange, 200, -1, 1);
-    TH2F *histMassV2SP = new TH2F("histMassV2SP", "", nMassBins, minMassRange, maxMassRange, 200, -1, 1);
-    TH2F *histMassV2EP = new TH2F("histMassV2EP", "", nMassBins, minMassRange, maxMassRange, 200, -1, 1);
     TH2F *histMassPt = new TH2F("histMassPt", "", nMassBins, minMassRange, maxMassRange, 100, 0, 5);
 
     string pathToFile = "/Users/lucamicheletti/cernbox/JPSI/Run3/2023/PbPb/pass2/AO2D_reduced_with_flow.root";
@@ -100,15 +98,13 @@ void read_tree_fast() {
                     histMassC2DP -> Fill(fMass, fCos2DeltaPhi);
                     histMassR2EP -> Fill(fMass, fR2EP);
                     histMassPt -> Fill(fMass, fPt);
-                    histMassV2SP -> Fill(fMass, fU2Q2/fR2SP);
-                    histMassV2EP -> Fill(fMass, fCos2DeltaPhi/fR2EP);
                 }
             }
         }
     }
     fIn -> Close();
 
-    /*TCanvas *canvasMassU2Q2 = new TCanvas("canvasMassU2Q2", "", 600, 600);
+    TCanvas *canvasMassU2Q2 = new TCanvas("canvasMassU2Q2", "", 600, 600);
     histMassU2Q2 -> Draw("COLZ");
 
     TCanvas *canvasMassR2EP = new TCanvas("canvasMassR2EP", "", 600, 600);
@@ -118,15 +114,7 @@ void read_tree_fast() {
     histMassC2DP -> Draw("COLZ");
 
     TCanvas *canvasMassR2SP = new TCanvas("canvasMassR2SP", "", 600, 600);
-    histMassR2SP -> Draw("COLZ");*/
-
-    TCanvas *canvasMassV2SP = new TCanvas("canvasMassV2SP", "canvasMassV2SP", 600, 600);
-    histMassV2SP -> Draw("COLZ");
-
-    TCanvas *canvasMassV2EP = new TCanvas("canvasMassV2EP", "canvasMassV2EP", 600, 600);
-    histMassV2EP -> Draw("COLZ");
-
-    return;
+    histMassR2SP -> Draw("COLZ");
 
     TH1F *histProjMass  = (TH1F*) histMassU2Q2 -> ProjectionX("histProjMass");
 
@@ -205,7 +193,7 @@ void read_tree_fast() {
     histProjPt -> Draw("EP");
 
 
-    /*TCanvas *canvasU2Q2 = new TCanvas("canvasU2Q2", "", 600, 600);
+    TCanvas *canvasU2Q2 = new TCanvas("canvasU2Q2", "", 600, 600);
     histU2Q2 -> Draw("EP");
 
     TCanvas *canvasR2SP = new TCanvas("canvasR2SP", "", 600, 600);
@@ -215,7 +203,7 @@ void read_tree_fast() {
     histC2DP -> Draw("EP");
 
     TCanvas *canvasR2EP = new TCanvas("canvasR2EP", "", 600, 600);
-    histR2EP -> Draw("EP");*/
+    histR2EP -> Draw("EP");
 
     TFile *fOut = new TFile("v2_results.root", "RECREATE");
     histProjMass -> Write();
