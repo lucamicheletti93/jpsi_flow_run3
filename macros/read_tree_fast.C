@@ -35,11 +35,11 @@ void LoadStyle();
 void SetLegend(TLegend *);
 
 void read_tree_fast() {
-    LoadStyle();
+    //LoadStyle();
     float fMass, fPt, fEta, fTauz, fTauxy, fU2Q2, fCos2DeltaPhi, fR2EP, fR2SP, fCentFT0C = -99999;
     int fSign = -99999;
 
-    const int nMassBins = 120;
+    const int nMassBins = 30;
     const double minMassRange = 2;
     const double maxMassRange = 5;
 
@@ -49,18 +49,27 @@ void read_tree_fast() {
     lineJpsi -> SetLineWidth(2);
 
     TH1F *histMass = new TH1F("histMass", "", nMassBins, minMassRange, maxMassRange);
-    TH1F *histU2Q2 = new TH1F("histU2Q2", "", 1000, -100, 100);
-    TH1F *histR2SP = new TH1F("histR2SP", "", 1000, -100, 100);
-    TH1F *histC2DP = new TH1F("histC2DP", "", 1000, -100, 100);
-    TH1F *histR2EP = new TH1F("histR2EP", "", 1000, -100, 100);
+    TH1F *histU2Q2 = new TH1F("histU2Q2", "", 1000, -1, 1);
+    TH1F *histR2SP = new TH1F("histR2SP", "", 1000, -1, 1);
+    TH1F *histC2DP = new TH1F("histC2DP", "", 1000, -1, 1);
+    TH1F *histR2EP = new TH1F("histR2EP", "", 1000, -1, 1);
 
-    TH2F *histMassU2Q2 = new TH2F("histMassU2Q2", "", nMassBins, minMassRange, maxMassRange, 200, -1, 1);
-    TH2F *histMassR2EP = new TH2F("histMassR2EP", "", nMassBins, minMassRange, maxMassRange, 200, -1, 1);
-    TH2F *histMassC2DP = new TH2F("histMassC2DP", "", nMassBins, minMassRange, maxMassRange, 200, -1, 1);
-    TH2F *histMassR2SP = new TH2F("histMassR2SP", "", nMassBins, minMassRange, maxMassRange, 200, -1, 1);
+    TH2F *histMassU2Q2 = new TH2F("histMassU2Q2", "histMassU2Q2", nMassBins, minMassRange, maxMassRange, 200, -1, 1);
+    TH2F *histMassR2EP = new TH2F("histMassR2EP", "histMassR2EP", nMassBins, minMassRange, maxMassRange, 200, -1, 1);
+    TH2F *histMassC2DP = new TH2F("histMassC2DP", "histMassC2DP", nMassBins, minMassRange, maxMassRange, 200, -1, 1);
+    TH2F *histMassR2SP = new TH2F("histMassR2SP", "histMassR2SP", nMassBins, minMassRange, maxMassRange, 200, -1, 1);
     TH2F *histMassPt = new TH2F("histMassPt", "", nMassBins, minMassRange, maxMassRange, 100, 0, 5);
 
-    string pathToFile = "/Users/lucamicheletti/cernbox/JPSI/Run3/2023/PbPb/pass2/AO2D_reduced_with_flow.root";
+    auto hprofMassU2Q2  = new TProfile("hprofMassU2Q2", "hprofMassU2Q2", 100, minMassRange, maxMassRange, -1, 1, "");
+    auto hprofMassR2SP  = new TProfile("hprofMassR2SP", "hprofMassR2SP", 100, minMassRange, maxMassRange, -1, 1, "");
+
+    auto hprofCentU2Q2  = new TProfile("hprofCentU2Q2", "hprofCentU2Q2", 100, 0, 100, -1, 1, "");
+    auto hprofCentR2SP  = new TProfile("hprofCentR2SP", "hprofCentR2SP", 100, 0, 100, -1, 1, "");
+
+    hprofMassU2Q2 -> SetLineColor(kRed+1);
+    hprofMassR2SP -> SetLineColor(kRed+1);
+
+    string pathToFile = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/data/pass2/LHC22zzh/AO2D_reduced_with_flow.root";
     TFile *fIn = new TFile(pathToFile.c_str(), "READ");
     TIter next(fIn -> GetListOfKeys()); 
     TKey *key; 
@@ -92,28 +101,42 @@ void read_tree_fast() {
             histR2EP -> Fill(fR2EP);
 
             if (fSign == 0 && TMath::Abs(fEta) > 2.5 && TMath::Abs(fEta) < 4) {
-                if (fCentFT0C > 0 && fCentFT0C < 50 && fPt > 0 && fPt < 10) {
+                if (fCentFT0C > 0 && fCentFT0C < 100 && fPt > 0 && fPt < 10) {
+                    hprofCentU2Q2 -> Fill(fCentFT0C, fU2Q2);
+                    hprofCentR2SP -> Fill(fCentFT0C, fR2SP);
+                }
+                if (fCentFT0C > 20 && fCentFT0C < 50 && fPt > 0 && fPt < 10) {
                     histMassU2Q2 -> Fill(fMass, fU2Q2);
                     histMassR2SP -> Fill(fMass, fR2SP);
                     histMassC2DP -> Fill(fMass, fCos2DeltaPhi);
                     histMassR2EP -> Fill(fMass, fR2EP);
                     histMassPt -> Fill(fMass, fPt);
+                    histR2SP -> Fill(fR2SP);
+
+                    hprofMassU2Q2 -> Fill(fMass, fU2Q2);
+                    hprofMassR2SP -> Fill(fMass, fR2SP);
                 }
             }
         }
     }
     fIn -> Close();
 
-    TCanvas *canvasMassU2Q2 = new TCanvas("canvasMassU2Q2", "", 600, 600);
+    TCanvas *canvasProfCent = new TCanvas("canvasProfCent", "", 1200, 1200);
+    canvasProfCent -> Divide(2, 2);
+    canvasProfCent -> cd(1);
+    hprofCentU2Q2 -> Draw("EP");
+    canvasProfCent -> cd(2);
+    hprofCentR2SP -> Draw("EP");
+
+    TCanvas *canvasDistr = new TCanvas("canvasDistr", "canvasDistr", 1200, 1200);
+    canvasDistr -> Divide(2, 2);
+    canvasDistr -> cd(1);
     histMassU2Q2 -> Draw("COLZ");
-
-    TCanvas *canvasMassR2EP = new TCanvas("canvasMassR2EP", "", 600, 600);
+    canvasDistr -> cd(2);
     histMassR2EP -> Draw("COLZ");
-
-    TCanvas *canvasMassC2DP = new TCanvas("canvasMassC2DP", "", 600, 600);
+    canvasDistr -> cd(3);
     histMassC2DP -> Draw("COLZ");
-
-    TCanvas *canvasMassR2SP = new TCanvas("canvasMassR2SP", "", 600, 600);
+    canvasDistr -> cd(4);
     histMassR2SP -> Draw("COLZ");
 
     TH1F *histProjMass  = (TH1F*) histMassU2Q2 -> ProjectionX("histProjMass");
@@ -167,12 +190,14 @@ void read_tree_fast() {
     lineJpsi -> Draw("SAME");
     canvasProfMassV2SP -> cd(2);
     histProjU2Q2 -> Draw("EP");
+    hprofMassU2Q2 -> Draw("EP SAME");
     canvasProfMassV2SP -> cd(3);
     histV2SP -> GetYaxis() -> SetRangeUser(-1, 2);
     histV2SP -> Draw("EP");
     lineJpsi -> Draw("SAME");
     canvasProfMassV2SP -> cd(4);
     histProjR2SP -> Draw("EP");
+    hprofMassR2SP -> Draw("EP SAME");
 
     TCanvas *canvasProfMassV2EP = new TCanvas("canvasProfMassV2EP", "", 1200, 1200);
     canvasProfMassV2EP -> Divide(2, 2);

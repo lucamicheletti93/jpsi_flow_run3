@@ -1,6 +1,6 @@
 
 input:
-    output_dir_name: "/Users/lucamicheletti/cernbox/JPSI/Run3/2023/PbPb/pass2"
+    output_dir_name: "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/data/pass2/LHC22zzh/"
     run_list: [
       544124,
       544123,
@@ -23,8 +23,8 @@ input:
       "/alice/cern.ch/user/a/alihyperloop/jobs/0030/hy_306021/AOD"
     ]
 
-    file_type: "AO2D.root"
-    file_path: "/Users/lucamicheletti/cernbox/JPSI/Run3/2023/PbPb/pass2"
+    file_type: "AnalysisResults.root"
+    file_path: "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/data/pass2/LHC22zzh/"
     table_maker_stat: table-maker/Statistics
     table_maker: table-maker/output
     table_maker_dir: ["Muons_muonQualityCuts"]
@@ -32,5 +32,5 @@ input:
 
 output:
     output_fig_name: figures_1/LHC22o_full_stat
-    output_dir_name: /Users/lucamicheletti/cernbox/JPSI/Run3/2023/PbPb/pass2
+    output_dir_name: /Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/data/pass2/LHC22zzh/
     output_file_name: AO2D_reduced_with_flow.root
