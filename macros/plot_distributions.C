@@ -21,6 +21,8 @@ void SetLegend(TLegend *);
 TH1D* projectHistogram(THnSparseF *, double , double , double , double );
 TProfile* projectProfile(THnSparseF *, double , double , double , double , int);
 
+const int rebin = 2;
+
 void plot_track_distributions() {
     gStyle -> SetPalette(kRainBow);
 
@@ -33,6 +35,9 @@ void plot_track_distributions() {
     TH1D *histProjPsi2A[29][9];
     TH1D *histProjPsi2B[29][9];
     TH1D *histProjPsi2C[29][9];
+    TH1D *histProjSumPsi2A[9];
+    TH1D *histProjSumPsi2B[9];
+    TH1D *histProjSumPsi2C[9];
 
     TH1F *histColCounterAll = new TH1F("histColCounterAll", "", 29, 0, 29);
     TH1F *histColCounterAcc = new TH1F("histColCounterAcc", "", 29, 0, 29);
@@ -75,6 +80,16 @@ void plot_track_distributions() {
             histProjPsi2A[index][iCent] = (TH1D*) histPsi2ACentFT0C -> ProjectionY(Form("Psi2ACentFT0C_%i_%i", iCent, run), iCent+1);
             histProjPsi2B[index][iCent] = (TH1D*) histPsi2BCentFT0C -> ProjectionY(Form("Psi2BCentFT0C_%i_%i", iCent, run), iCent+1);
             histProjPsi2C[index][iCent] = (TH1D*) histPsi2CCentFT0C -> ProjectionY(Form("Psi2CCentFT0C_%i_%i", iCent, run), iCent+1);
+
+            if (index == 0) {
+                histProjSumPsi2A[iCent] = (TH1D*) histProjPsi2A[index][iCent] -> Clone(Form("Psi2AProjCentFT0C_%i", iCent));
+                histProjSumPsi2B[iCent] = (TH1D*) histProjPsi2B[index][iCent] -> Clone(Form("Psi2BProjCentFT0C_%i", iCent));
+                histProjSumPsi2C[iCent] = (TH1D*) histProjPsi2C[index][iCent] -> Clone(Form("Psi2CProjCentFT0C_%i", iCent));
+            } else {
+                histProjSumPsi2A[iCent] -> Add(histProjPsi2A[index][iCent]);
+                histProjSumPsi2B[iCent] -> Add(histProjPsi2B[index][iCent]);
+                histProjSumPsi2C[iCent] -> Add(histProjPsi2C[index][iCent]);
+            }
         }
         index++;
     }
@@ -94,6 +109,15 @@ void plot_track_distributions() {
             histProjPsi2A[i][iCent] -> Draw("SAME PLC PMC");
         }
         gPad -> BuildLegend(0.7, 0.4, 0.980, 0.935, "", "L");
+
+        histProjSumPsi2A[iCent] -> SetMarkerStyle(20);
+        histProjSumPsi2A[iCent] -> SetMarkerSize(0.5);
+        histProjSumPsi2A[iCent] -> SetMarkerColor(kBlack);
+        histProjSumPsi2A[iCent] -> SetLineColor(kBlack);
+        histProjSumPsi2A[iCent] -> Scale(1. / histProjSumPsi2A[iCent] -> Integral());
+        histProjSumPsi2A[iCent] -> GetYaxis() -> SetRangeUser(0, 0.03);
+        histProjSumPsi2A[iCent] -> Draw("SAME EP");
+
         latexTitle -> DrawLatex(0.20, 0.80, Form("FT0C %s", centFT0C[iCent].c_str()));
     }
     canvasPsi2A -> SaveAs("LHC23_golden/Psi2A_vs_CentFT0.pdf");
@@ -108,6 +132,15 @@ void plot_track_distributions() {
             histProjPsi2B[i][iCent] -> Draw("SAME PLC PMC");
         }
         gPad -> BuildLegend(0.6, 0.6, 0.980, 0.935, "", "L");
+
+        histProjSumPsi2B[iCent] -> SetMarkerStyle(20);
+        histProjSumPsi2B[iCent] -> SetMarkerSize(0.5);
+        histProjSumPsi2B[iCent] -> SetMarkerColor(kBlack);
+        histProjSumPsi2B[iCent] -> SetLineColor(kBlack);
+        histProjSumPsi2B[iCent] -> Scale(1. / histProjSumPsi2B[iCent] -> Integral());
+        histProjSumPsi2B[iCent] -> GetYaxis() -> SetRangeUser(0, 0.03);
+        histProjSumPsi2B[iCent] -> Draw("SAME EP");
+
         latexTitle -> DrawLatex(0.20, 0.80, Form("FT0C %s", centFT0C[iCent].c_str()));
     }
     canvasPsi2B -> SaveAs("LHC23_golden/Psi2B_vs_CentFT0.pdf");
@@ -122,6 +155,15 @@ void plot_track_distributions() {
             histProjPsi2C[i][iCent] -> Draw("SAME PLC PMC");
         }
         gPad -> BuildLegend(0.6, 0.6, 0.980, 0.935, "", "L");
+
+        histProjSumPsi2C[iCent] -> SetMarkerStyle(20);
+        histProjSumPsi2C[iCent] -> SetMarkerSize(0.5);
+        histProjSumPsi2C[iCent] -> SetMarkerColor(kBlack);
+        histProjSumPsi2C[iCent] -> SetLineColor(kBlack);
+        histProjSumPsi2C[iCent] -> Scale(1. / histProjSumPsi2C[iCent] -> Integral());
+        histProjSumPsi2C[iCent] -> GetYaxis() -> SetRangeUser(0, 0.03);
+        histProjSumPsi2C[iCent] -> Draw("SAME EP");
+
         latexTitle -> DrawLatex(0.20, 0.80, Form("FT0C %s", centFT0C[iCent].c_str()));
     }
     canvasPsi2C -> SaveAs("LHC23_golden/Psi2C_vs_CentFT0.pdf");
@@ -209,6 +251,7 @@ void plot_dimuon_distributions(bool integrated = false) {
             histMassSEPM -> SetMarkerStyle(20);
             histMassSEPM -> SetMarkerSize(0.8);
             histMassSEPM -> SetMarkerColor(kBlack);
+            histMassSEPM -> Rebin(rebin);
 
             histV2SEPM -> SetLineColor(kBlack);
             histV2SEPM -> SetMarkerStyle(20);
@@ -221,6 +264,7 @@ void plot_dimuon_distributions(bool integrated = false) {
             histPtSEPM -> SetMarkerColor(kBlack);
 
             histMassMEPM -> SetLineColor(kAzure+4);
+            histMassMEPM -> Rebin(rebin);
             histV2MEPM -> SetLineColor(kAzure+4);
             histPtMEPM -> SetLineColor(kAzure+4);
 
@@ -688,7 +732,7 @@ TProfile* projectProfile(THnSparseF *histSparse, double minPtRange, double maxPt
     histSparse -> GetAxis(2) -> SetRange(minCentrBin, maxCentrBin);
 
     TH2D *hist2DProj = (TH2D*) histSparse -> Projection(var, 0, "Projection");
-    hist2DProj -> Rebin2D(2);
+    hist2DProj -> Rebin2D(rebin);
     TProfile *histProj = (TProfile*) hist2DProj -> ProfileX(Form("histProj_%i_%1.0f_%1.0f__%1.0f_%1.0f", var, minPtRange, maxPtRange, minCentrRange, maxCentrRange));
     return histProj;
 }
