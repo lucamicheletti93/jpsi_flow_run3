@@ -33,10 +33,22 @@ void plot_track_distributions() {
     TH1D *histProjPsi2A[29][9];
     TH1D *histProjPsi2B[29][9];
     TH1D *histProjPsi2C[29][9];
+
+    TH1F *histColCounterAll = new TH1F("histColCounterAll", "", 29, 0, 29);
+    TH1F *histColCounterAcc = new TH1F("histColCounterAcc", "", 29, 0, 29);
+    TH1F *histCounterTVX = new TH1F("histCounterTVX", "", 29, 0, 29);
+
     int index = 0;
+    double counterColAll = 0;
+    double counterColAcc = 0;
+    double counterTVX = 0;
 
     for (auto const& run : runList) {
         std::cout << run << std::endl;
+        histColCounterAll -> GetXaxis() -> SetBinLabel(index+1, Form("%i", run));
+        histColCounterAcc -> GetXaxis() -> SetBinLabel(index+1, Form("%i", run));
+        histCounterTVX -> GetXaxis() -> SetBinLabel(index+1, Form("%i", run));
+
         TFile *fIn = new TFile(Form("%s/%i/AnalysisResults.root", pathToFiles.c_str(), run));
         TList *list1 = (TList*) fIn -> Get("d-q-event-qvector/outputQA");
         TList *list2 = (TList*) list1 -> FindObject("Event_AfterCuts");
@@ -46,6 +58,18 @@ void plot_track_distributions() {
         histPsi2ACentFT0C -> RebinX(2);
         histPsi2BCentFT0C -> RebinX(2);
         histPsi2CCentFT0C -> RebinX(2);
+
+        TH1F *histTmpColCounterAll = (TH1F*) fIn -> Get("event-selection-task/hColCounterAll");
+        TH1F *histTmpColCounterAcc = (TH1F*) fIn -> Get("event-selection-task/hColCounterAcc");
+        TH1F *histTmpCounterTVX = (TH1F*) fIn -> Get("bc-selection-task/hCounterTVX");
+
+        histColCounterAll -> SetBinContent(index+1, histTmpColCounterAll -> GetBinContent(1));
+        histColCounterAcc -> SetBinContent(index+1, histTmpColCounterAcc -> GetBinContent(1));
+        histCounterTVX -> SetBinContent(index+1, histTmpCounterTVX -> GetBinContent(1));
+
+        counterColAll += histTmpColCounterAll -> GetBinContent(1);
+        counterColAcc += histTmpColCounterAcc -> GetBinContent(1);
+        counterTVX += histTmpCounterTVX -> GetBinContent(1);
         
         for (int iCent = 0;iCent < 9;iCent++) {
             histProjPsi2A[index][iCent] = (TH1D*) histPsi2ACentFT0C -> ProjectionY(Form("Psi2ACentFT0C_%i_%i", iCent, run), iCent+1);
@@ -102,9 +126,27 @@ void plot_track_distributions() {
     }
     canvasPsi2C -> SaveAs("LHC23_golden/Psi2C_vs_CentFT0.pdf");
 
+    TCanvas *canvasColCounterAcc = new TCanvas("canvasColCounterAcc", "", 1000, 600);
+    gStyle -> SetOptStat(0);
+    gPad -> SetLogy(1);
+    histColCounterAll -> SetLineColor(kBlack);
+    histColCounterAll -> GetYaxis() -> SetRangeUser(1e4, 1e11);
+    histColCounterAll -> Draw("H");
+    histColCounterAcc -> Draw("H SAME");
+    latexTitle -> DrawLatex(0.20, 0.80, Form("counter collisions accepted = %1.0f", counterColAcc));
+
+    TCanvas *canvasCounterTVX = new TCanvas("canvasCounterTVX", "", 1000, 600);
+    gStyle -> SetOptStat(0);
+    gPad -> SetLogy();
+    histCounterTVX -> GetYaxis() -> SetRangeUser(1e4, 1e11);
+    histCounterTVX -> Draw("H");
+    latexTitle -> DrawLatex(0.20, 0.80, Form("counter TVX = %1.0f", counterTVX));
+
+
 }
 
 void plot_dimuon_distributions(bool integrated = false) {
+    //string pathToFiles = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/data/pass2/LHC23_golden/dimuon_train_198686_with_cuts";
     string pathToFiles = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/data/pass2/LHC23_golden/dimuon_train_201824_no_cuts";
     //string muonCut = "muonLowPt10SigmaPDCA";
     string muonCut = "matchedMchMid";
@@ -139,6 +181,8 @@ void plot_dimuon_distributions(bool integrated = false) {
         //double maxPtBins[] = {1, 2, 4, 6, 10};
         double minPtBins[] = {0, 1, 2, 3, 5};
         double maxPtBins[] = {1, 2, 3, 5, 10};
+
+        TFile *fOut = new TFile(Form("%s/Histograms_%s_centr_%1.f_%1.f.root", pathToFiles.c_str(), muonCut.c_str(), minCentrBins[0], maxCentrBins[0]), "RECREATE");
 
         for (int iPt = 0;iPt < nPtBins;iPt++) {
             TH1D *histMassSEPM = (TH1D*) projectHistogram(histSEPM, minPtBins[iPt], maxPtBins[iPt], minCentrBins[0], maxCentrBins[0]);
@@ -221,7 +265,16 @@ void plot_dimuon_distributions(bool integrated = false) {
             histPtMEPM -> Draw("H SAME");
 
             canvasMassV2Pt -> SaveAs(Form("LHC23_golden/flow/%s_distrib_centr_%s_%1.0f_%1.0f__%1.0f_%1.0f%s.pdf", muonCut.c_str(), methodName.c_str(), minPtBins[iPt], maxPtBins[iPt], minCentrBins[0], maxCentrBins[0], suffix.c_str()));
+        
+            fOut -> cd();
+            histMassSEPM -> Write();
+            histMassMEPM -> Write();
+            histV2SEPM -> Write();
+            histV2MEPM -> Write();
+            histPtSEPM -> Write();
+            histPtMEPM -> Write();
         }
+        fOut -> Close();
     }
 
     if (integrated) {
@@ -499,9 +552,14 @@ void plot_results () {
 
     TCanvas *canvasPtSigJpsi = new TCanvas("canvasPtSigJpsi", "", 800, 600);
     gPad -> SetLogy(1);
-    histPtSigJpsiRun3 -> Scale(1. / histPtSigJpsiRun3 -> Integral(), "WIDTH");
-    histPtRebinSigJpsiRun3 -> Scale(1. / histPtRebinSigJpsiRun3 -> Integral(), "WIDTH");
-    histPtSigJpsiRun2 -> Scale(1. / histPtSigJpsiRun2 -> Integral(), "WIDTH");
+    //histPtSigJpsiRun3 -> Scale(1. / histPtSigJpsiRun3 -> Integral(), "WIDTH");
+    //histPtRebinSigJpsiRun3 -> Scale(1. / histPtRebinSigJpsiRun3 -> Integral(), "WIDTH");
+    //histPtSigJpsiRun2 -> Scale(1. / histPtSigJpsiRun2 -> Integral(), "WIDTH");
+
+    histPtSigJpsiRun3 -> Scale(1. / 0.30, "WIDTH");
+    histPtRebinSigJpsiRun3 -> Scale(1. / 0.30, "WIDTH");
+    histPtSigJpsiRun2 -> Scale(1. / 0.75, "WIDTH");
+
     histPtSigJpsiRun2 -> SetTitle("");
     histPtSigJpsiRun2 -> GetXaxis() -> SetTitle("#it{p}_{T} (GeV/#it{c})");
     histPtSigJpsiRun2 -> GetYaxis() -> SetTitle("Normalized N_{J/#psi}");
