@@ -5,39 +5,58 @@ void performance_plot() {
     LoadStyle();
     gStyle -> SetOptStat(0);
 
-    TFile *fIn = new TFile("/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/data/pass2/LHC23_golden/dimuon_train_201824_no_cuts/Histograms_matchedMchMid_centr_10_50.root");
-    fIn -> ls();
+    const double resolution = 0.65200005;
+
+    TFile *fIn = new TFile("/Users/lucamicheletti/GITHUB/jpsi_flow_run3/macros/Histograms_10_50_pT_2-3.root");
+
     TH1D *histMassSEPM = (TH1D*) fIn -> Get("histMassSEPM_2_3__10_50");
     TH1D *histV2SEPM = (TH1D*) fIn -> Get("histV2SEPM_2_3__10_50");
-    TH1D *histPtSEPM = (TH1D*) fIn -> Get("histPtSEPM_2_3__10_50");
+    histV2SEPM -> Scale(1. / resolution);
 
     TH1D *histMassMEPM = (TH1D*) fIn -> Get("histMassMEPM_2_3__10_50");
     TH1D *histV2MEPM = (TH1D*) fIn -> Get("histV2MEPM_2_3__10_50");
-    TH1D *histPtMEPM = (TH1D*) fIn -> Get("histPtMEPM_2_3__10_50");
+    histV2MEPM -> Scale(1. / resolution);
+
+    std::cout << histV2MEPM -> GetBinContent(histV2MEPM -> FindBin(3.)) << std::endl;
 
     histMassSEPM -> SetTitle("");
     histV2SEPM -> SetTitle("");
-    histPtSEPM -> SetTitle("");
 
-    histMassSEPM -> GetXaxis() -> SetRangeUser(2., 4.9);
-    histMassSEPM -> GetYaxis() -> SetLabelSize(0.04);
+    histMassSEPM -> GetXaxis() -> SetRangeUser(2.5, 4.5);
+    histMassSEPM -> GetYaxis() -> SetRangeUser(5e3, 1e6);
+    histMassSEPM -> GetYaxis() -> SetLabelSize(0.05);
     histMassSEPM -> GetYaxis() -> SetTitle("d#it{N} / d#it{m}_{#mu#mu} (GeV/#it{c}^{2})^{-1}");
-    histMassSEPM -> GetYaxis() -> SetTitleSize(0.05);
+    histMassSEPM -> GetYaxis() -> SetTitleSize(0.06);
 
-    histV2SEPM -> GetXaxis() -> SetRangeUser(2., 4.9);
-    histV2SEPM -> GetXaxis() -> SetLabelSize(0.06);
-    histV2SEPM -> GetXaxis() -> SetTitle("#it{m}_{#mu#mu} (GeV/#it{c}^{2})");
+    histV2SEPM -> GetXaxis() -> SetRangeUser(2.5, 4.5);
+    histV2SEPM -> GetXaxis() -> SetLabelSize(0.08);
+    histV2SEPM -> GetXaxis() -> SetTitle("");
     histV2SEPM -> GetXaxis() -> SetTitleSize(0.07);
-    histV2SEPM -> GetYaxis() -> SetLabelSize(0.06);
+    histV2SEPM -> GetYaxis() -> SetRangeUser(0.016, 0.074);
+    histV2SEPM -> GetYaxis() -> SetLabelSize(0.07);
     histV2SEPM -> GetYaxis() -> CenterTitle(true);
-    histV2SEPM -> GetYaxis() -> SetTitle("#it{v}_{2} (EP)");
+    histV2SEPM -> GetYaxis() -> SetTitle("#it{v}_{2} {EP, |#Delta#eta| > 1.1}");
     histV2SEPM -> GetYaxis() -> SetTitleOffset(0.75);
-    histV2SEPM -> GetYaxis() -> SetTitleSize(0.07);
+    histV2SEPM -> GetYaxis() -> SetTitleSize(0.08);
 
-    histPtSEPM -> GetXaxis() -> SetRangeUser(2., 4.9);
+    histMassSEPM -> SetLineColor(kBlack);
+    histMassMEPM -> SetLineColor(kBlack);
+    histMassMEPM -> SetMarkerStyle(24);
+    histMassMEPM -> SetMarkerSize(0.80);
+    histV2SEPM -> SetLineColor(kBlack);
+    histV2MEPM -> SetLineColor(kBlack);
+    histV2MEPM -> SetMarkerStyle(24);
+    histV2MEPM -> SetMarkerSize(0.80);
 
-    histV2MEPM -> SetLineColor(kAzure+2);
-    histMassSEPM -> SetLineColor(kAzure+2);
+    TFile *fFuncIn = new TFile("Fit_Function_Cent10-50_Pt2_3Bin.root");
+    TF1 *funcMassSigBkg = (TF1*) fFuncIn -> Get("Mass_Signal_plus_bkg");
+    funcMassSigBkg -> SetLineColor(kRed+1);
+    TF1 *funcMassBkg = (TF1*) fFuncIn -> Get("Mass_bkg");
+    funcMassBkg -> SetLineColor(kBlue+1);
+    TF1 *funcV2SigBkg = (TF1*) fFuncIn -> Get("v2_Signal_plus_bkg");
+    funcV2SigBkg -> SetLineColor(kRed+1);
+    TF1 *funcV2Bkg = (TF1*) fFuncIn -> Get("v2_bkg");
+    funcV2Bkg -> SetLineColor(kBlue+1);
 
     TCanvas *canvasMassV2Pt = new TCanvas("canvasMassV2Pt", "", 800, 1800);
     
@@ -49,13 +68,30 @@ void performance_plot() {
     pad1 -> cd();
     gPad -> SetLogy(true);
     histMassSEPM -> Draw("EP");
-    histMassMEPM -> Draw("H SAME");
+    histMassMEPM -> Draw("EP SAME");
+    funcMassSigBkg -> Draw("SAME");
+    //funcMassBkg -> Draw("SAME");
+
+    TLegend *legendHist = new TLegend(0.58, 0.35, 0.75, 0.60, " ", "brNDC");
+    SetLegend(legendHist);
+    legendHist -> SetTextSize(0.055);
+    legendHist -> SetHeader("Opposite-sign pairs");
+    legendHist -> AddEntry(histMassSEPM,"Same-event", "PL");
+    legendHist -> AddEntry(histMassMEPM,"Mixed-event", "PL");
+    legendHist -> Draw();
+
+    TLegend *legendFunc = new TLegend(0.20, 0.15, 0.37, 0.40, " ", "brNDC");
+    SetLegend(legendFunc);
+    legendFunc -> SetTextSize(0.055);
+    legendFunc -> AddEntry(funcV2SigBkg,"Signal", "L");
+    legendFunc -> AddEntry(funcV2Bkg,"Background", "L");
+    legendFunc -> Draw();
 
     TLatex *latexTitle = new TLatex();
     latexTitle -> SetTextSize(0.06);
     latexTitle -> SetNDC();
     latexTitle -> SetTextFont(42);
-    latexTitle -> DrawLatex(0.22, 0.87, "ALICE performance, Pb-Pb #sqrt{#it{s}_{NN}} = 5.36 TeV");
+    latexTitle -> DrawLatex(0.22, 0.87, "ALICE performance, Pb#minusPb #sqrt{#it{s}_{NN}} = 5.36 TeV");
     latexTitle -> DrawLatex(0.50, 0.77, "J/#psi #rightarrow #mu^{+}#mu^{-}, 2.5 < y < 4");
     latexTitle -> DrawLatex(0.50, 0.67, "10#minus50\%, 2 < #it{p}_{T} < 3 GeV/#it{c}");
 
@@ -65,11 +101,19 @@ void performance_plot() {
     pad2 -> Draw();
     pad2 -> cd();
     histV2SEPM -> Draw("EP");
-    histV2MEPM -> Draw("H SAME");
+    histV2MEPM -> Draw("EP SAME");
+    funcV2Bkg -> Draw("SAME");
+    funcV2SigBkg -> Draw("SAME");
+
+    canvasMassV2Pt -> cd();
+    TLatex *latexAxis = new TLatex();
+    latexAxis -> SetTextSize(0.04);
+    latexAxis -> SetNDC();
+    latexAxis -> SetTextFont(42);
+    latexAxis -> DrawLatex(0.70, 0.030, "#it{m}_{#mu#mu} (GeV/#it{c}^{2})");
 
     canvasMassV2Pt -> Update();
-    canvasMassV2Pt -> SaveAs("performance_plot_test.pdf");
-
+    canvasMassV2Pt -> SaveAs("flow_performance.pdf");
 }
 ////////////////////////////////////////////////////////////////////////////////
 void LoadStyle(){
