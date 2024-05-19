@@ -7,7 +7,7 @@ void performance_plot() {
 
     const double resolution = 0.65200005;
 
-    TFile *fIn = new TFile("/Users/lucamicheletti/GITHUB/jpsi_flow_run3/macros/Histograms_10_50_pT_2-3.root");
+    TFile *fIn = new TFile("Histograms_10_50_pT_2-3.root");
 
     TH1D *histMassSEPM = (TH1D*) fIn -> Get("histMassSEPM_2_3__10_50");
     TH1D *histV2SEPM = (TH1D*) fIn -> Get("histV2SEPM_2_3__10_50");
