@@ -48,7 +48,7 @@ void performance_plot() {
     histV2MEPM -> SetMarkerStyle(24);
     histV2MEPM -> SetMarkerSize(0.80);
 
-    TFile *fFuncIn = new TFile("Fit_Function_Cent10-50_Pt2_3Bin_new.root");
+    TFile *fFuncIn = new TFile("Fit_Function_Cent10-50_Pt2_3Bin.root");
     TF1 *funcMassSigBkg = (TF1*) fFuncIn -> Get("Mass_Signal_plus_bkg");
     funcMassSigBkg -> SetLineColor(kRed+1);
     TF1 *funcMassBkg = (TF1*) fFuncIn -> Get("Mass_bkg_noscale");
