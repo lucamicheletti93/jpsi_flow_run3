@@ -51,7 +51,7 @@ void performance_plot() {
     TFile *fFuncIn = new TFile("Fit_Function_Cent10-50_Pt2_3Bin.root");
     TF1 *funcMassSigBkg = (TF1*) fFuncIn -> Get("Mass_Signal_plus_bkg");
     funcMassSigBkg -> SetLineColor(kRed+1);
-    TF1 *funcMassBkg = (TF1*) fFuncIn -> Get("Mass_bkg");
+    TF1 *funcMassBkg = (TF1*) fFuncIn -> Get("Mass_bkg_noscale");
     funcMassBkg -> SetLineColor(kBlue+1);
     TF1 *funcV2SigBkg = (TF1*) fFuncIn -> Get("v2_Signal_plus_bkg");
     funcV2SigBkg -> SetLineColor(kRed+1);
@@ -70,7 +70,7 @@ void performance_plot() {
     histMassSEPM -> Draw("EP");
     histMassMEPM -> Draw("EP SAME");
     funcMassSigBkg -> Draw("SAME");
-    //funcMassBkg -> Draw("SAME");
+    funcMassBkg -> Draw("SAME");
 
     TLegend *legendHist = new TLegend(0.58, 0.35, 0.75, 0.60, " ", "brNDC");
     SetLegend(legendHist);
