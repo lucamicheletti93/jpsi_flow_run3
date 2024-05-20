@@ -35,7 +35,7 @@ void performance_plot() {
     histV2SEPM -> GetYaxis() -> SetRangeUser(0.016, 0.074);
     histV2SEPM -> GetYaxis() -> SetLabelSize(0.07);
     histV2SEPM -> GetYaxis() -> CenterTitle(true);
-    histV2SEPM -> GetYaxis() -> SetTitle("#it{v}_{2} {EP, |#Delta#eta| > 1.1}");
+    histV2SEPM -> GetYaxis() -> SetTitle("#it{v}_{2} {EP, |#Delta#eta| > 2.5}");
     histV2SEPM -> GetYaxis() -> SetTitleOffset(0.75);
     histV2SEPM -> GetYaxis() -> SetTitleSize(0.08);
 
@@ -48,7 +48,7 @@ void performance_plot() {
     histV2MEPM -> SetMarkerStyle(24);
     histV2MEPM -> SetMarkerSize(0.80);
 
-    TFile *fFuncIn = new TFile("Fit_Function_Cent10-50_Pt2_3Bin.root");
+    TFile *fFuncIn = new TFile("Fit_Function_Cent10-50_Pt2_3Bin_new.root");
     TF1 *funcMassSigBkg = (TF1*) fFuncIn -> Get("Mass_Signal_plus_bkg");
     funcMassSigBkg -> SetLineColor(kRed+1);
     TF1 *funcMassBkg = (TF1*) fFuncIn -> Get("Mass_bkg_noscale");
@@ -69,8 +69,8 @@ void performance_plot() {
     gPad -> SetLogy(true);
     histMassSEPM -> Draw("EP");
     histMassMEPM -> Draw("EP SAME");
-    funcMassSigBkg -> Draw("SAME");
     funcMassBkg -> Draw("SAME");
+    funcMassSigBkg -> Draw("SAME");
 
     TLegend *legendHist = new TLegend(0.58, 0.35, 0.75, 0.60, " ", "brNDC");
     SetLegend(legendHist);
