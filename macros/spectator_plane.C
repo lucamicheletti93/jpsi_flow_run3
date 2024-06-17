@@ -1,7 +1,7 @@
 void SetProfile(TProfile *, int , int , int , double );
 
 void spectator_plane() {
-    string pathToFiles = "/Users/lucamicheletti/alice/local_train_test_zdc";
+    string pathToFiles = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/data/pass3/LHC23zzh_small/train_225020_spectator_plane";
     TFile *fIn = new TFile(Form("%s/AnalysisResults.root", pathToFiles.c_str()));
 
     TList *list1 = (TList*) fIn -> Get("d-q-event-qvector/outputQA");
@@ -19,6 +19,9 @@ void spectator_plane() {
     TH2D *histQ1ZNACYYCentFT0C = (TH2D*)list2 -> FindObject("Q1ZNACYY_CentFT0C");
     TH2D *histQ1ZNACYXCentFT0C = (TH2D*)list2 -> FindObject("Q1ZNACYX_CentFT0C");
     TH2D *histQ1ZNACXYCentFT0C = (TH2D*)list2 -> FindObject("Q1ZNACXY_CentFT0C");
+
+    TH2D *histIntercalibZNACentFT0C = (TH2D*)list2 -> FindObject("IntercalibZNA_CentFT0C");
+    TH2D *histIntercalibZNCCentFT0C = (TH2D*)list2 -> FindObject("IntercalibZNC_CentFT0C");
 
     histQ1ZNAXCentFT0C -> GetYaxis() -> SetRangeUser(-2, 2);
     histQ1ZNAYCentFT0C -> GetYaxis() -> SetRangeUser(-2, 2);
@@ -40,6 +43,9 @@ void spectator_plane() {
     TProfile *profQ1ZNACYXCentFT0C = (TProfile*) histQ1ZNACYXCentFT0C -> ProfileX("profQ1ZNACYXCentFT0C");
     TProfile *profQ1ZNACXYCentFT0C = (TProfile*) histQ1ZNACXYCentFT0C -> ProfileX("profQ1ZNACXYCentFT0C");
 
+    TProfile *profIntercalibZNACentFT0C = (TProfile*) histIntercalibZNACentFT0C -> ProfileX("profIntercalibZNACentFT0C");
+    TProfile *profIntercalibZNCCentFT0C = (TProfile*) histIntercalibZNCCentFT0C -> ProfileX("profIntercalibZNCCentFT0C");
+
     SetProfile(profQ1ZNAXCentFT0C, 1, 1, 20, 0.8);
     SetProfile(profQ1ZNAYCentFT0C, 1, 1, 20, 0.8);
     SetProfile(profQ1ZNCXCentFT0C, 1, 1, 20, 0.8);
@@ -49,6 +55,9 @@ void spectator_plane() {
     SetProfile(profQ1ZNACYYCentFT0C, 1, 1, 20, 0.5);
     SetProfile(profQ1ZNACYXCentFT0C, 1, 1, 20, 0.5);
     SetProfile(profQ1ZNACXYCentFT0C, 1, 1, 20, 0.5);
+
+    SetProfile(profIntercalibZNACentFT0C, 1, 1, 20, 0.5);
+    SetProfile(profIntercalibZNCCentFT0C, 1, 1, 20, 0.5);
 
     TLine *lineUnity = new TLine(0, 0, 90, 0);
     lineUnity -> SetLineColor(kGray+2);
@@ -136,6 +145,23 @@ void spectator_plane() {
         histProj -> GetYaxis() -> SetRangeUser(-3., 3.);
         histProj -> Draw("COLZ");
     }
+
+    TCanvas *canvasIntercalibZNACentFT0C = new TCanvas("canvasIntercalibZNACentFT0C", "", 800, 600);
+    histIntercalibZNACentFT0C -> Draw("COLZ");
+    lineUnity -> Draw("SAME");
+    profIntercalibZNACentFT0C -> Draw("EP SAME");
+
+    TCanvas *canvasIntercalibZNCCentFT0C = new TCanvas("canvasIntercalibZNCCentFT0C", "", 800, 600);
+    histIntercalibZNCCentFT0C -> Draw("COLZ");
+    lineUnity -> Draw("SAME");
+    profIntercalibZNCCentFT0C -> Draw("EP SAME");
+
+    canvasQ1ZNCentFT0C -> SaveAs("plots/Q1ZNCentFT0C.pdf");
+    canvasQ1ZNACCentFT0C -> SaveAs("plots/Q1ZNACCentFT0C.pdf");
+    canvasQ1ZNA -> SaveAs("plots/Q1ZNA.pdf");
+    canvasQ1ZNC -> SaveAs("plots/Q1ZNC.pdf");
+    canvasIntercalibZNACentFT0C -> SaveAs("plots/IntercalibZNACentFT0C.pdf");
+    canvasIntercalibZNCCentFT0C -> SaveAs("plots/IntercalibZNCCentFT0C.pdf");
 }
 ////////////////////////////////////////////////////////////////////////////////
 void SetProfile(TProfile *prof, int color, int lineWidth, int markerStyle, double markerSize) {
