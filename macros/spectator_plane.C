@@ -1,7 +1,7 @@
 void SetProfile(TProfile *, int , int , int , double );
 
 void spectator_plane() {
-    string pathToFiles = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/data/pass3/LHC23zzh_small/train_225020_spectator_plane";
+    string pathToFiles = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/data/pass3/LHC23zzh_small/train_225020_spectator_plane/544122";
     TFile *fIn = new TFile(Form("%s/AnalysisResults.root", pathToFiles.c_str()));
 
     TList *list1 = (TList*) fIn -> Get("d-q-event-qvector/outputQA");
