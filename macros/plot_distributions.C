@@ -2,6 +2,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <TSystem.h>
 #include "TCanvas.h"
 #include "TLegend.h"
 #include "TLine.h"
@@ -28,6 +29,7 @@ void plot_track_distributions() {
     gStyle -> SetPalette(kRainBow);
 
     // Bad run: 544091
+    /*
     const int nRuns = 28;
     int runList[] = {544013, 544028, 544032, 544091, 544095, 544098, 544116, 544121, 544122, 544123, 
                     544124, 544184, 544185, 544389, 544390, 544391, 544392, 544451, 544454, 544474, 
@@ -35,6 +37,7 @@ void plot_track_distributions() {
     string pathToFiles = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/data/pass3/LHC23_golden/train_230426/merged_files";
     string pathOut = "LHC23_golden/pass3";
     string rootDirName = "Event_AfterCuts_centralFW";
+    */
 
     /*
     const int nRuns = 29;
@@ -44,6 +47,7 @@ void plot_track_distributions() {
     string pathToFiles = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/data/pass2/LHC23_golden/train_195781";
     string pathOut = "LHC23_golden/pass2";
     string rootDirName = "Event_AfterCuts";
+    bool skipZDC = true;
     */
 
     /*
@@ -52,7 +56,22 @@ void plot_track_distributions() {
     string pathToFiles = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/data/pass3/LHC23zzh_small/train_225020_spectator_plane";
     string pathOut = "LHC23zzh_small/pass3";
     string rootDirName = "Event_AfterCuts_centralFW";
+    bool skipZDC = false;
     */
+
+    string pathToFiles = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/data/pass3/LHC23_full/train_230427";
+    ifstream fRunList(Form("%s/run_list.txt", pathToFiles.c_str()));
+    int nRuns = 100;
+    int runNumber;
+    vector<int> runList;
+    runList.reserve(100);
+    while(!fRunList.eof()) {
+        fRunList >> runNumber;
+        runList.push_back(runNumber);
+    }
+    string pathOut = "LHC23_full/pass3";
+    string rootDirName = "Event_AfterCuts_centralFW";
+    bool skipZDC = false;
 
     string centFT0C[] = {"0 - 10%", "10 - 20%", "20 - 30%", "30 - 40%", "40 - 50%", "50 - 60%", "60 - 70%", "70 - 80%", "80 - 90%"};
     TH1D *histProjPsi2A[nRuns][9];
@@ -78,6 +97,8 @@ void plot_track_distributions() {
     TH1F *histCounterTVX = new TH1F("histCounterTVX", "", 29, 0, 29);
     TH1F *histCounterLumiTCE = new TH1F("histCounterLumiTCE", "", 29, 0, 29);
 
+    TH1D *histCentFT0C = new TH1D("histCentFT0C", "", 100, 0, 100);
+
     int index = 0;
     double counterColAll = 0;
     double counterColAcc = 0;
@@ -85,10 +106,16 @@ void plot_track_distributions() {
     double counterLumiTCE = 0;
 
     for (auto const& run : runList) {
+        std::cout << "Run = " << run << std::endl;
         histColCounterAll -> GetXaxis() -> SetBinLabel(index+1, Form("%i", run));
         histColCounterAcc -> GetXaxis() -> SetBinLabel(index+1, Form("%i", run));
         histCounterTVX -> GetXaxis() -> SetBinLabel(index+1, Form("%i", run));
         histCounterLumiTCE -> GetXaxis() -> SetBinLabel(index+1, Form("%i", run));
+
+        string filePath = Form("%s/%i/AnalysisResults.root", pathToFiles.c_str(), run);
+        if (gSystem -> AccessPathName(filePath.c_str())) {
+            continue;
+        }
 
         TFile *fIn = new TFile(Form("%s/%i/AnalysisResults.root", pathToFiles.c_str(), run));
         TList *list1 = (TList*) fIn -> Get("d-q-event-qvector/outputQA");
@@ -97,36 +124,43 @@ void plot_track_distributions() {
         TH2D *histPsi2BCentFT0C = (TH2D*)list2 -> FindObject("Psi2B_CentFT0C");
         TH2D *histPsi2CCentFT0C = (TH2D*)list2 -> FindObject("Psi2C_CentFT0C");
 
-        // Spectator plane variables
-        THnSparseF* histSparseZNA = (THnSparseF*) list2 -> FindObject("Q1ZNAX_Q1ZNAY_CentFT0C");
-        THnSparseF* histSparseZNC = (THnSparseF*) list2 -> FindObject("Q1ZNCX_Q1ZNCY_CentFT0C");
+        TList *list3 = (TList*) fIn -> Get("table-maker/output");
+        TList *list4 = (TList*) list3 -> FindObject("Event_AfterCuts");
+        TH1D *histTmpCentFT0C = (TH1D*)list4 -> FindObject("CentFT0C");
+        histCentFT0C -> Add(histTmpCentFT0C);
 
-        TH2D *histQ1ZNAXCentFT0C = (TH2D*) histSparseZNA -> Projection(0, 2, "");
-        TH2D *histQ1ZNAYCentFT0C = (TH2D*) histSparseZNA -> Projection(1, 2, "");
-        TH2D *histQ1ZNCXCentFT0C = (TH2D*) histSparseZNC -> Projection(0, 2, "");
-        TH2D *histQ1ZNCYCentFT0C = (TH2D*) histSparseZNC -> Projection(1, 2, "");
+        if (!skipZDC) {
+            // Spectator plane variables
+            THnSparseF* histSparseZNA = (THnSparseF*) list2 -> FindObject("Q1ZNAX_Q1ZNAY_CentFT0C");
+            THnSparseF* histSparseZNC = (THnSparseF*) list2 -> FindObject("Q1ZNCX_Q1ZNCY_CentFT0C");
 
-        TH2D *histQ1ZNACXXCentFT0C = (TH2D*) list2 -> FindObject("Q1ZNACXX_CentFT0C");
-        TH2D *histQ1ZNACYYCentFT0C = (TH2D*) list2 -> FindObject("Q1ZNACYY_CentFT0C");
-        TH2D *histQ1ZNACYXCentFT0C = (TH2D*) list2 -> FindObject("Q1ZNACYX_CentFT0C");
-        TH2D *histQ1ZNACXYCentFT0C = (TH2D*) list2 -> FindObject("Q1ZNACXY_CentFT0C");
+            TH2D *histQ1ZNAXCentFT0C = (TH2D*) histSparseZNA -> Projection(0, 2, "");
+            TH2D *histQ1ZNAYCentFT0C = (TH2D*) histSparseZNA -> Projection(1, 2, "");
+            TH2D *histQ1ZNCXCentFT0C = (TH2D*) histSparseZNC -> Projection(0, 2, "");
+            TH2D *histQ1ZNCYCentFT0C = (TH2D*) histSparseZNC -> Projection(1, 2, "");
 
-        TH2D *histIntercalibZNACentFT0C = (TH2D*)list2 -> FindObject("IntercalibZNA_CentFT0C");
-        TH2D *histIntercalibZNCCentFT0C = (TH2D*)list2 -> FindObject("IntercalibZNC_CentFT0C");
+            TH2D *histQ1ZNACXXCentFT0C = (TH2D*) list2 -> FindObject("Q1ZNACXX_CentFT0C");
+            TH2D *histQ1ZNACYYCentFT0C = (TH2D*) list2 -> FindObject("Q1ZNACYY_CentFT0C");
+            TH2D *histQ1ZNACYXCentFT0C = (TH2D*) list2 -> FindObject("Q1ZNACYX_CentFT0C");
+            TH2D *histQ1ZNACXYCentFT0C = (TH2D*) list2 -> FindObject("Q1ZNACXY_CentFT0C");
+
+            TH2D *histIntercalibZNACentFT0C = (TH2D*)list2 -> FindObject("IntercalibZNA_CentFT0C");
+            TH2D *histIntercalibZNCCentFT0C = (TH2D*)list2 -> FindObject("IntercalibZNC_CentFT0C");
 
 
-        profQ1ZNAXCentFT0C[index] = (TProfile*) histQ1ZNAXCentFT0C -> ProfileX(Form("profQ1ZNAXCentFT0C_%i", run));
-        profQ1ZNAYCentFT0C[index] = (TProfile*) histQ1ZNAYCentFT0C -> ProfileX(Form("profQ1ZNAYCentFT0C_%i", run));
-        profQ1ZNCXCentFT0C[index] = (TProfile*) histQ1ZNCXCentFT0C -> ProfileX(Form("profQ1ZNCXCentFT0C_%i", run));
-        profQ1ZNCYCentFT0C[index] = (TProfile*) histQ1ZNCYCentFT0C -> ProfileX(Form("profQ1ZNCYCentFT0C_%i", run));
+            profQ1ZNAXCentFT0C[index] = (TProfile*) histQ1ZNAXCentFT0C -> ProfileX(Form("profQ1ZNAXCentFT0C_%i", run));
+            profQ1ZNAYCentFT0C[index] = (TProfile*) histQ1ZNAYCentFT0C -> ProfileX(Form("profQ1ZNAYCentFT0C_%i", run));
+            profQ1ZNCXCentFT0C[index] = (TProfile*) histQ1ZNCXCentFT0C -> ProfileX(Form("profQ1ZNCXCentFT0C_%i", run));
+            profQ1ZNCYCentFT0C[index] = (TProfile*) histQ1ZNCYCentFT0C -> ProfileX(Form("profQ1ZNCYCentFT0C_%i", run));
 
-        profQ1ZNACXXCentFT0C[index] = (TProfile*) histQ1ZNACXXCentFT0C -> ProfileX(Form("profQ1ZNACXXCentFT0C_%i", run));
-        profQ1ZNACYYCentFT0C[index] = (TProfile*) histQ1ZNACYYCentFT0C -> ProfileX(Form("profQ1ZNACYYCentFT0C_%i", run));
-        profQ1ZNACYXCentFT0C[index] = (TProfile*) histQ1ZNACYXCentFT0C -> ProfileX(Form("profQ1ZNACYXCentFT0C_%i", run));
-        profQ1ZNACXYCentFT0C[index] = (TProfile*) histQ1ZNACXYCentFT0C -> ProfileX(Form("profQ1ZNACXYCentFT0C_%i", run));
+            profQ1ZNACXXCentFT0C[index] = (TProfile*) histQ1ZNACXXCentFT0C -> ProfileX(Form("profQ1ZNACXXCentFT0C_%i", run));
+            profQ1ZNACYYCentFT0C[index] = (TProfile*) histQ1ZNACYYCentFT0C -> ProfileX(Form("profQ1ZNACYYCentFT0C_%i", run));
+            profQ1ZNACYXCentFT0C[index] = (TProfile*) histQ1ZNACYXCentFT0C -> ProfileX(Form("profQ1ZNACYXCentFT0C_%i", run));
+            profQ1ZNACXYCentFT0C[index] = (TProfile*) histQ1ZNACXYCentFT0C -> ProfileX(Form("profQ1ZNACXYCentFT0C_%i", run));
 
-        profIntercalibZNACentFT0C[index] = (TProfile*) histIntercalibZNACentFT0C -> ProfileX(Form("profIntercalibZNACentFT0C_%i", run));
-        profIntercalibZNCCentFT0C[index] = (TProfile*) histIntercalibZNCCentFT0C -> ProfileX(Form("profIntercalibZNCCentFT0C_%i", run));
+            profIntercalibZNACentFT0C[index] = (TProfile*) histIntercalibZNACentFT0C -> ProfileX(Form("profIntercalibZNACentFT0C_%i", run));
+            profIntercalibZNCCentFT0C[index] = (TProfile*) histIntercalibZNCCentFT0C -> ProfileX(Form("profIntercalibZNCCentFT0C_%i", run));
+        }
 
         histPsi2ACentFT0C -> RebinX(2);
         histPsi2BCentFT0C -> RebinX(2);
@@ -176,7 +210,7 @@ void plot_track_distributions() {
     canvasPsi2A -> Divide(3, 3);
     for (int iCent = 0;iCent < 9;iCent++) {
         canvasPsi2A -> cd(iCent+1);
-        for (int i = 0;i < nRuns;i++) {
+        for (int i = 0;i < index;i++) {
             histProjPsi2A[i][iCent] -> Scale(1. / histProjPsi2A[i][iCent] -> Integral());
             histProjPsi2A[i][iCent] -> GetYaxis() -> SetRangeUser(0, 0.03);
             histProjPsi2A[i][iCent] -> Draw("SAME PLC PMC");
@@ -199,7 +233,7 @@ void plot_track_distributions() {
     canvasPsi2B -> Divide(3, 3);
     for (int iCent = 0;iCent < 9;iCent++) {
         canvasPsi2B -> cd(iCent+1);
-        for (int i = 0;i < nRuns;i++) {
+        for (int i = 0;i < index;i++) {
             histProjPsi2B[i][iCent] -> Scale(1. / histProjPsi2B[i][iCent] -> Integral());
             histProjPsi2B[i][iCent] -> GetYaxis() -> SetRangeUser(0, 0.03);
             histProjPsi2B[i][iCent] -> Draw("SAME PLC PMC");
@@ -222,7 +256,7 @@ void plot_track_distributions() {
     canvasPsi2C -> Divide(3, 3);
     for (int iCent = 0;iCent < 9;iCent++) {
         canvasPsi2C -> cd(iCent+1);
-        for (int i = 0;i < nRuns;i++) {
+        for (int i = 0;i < index;i++) {
             histProjPsi2C[i][iCent] -> Scale(1. / histProjPsi2C[i][iCent] -> Integral());
             histProjPsi2C[i][iCent] -> GetYaxis() -> SetRangeUser(0, 0.03);
             histProjPsi2C[i][iCent] -> Draw("SAME PLC PMC");
@@ -242,95 +276,97 @@ void plot_track_distributions() {
     canvasPsi2C -> SaveAs(Form("%s/Psi2C_vs_CentFT0.pdf", pathOut.c_str()));
 
 
-    TCanvas *canvasProfQ1ZNAC = new TCanvas("canvasProfQ1ZNAC", "", 1200, 1200);
-    canvasProfQ1ZNAC -> Divide(2, 2);
-    canvasProfQ1ZNAC -> cd(1);
-    for (int i = 0;i < nRuns;i++) {
-        profQ1ZNAXCentFT0C[i] -> GetYaxis() -> SetRangeUser(-0.5, 0.5);
-        profQ1ZNAXCentFT0C[i] -> GetYaxis() -> SetTitle("Q_{1,x}^{ZNA}");
-        profQ1ZNAXCentFT0C[i] -> SetTitle(Form("%i", runList[i]));
-        profQ1ZNAXCentFT0C[i] -> Draw("SAME PLC PMC");
-    }
-    gPad -> BuildLegend(0.75, 0.6, 0.935, 0.935, "", "L");
-    canvasProfQ1ZNAC -> cd(2);
-    for (int i = 0;i < nRuns;i++) {
-        profQ1ZNAYCentFT0C[i] -> GetYaxis() -> SetRangeUser(-0.5, 0.5);
-        profQ1ZNAYCentFT0C[i] -> GetYaxis() -> SetTitle("Q_{1,y}^{ZNA}");
-        profQ1ZNAYCentFT0C[i] -> SetTitle(Form("%i", runList[i]));
-        profQ1ZNAYCentFT0C[i] -> Draw("SAME PLC PMC");
-    }
-    gPad -> BuildLegend(0.75, 0.6, 0.935, 0.935, "", "L");
-    canvasProfQ1ZNAC -> cd(3);
-    for (int i = 0;i < nRuns;i++) {
-        profQ1ZNCXCentFT0C[i] -> GetYaxis() -> SetRangeUser(-0.5, 0.5);
-        profQ1ZNCXCentFT0C[i] -> GetYaxis() -> SetTitle("Q_{1,x}^{ZNC}");
-        profQ1ZNCXCentFT0C[i] -> SetTitle(Form("%i", runList[i]));
-        profQ1ZNCXCentFT0C[i] -> Draw("SAME PLC PMC");
-    }
-    gPad -> BuildLegend(0.75, 0.6, 0.935, 0.935, "", "L");
-    canvasProfQ1ZNAC -> cd(4);
-    for (int i = 0;i < nRuns;i++) {
-        profQ1ZNCYCentFT0C[i] -> GetYaxis() -> SetRangeUser(-0.5, 0.5);
-        profQ1ZNCYCentFT0C[i] -> GetYaxis() -> SetTitle("Q_{1,y}^{ZNC}");
-        profQ1ZNCYCentFT0C[i] -> SetTitle(Form("%i", runList[i]));
-        profQ1ZNCYCentFT0C[i] -> Draw("SAME PLC PMC");
-    }
-    gPad -> BuildLegend(0.75, 0.6, 0.935, 0.935, "", "L");
+    if (!skipZDC) {
+        TCanvas *canvasProfQ1ZNAC = new TCanvas("canvasProfQ1ZNAC", "", 1200, 1200);
+        canvasProfQ1ZNAC -> Divide(2, 2);
+        canvasProfQ1ZNAC -> cd(1);
+        for (int i = 0;i < index;i++) {
+            profQ1ZNAXCentFT0C[i] -> GetYaxis() -> SetRangeUser(-0.5, 0.5);
+            profQ1ZNAXCentFT0C[i] -> GetYaxis() -> SetTitle("Q_{1,x}^{ZNA}");
+            profQ1ZNAXCentFT0C[i] -> SetTitle(Form("%i", runList[i]));
+            profQ1ZNAXCentFT0C[i] -> Draw("SAME PLC PMC");
+        }
+        gPad -> BuildLegend(0.75, 0.6, 0.935, 0.935, "", "L");
+        canvasProfQ1ZNAC -> cd(2);
+        for (int i = 0;i < index;i++) {
+            profQ1ZNAYCentFT0C[i] -> GetYaxis() -> SetRangeUser(-0.5, 0.5);
+            profQ1ZNAYCentFT0C[i] -> GetYaxis() -> SetTitle("Q_{1,y}^{ZNA}");
+            profQ1ZNAYCentFT0C[i] -> SetTitle(Form("%i", runList[i]));
+            profQ1ZNAYCentFT0C[i] -> Draw("SAME PLC PMC");
+        }
+        gPad -> BuildLegend(0.75, 0.6, 0.935, 0.935, "", "L");
+        canvasProfQ1ZNAC -> cd(3);
+        for (int i = 0;i < index;i++) {
+            profQ1ZNCXCentFT0C[i] -> GetYaxis() -> SetRangeUser(-0.5, 0.5);
+            profQ1ZNCXCentFT0C[i] -> GetYaxis() -> SetTitle("Q_{1,x}^{ZNC}");
+            profQ1ZNCXCentFT0C[i] -> SetTitle(Form("%i", runList[i]));
+            profQ1ZNCXCentFT0C[i] -> Draw("SAME PLC PMC");
+        }
+        gPad -> BuildLegend(0.75, 0.6, 0.935, 0.935, "", "L");
+        canvasProfQ1ZNAC -> cd(4);
+        for (int i = 0;i < index;i++) {
+            profQ1ZNCYCentFT0C[i] -> GetYaxis() -> SetRangeUser(-0.5, 0.5);
+            profQ1ZNCYCentFT0C[i] -> GetYaxis() -> SetTitle("Q_{1,y}^{ZNC}");
+            profQ1ZNCYCentFT0C[i] -> SetTitle(Form("%i", runList[i]));
+            profQ1ZNCYCentFT0C[i] -> Draw("SAME PLC PMC");
+        }
+        gPad -> BuildLegend(0.75, 0.6, 0.935, 0.935, "", "L");
 
-    canvasProfQ1ZNAC -> SaveAs(Form("%s/Q1ZNAC_vs_CentFT0.pdf", pathOut.c_str()));
+        canvasProfQ1ZNAC -> SaveAs(Form("%s/Q1ZNAC_vs_CentFT0.pdf", pathOut.c_str()));
 
-    TCanvas *canvasProfCrossQ1ZNAC = new TCanvas("canvasProfCrossQ1ZNAC", "", 1200, 1200);
-    canvasProfCrossQ1ZNAC -> Divide(2, 2);
-    canvasProfCrossQ1ZNAC -> cd(1);
-    for (int i = 0;i < nRuns;i++) {
-        profQ1ZNACXXCentFT0C[i] -> GetYaxis() -> SetRangeUser(-0.2, 0.2);
-        profQ1ZNACXXCentFT0C[i] -> GetYaxis() -> SetTitle("<Q_{1,x} (ZNA) #dot Q_{1,x} (ZNC)>");
-        profQ1ZNACXXCentFT0C[i] -> Draw("SAME PLC PMC");
-    }
-    gPad -> BuildLegend(0.15, 0.6, 0.4, 0.9, "", "L");
-    canvasProfCrossQ1ZNAC -> cd(2);
-    for (int i = 0;i < nRuns;i++) {
-        profQ1ZNACYYCentFT0C[i] -> GetYaxis() -> SetRangeUser(-0.2, 0.2);
-        profQ1ZNACYYCentFT0C[i] -> GetYaxis() -> SetTitle("<Q_{1,y} (ZNA) #dot Q_{1,y} (ZNC)>");
-        profQ1ZNACYYCentFT0C[i] -> Draw("SAME PLC PMC");
-    }
-    gPad -> BuildLegend(0.15, 0.6, 0.4, 0.9, "", "L");
-    canvasProfCrossQ1ZNAC -> cd(3);
-    for (int i = 0;i < nRuns;i++) {
-        profQ1ZNACYXCentFT0C[i] -> GetYaxis() -> SetRangeUser(-0.2, 0.2);
-        profQ1ZNACYXCentFT0C[i] -> GetYaxis() -> SetTitle("<Q_{1,y} (ZNA) #dot Q_{1,x} (ZNC)>");
-        profQ1ZNACYXCentFT0C[i] -> Draw("SAME PLC PMC");
-    }
-    gPad -> BuildLegend(0.15, 0.6, 0.4, 0.9, "", "L");
-    canvasProfCrossQ1ZNAC -> cd(4);
-    for (int i = 0;i < nRuns;i++) {
-        profQ1ZNACXYCentFT0C[i] -> GetYaxis() -> SetRangeUser(-0.2, 0.2);
-        profQ1ZNACXYCentFT0C[i] -> GetYaxis() -> SetTitle("<Q_{1,x} (ZNA) #dot Q_{1,y} (ZNC)>");
-        profQ1ZNACXYCentFT0C[i] -> Draw("SAME PLC PMC");
-    }
-    gPad -> BuildLegend(0.15, 0.6, 0.4, 0.9, "", "L");
+        TCanvas *canvasProfCrossQ1ZNAC = new TCanvas("canvasProfCrossQ1ZNAC", "", 1200, 1200);
+        canvasProfCrossQ1ZNAC -> Divide(2, 2);
+        canvasProfCrossQ1ZNAC -> cd(1);
+        for (int i = 0;i < index;i++) {
+            profQ1ZNACXXCentFT0C[i] -> GetYaxis() -> SetRangeUser(-0.2, 0.2);
+            profQ1ZNACXXCentFT0C[i] -> GetYaxis() -> SetTitle("<Q_{1,x} (ZNA) #dot Q_{1,x} (ZNC)>");
+            profQ1ZNACXXCentFT0C[i] -> Draw("SAME PLC PMC");
+        }
+        gPad -> BuildLegend(0.15, 0.6, 0.4, 0.9, "", "L");
+        canvasProfCrossQ1ZNAC -> cd(2);
+        for (int i = 0;i < index;i++) {
+            profQ1ZNACYYCentFT0C[i] -> GetYaxis() -> SetRangeUser(-0.2, 0.2);
+            profQ1ZNACYYCentFT0C[i] -> GetYaxis() -> SetTitle("<Q_{1,y} (ZNA) #dot Q_{1,y} (ZNC)>");
+            profQ1ZNACYYCentFT0C[i] -> Draw("SAME PLC PMC");
+        }
+        gPad -> BuildLegend(0.15, 0.6, 0.4, 0.9, "", "L");
+        canvasProfCrossQ1ZNAC -> cd(3);
+        for (int i = 0;i < index;i++) {
+            profQ1ZNACYXCentFT0C[i] -> GetYaxis() -> SetRangeUser(-0.2, 0.2);
+            profQ1ZNACYXCentFT0C[i] -> GetYaxis() -> SetTitle("<Q_{1,y} (ZNA) #dot Q_{1,x} (ZNC)>");
+            profQ1ZNACYXCentFT0C[i] -> Draw("SAME PLC PMC");
+        }
+        gPad -> BuildLegend(0.15, 0.6, 0.4, 0.9, "", "L");
+        canvasProfCrossQ1ZNAC -> cd(4);
+        for (int i = 0;i < index;i++) {
+            profQ1ZNACXYCentFT0C[i] -> GetYaxis() -> SetRangeUser(-0.2, 0.2);
+            profQ1ZNACXYCentFT0C[i] -> GetYaxis() -> SetTitle("<Q_{1,x} (ZNA) #dot Q_{1,y} (ZNC)>");
+            profQ1ZNACXYCentFT0C[i] -> Draw("SAME PLC PMC");
+        }
+        gPad -> BuildLegend(0.15, 0.6, 0.4, 0.9, "", "L");
 
-    canvasProfCrossQ1ZNAC -> SaveAs(Form("%s/CrossQ1ZNAC_vs_CentFT0.pdf", pathOut.c_str()));
+        canvasProfCrossQ1ZNAC -> SaveAs(Form("%s/CrossQ1ZNAC_vs_CentFT0.pdf", pathOut.c_str()));
 
-    TCanvas *canvasProfIntercalibZNA = new TCanvas("canvasProfIntercalibZNACentFT0C", "", 800, 600);
-    for (int i = 0;i < nRuns;i++) {
-        profIntercalibZNACentFT0C[i] -> GetYaxis() -> SetRangeUser(-20, 20);
-        profIntercalibZNACentFT0C[i] -> SetTitle(Form("%i", runList[i]));
-        profIntercalibZNACentFT0C[i] -> GetYaxis() -> SetTitle("ZNA^{common} - (ZNA1 + ZNA2 + ZNA3 + ZNA4)");
-        profIntercalibZNACentFT0C[i] -> Draw("SAME PLC PMC");
-    }
-    gPad -> BuildLegend(0.15, 0.6, 0.4, 0.935, "", "L");
-    canvasProfIntercalibZNA -> SaveAs(Form("%s/IntercalibZNA.pdf", pathOut.c_str()));
+        TCanvas *canvasProfIntercalibZNA = new TCanvas("canvasProfIntercalibZNACentFT0C", "", 800, 600);
+        for (int i = 0;i < index;i++) {
+            profIntercalibZNACentFT0C[i] -> GetYaxis() -> SetRangeUser(-20, 20);
+            profIntercalibZNACentFT0C[i] -> SetTitle(Form("%i", runList[i]));
+            profIntercalibZNACentFT0C[i] -> GetYaxis() -> SetTitle("ZNA^{common} - (ZNA1 + ZNA2 + ZNA3 + ZNA4)");
+            profIntercalibZNACentFT0C[i] -> Draw("SAME PLC PMC");
+        }
+        gPad -> BuildLegend(0.15, 0.6, 0.4, 0.935, "", "L");
+        canvasProfIntercalibZNA -> SaveAs(Form("%s/IntercalibZNA.pdf", pathOut.c_str()));
 
-    TCanvas *canvasProfIntercalibZNC = new TCanvas("canvasProfIntercalibZNCCentFT0C", "", 800, 600);
-    for (int i = 0;i < nRuns;i++) {
-        profIntercalibZNCCentFT0C[i] -> GetYaxis() -> SetRangeUser(-20, 20);
-        profIntercalibZNCCentFT0C[i] -> SetTitle(Form("%i", runList[i]));
-        profIntercalibZNCCentFT0C[i] -> GetYaxis() -> SetTitle("ZNC^{common} - (ZNC1 + ZNC2 + ZNC3 + ZNC4)");
-        profIntercalibZNCCentFT0C[i] -> Draw("SAME PLC PMC");
+        TCanvas *canvasProfIntercalibZNC = new TCanvas("canvasProfIntercalibZNCCentFT0C", "", 800, 600);
+        for (int i = 0;i < index;i++) {
+            profIntercalibZNCCentFT0C[i] -> GetYaxis() -> SetRangeUser(-20, 20);
+            profIntercalibZNCCentFT0C[i] -> SetTitle(Form("%i", runList[i]));
+            profIntercalibZNCCentFT0C[i] -> GetYaxis() -> SetTitle("ZNC^{common} - (ZNC1 + ZNC2 + ZNC3 + ZNC4)");
+            profIntercalibZNCCentFT0C[i] -> Draw("SAME PLC PMC");
+        }
+        gPad -> BuildLegend(0.15, 0.6, 0.4, 0.935, "", "L");
+        canvasProfIntercalibZNC -> SaveAs(Form("%s/IntercalibZNC.pdf", pathOut.c_str()));
     }
-    gPad -> BuildLegend(0.15, 0.6, 0.4, 0.935, "", "L");
-    canvasProfIntercalibZNC -> SaveAs(Form("%s/IntercalibZNC.pdf", pathOut.c_str()));
 
     TCanvas *canvasColCounterAcc = new TCanvas("canvasColCounterAcc", "", 1000, 600);
     gStyle -> SetOptStat(0);
@@ -357,11 +393,22 @@ void plot_track_distributions() {
     histCounterLumiTCE -> Draw("H");
     latexTitle -> DrawLatex(0.20, 0.80, Form("Luminosity TCE = %3.2f #mub^{-1}", counterLumiTCE));
 
+    TCanvas *canvasCentFT0C = new TCanvas("canvasCentFT0C", "", 1000, 600);
+    gStyle -> SetOptStat(0);
+    gPad -> SetLogy();
+    histCentFT0C -> GetXaxis() -> SetRangeUser(0, 90);
+    histCentFT0C -> GetXaxis() -> SetTitle("Cent. FT0C");
+    histCentFT0C -> Scale(1. / histCentFT0C -> Integral());
+    histCentFT0C -> Draw("H");
+
     canvasColCounterAcc -> SaveAs(Form("%s/collision_counter.pdf", pathOut.c_str()));
     canvasCounterTVX -> SaveAs(Form("%s/TVX_counter.pdf", pathOut.c_str()));
     canvasCounterLumi -> SaveAs(Form("%s/lumi_counter.pdf", pathOut.c_str()));
+    canvasCentFT0C -> SaveAs(Form("%s/centrality_FT0C.pdf", pathOut.c_str()));
 
-
+    TFile *fOut = new TFile(Form("%s/centrality.root", pathOut.c_str()), "RECREATE");
+    histCentFT0C -> Write();
+    fOut -> Close();
 }
 
 void plot_dimuon_distributions(bool integrated = false) {
