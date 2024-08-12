@@ -501,7 +501,7 @@ Double_t FitFunctionBackgroundVWG(Double_t *x, Double_t *par)
 //-------------------------------------------------------------------------------
 Double_t FitFunctionFlowS2CB2VWGPOL2(Double_t *x, Double_t *par)
 {
-  // Fit function for Jpsi(Psip) mean pt with alphaJpsi and alphaPsiP
+  // Fit function for Jpsi(Psip) v2
   Double_t SPsiPFactor = 1.0341;
 
   Double_t par2[11] = {
@@ -527,7 +527,7 @@ Double_t FitFunctionFlowS2CB2VWGPOL2(Double_t *x, Double_t *par)
 //-------------------------------------------------------------------------------
 Double_t FitFunctionFlowS2CB2VWGPol3Cheb(Double_t *x, Double_t *par)
 {
-  // Fit function for Jpsi(Psip) mean pt with alphaJpsi and alphaPsiP
+  // Fit function for Jpsi(Psip) v2
   Double_t SPsiPFactor = 1.0341;
 
   Double_t par2[11] = {
