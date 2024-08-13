@@ -59,7 +59,8 @@ void plot_track_distributions() {
     bool skipZDC = false;
     */
 
-    string pathToFiles = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/data/pass3/LHC23_full/train_230427";
+    //string pathToFiles = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/data/pass3/LHC23_full/train_230427";
+    string pathToFiles = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/data/pass3/LHC23_golden/train_230426/merged_files";
     ifstream fRunList(Form("%s/run_list.txt", pathToFiles.c_str()));
     int nRuns = 100;
     int runNumber;
@@ -69,9 +70,10 @@ void plot_track_distributions() {
         fRunList >> runNumber;
         runList.push_back(runNumber);
     }
-    string pathOut = "LHC23_full/pass3";
+    //string pathOut = "LHC23_full/pass3";
+    string pathOut = "LHC23_golden/pass3";
     string rootDirName = "Event_AfterCuts_centralFW";
-    bool skipZDC = false;
+    bool skipZDC = true;
 
     string centFT0C[] = {"0 - 10%", "10 - 20%", "20 - 30%", "30 - 40%", "40 - 50%", "50 - 60%", "60 - 70%", "70 - 80%", "80 - 90%"};
     TH1D *histProjPsi2A[nRuns][9];
@@ -91,6 +93,21 @@ void plot_track_distributions() {
     TProfile *profQ1ZNACXYCentFT0C[nRuns];
     TProfile *profIntercalibZNACentFT0C[nRuns];
     TProfile *profIntercalibZNCCentFT0C[nRuns];
+
+    TProfile *profQ2YYABCentFT0C[nRuns];
+    TProfile *profQ2XXABCentFT0C[nRuns];
+    TProfile *profQ2XYABCentFT0C[nRuns];
+    TProfile *profQ2YXABCentFT0C[nRuns];
+
+    TProfile *profQ2YYACCentFT0C[nRuns];
+    TProfile *profQ2XXACCentFT0C[nRuns];
+    TProfile *profQ2XYACCentFT0C[nRuns];
+    TProfile *profQ2YXACCentFT0C[nRuns];
+
+    TProfile *profQ2YYBCCentFT0C[nRuns];
+    TProfile *profQ2XXBCCentFT0C[nRuns];
+    TProfile *profQ2XYBCCentFT0C[nRuns];
+    TProfile *profQ2YXBCCentFT0C[nRuns];
 
     TH1F *histColCounterAll = new TH1F("histColCounterAll", "", 29, 0, 29);
     TH1F *histColCounterAcc = new TH1F("histColCounterAcc", "", 29, 0, 29);
@@ -114,6 +131,7 @@ void plot_track_distributions() {
 
         string filePath = Form("%s/%i/AnalysisResults.root", pathToFiles.c_str(), run);
         if (gSystem -> AccessPathName(filePath.c_str())) {
+            std::cout << "FILE NOT FOUND!!!" << std::endl;
             continue;
         }
 
@@ -123,6 +141,21 @@ void plot_track_distributions() {
         TH2D *histPsi2ACentFT0C = (TH2D*)list2 -> FindObject("Psi2A_CentFT0C");
         TH2D *histPsi2BCentFT0C = (TH2D*)list2 -> FindObject("Psi2B_CentFT0C");
         TH2D *histPsi2CCentFT0C = (TH2D*)list2 -> FindObject("Psi2C_CentFT0C");
+
+        profQ2YYABCentFT0C[index] = (TProfile*)list2 -> FindObject("Q2YYAB_CentFT0C");
+        profQ2XXABCentFT0C[index] = (TProfile*)list2 -> FindObject("Q2XXAB_CentFT0C");
+        profQ2XYABCentFT0C[index] = (TProfile*)list2 -> FindObject("Q2XYAB_CentFT0C");
+        profQ2YXABCentFT0C[index] = (TProfile*)list2 -> FindObject("Q2YXAB_CentFT0C");
+
+        profQ2YYACCentFT0C[index] = (TProfile*)list2 -> FindObject("Q2YYAC_CentFT0C");
+        profQ2XXACCentFT0C[index] = (TProfile*)list2 -> FindObject("Q2XXAC_CentFT0C");
+        profQ2XYACCentFT0C[index] = (TProfile*)list2 -> FindObject("Q2XYAC_CentFT0C");
+        profQ2YXACCentFT0C[index] = (TProfile*)list2 -> FindObject("Q2YXAC_CentFT0C");
+
+        profQ2YYBCCentFT0C[index] = (TProfile*)list2 -> FindObject("Q2YYBC_CentFT0C");
+        profQ2XXBCCentFT0C[index] = (TProfile*)list2 -> FindObject("Q2XXBC_CentFT0C");
+        profQ2XYBCCentFT0C[index] = (TProfile*)list2 -> FindObject("Q2XYBC_CentFT0C");
+        profQ2YXBCCentFT0C[index] = (TProfile*)list2 -> FindObject("Q2YXBC_CentFT0C");
 
         TList *list3 = (TList*) fIn -> Get("table-maker/output");
         TList *list4 = (TList*) list3 -> FindObject("Event_AfterCuts");
@@ -183,19 +216,19 @@ void plot_track_distributions() {
 
         std::cout << run << " -> accepted collisions = " << histTmpColCounterAcc -> GetBinContent(1) << std::endl;
         
-        for (int iCent = 0;iCent < 9;iCent++) {
-            histProjPsi2A[index][iCent] = (TH1D*) histPsi2ACentFT0C -> ProjectionY(Form("Psi2ACentFT0C_%i_%i", iCent, run), iCent+1);
-            histProjPsi2B[index][iCent] = (TH1D*) histPsi2BCentFT0C -> ProjectionY(Form("Psi2BCentFT0C_%i_%i", iCent, run), iCent+1);
-            histProjPsi2C[index][iCent] = (TH1D*) histPsi2CCentFT0C -> ProjectionY(Form("Psi2CCentFT0C_%i_%i", iCent, run), iCent+1);
+        for (int iCentr = 0;iCentr < 9;iCentr++) {
+            histProjPsi2A[index][iCentr] = (TH1D*) histPsi2ACentFT0C -> ProjectionY(Form("Psi2ACentFT0C_%i_%i", iCentr, run), iCentr+1);
+            histProjPsi2B[index][iCentr] = (TH1D*) histPsi2BCentFT0C -> ProjectionY(Form("Psi2BCentFT0C_%i_%i", iCentr, run), iCentr+1);
+            histProjPsi2C[index][iCentr] = (TH1D*) histPsi2CCentFT0C -> ProjectionY(Form("Psi2CCentFT0C_%i_%i", iCentr, run), iCentr+1);
 
             if (index == 0) {
-                histProjSumPsi2A[iCent] = (TH1D*) histProjPsi2A[index][iCent] -> Clone(Form("Psi2AProjCentFT0C_%i", iCent));
-                histProjSumPsi2B[iCent] = (TH1D*) histProjPsi2B[index][iCent] -> Clone(Form("Psi2BProjCentFT0C_%i", iCent));
-                histProjSumPsi2C[iCent] = (TH1D*) histProjPsi2C[index][iCent] -> Clone(Form("Psi2CProjCentFT0C_%i", iCent));
+                histProjSumPsi2A[iCentr] = (TH1D*) histProjPsi2A[index][iCentr] -> Clone(Form("Psi2AProjCentFT0C_%i", iCentr));
+                histProjSumPsi2B[iCentr] = (TH1D*) histProjPsi2B[index][iCentr] -> Clone(Form("Psi2BProjCentFT0C_%i", iCentr));
+                histProjSumPsi2C[iCentr] = (TH1D*) histProjPsi2C[index][iCentr] -> Clone(Form("Psi2CProjCentFT0C_%i", iCentr));
             } else {
-                histProjSumPsi2A[iCent] -> Add(histProjPsi2A[index][iCent]);
-                histProjSumPsi2B[iCent] -> Add(histProjPsi2B[index][iCent]);
-                histProjSumPsi2C[iCent] -> Add(histProjPsi2C[index][iCent]);
+                histProjSumPsi2A[iCentr] -> Add(histProjPsi2A[index][iCentr]);
+                histProjSumPsi2B[iCentr] -> Add(histProjPsi2B[index][iCentr]);
+                histProjSumPsi2C[iCentr] -> Add(histProjPsi2C[index][iCentr]);
             }
         }
         index++;
@@ -208,72 +241,166 @@ void plot_track_distributions() {
 
     TCanvas *canvasPsi2A = new TCanvas("canvasPsi2A", "", 1800, 1800);
     canvasPsi2A -> Divide(3, 3);
-    for (int iCent = 0;iCent < 9;iCent++) {
-        canvasPsi2A -> cd(iCent+1);
+    for (int iCentr = 0;iCentr < 9;iCentr++) {
+        canvasPsi2A -> cd(iCentr+1);
         for (int i = 0;i < index;i++) {
-            histProjPsi2A[i][iCent] -> Scale(1. / histProjPsi2A[i][iCent] -> Integral());
-            histProjPsi2A[i][iCent] -> GetYaxis() -> SetRangeUser(0, 0.03);
-            histProjPsi2A[i][iCent] -> Draw("SAME PLC PMC");
+            histProjPsi2A[i][iCentr] -> Scale(1. / histProjPsi2A[i][iCentr] -> Integral());
+            histProjPsi2A[i][iCentr] -> GetYaxis() -> SetRangeUser(0, 0.03);
+            histProjPsi2A[i][iCentr] -> Draw("SAME PLC PMC");
         }
         gPad -> BuildLegend(0.7, 0.4, 0.980, 0.935, "", "L");
 
-        histProjSumPsi2A[iCent] -> SetMarkerStyle(20);
-        histProjSumPsi2A[iCent] -> SetMarkerSize(0.5);
-        histProjSumPsi2A[iCent] -> SetMarkerColor(kBlack);
-        histProjSumPsi2A[iCent] -> SetLineColor(kBlack);
-        histProjSumPsi2A[iCent] -> Scale(1. / histProjSumPsi2A[iCent] -> Integral());
-        histProjSumPsi2A[iCent] -> GetYaxis() -> SetRangeUser(0, 0.03);
-        histProjSumPsi2A[iCent] -> Draw("SAME EP");
+        histProjSumPsi2A[iCentr] -> SetMarkerStyle(20);
+        histProjSumPsi2A[iCentr] -> SetMarkerSize(0.5);
+        histProjSumPsi2A[iCentr] -> SetMarkerColor(kBlack);
+        histProjSumPsi2A[iCentr] -> SetLineColor(kBlack);
+        histProjSumPsi2A[iCentr] -> Scale(1. / histProjSumPsi2A[iCentr] -> Integral());
+        histProjSumPsi2A[iCentr] -> GetYaxis() -> SetRangeUser(0, 0.03);
+        histProjSumPsi2A[iCentr] -> Draw("SAME EP");
 
-        latexTitle -> DrawLatex(0.20, 0.80, Form("FT0C %s", centFT0C[iCent].c_str()));
+        latexTitle -> DrawLatex(0.20, 0.80, Form("FT0C %s", centFT0C[iCentr].c_str()));
     }
     canvasPsi2A -> SaveAs(Form("%s/Psi2A_vs_CentFT0.pdf", pathOut.c_str()));
 
     TCanvas *canvasPsi2B = new TCanvas("canvasPsi2B", "", 1800, 1800);
     canvasPsi2B -> Divide(3, 3);
-    for (int iCent = 0;iCent < 9;iCent++) {
-        canvasPsi2B -> cd(iCent+1);
+    for (int iCentr = 0;iCentr < 9;iCentr++) {
+        canvasPsi2B -> cd(iCentr+1);
         for (int i = 0;i < index;i++) {
-            histProjPsi2B[i][iCent] -> Scale(1. / histProjPsi2B[i][iCent] -> Integral());
-            histProjPsi2B[i][iCent] -> GetYaxis() -> SetRangeUser(0, 0.03);
-            histProjPsi2B[i][iCent] -> Draw("SAME PLC PMC");
+            histProjPsi2B[i][iCentr] -> Scale(1. / histProjPsi2B[i][iCentr] -> Integral());
+            histProjPsi2B[i][iCentr] -> GetYaxis() -> SetRangeUser(0, 0.03);
+            histProjPsi2B[i][iCentr] -> Draw("SAME PLC PMC");
         }
         gPad -> BuildLegend(0.6, 0.6, 0.980, 0.935, "", "L");
 
-        histProjSumPsi2B[iCent] -> SetMarkerStyle(20);
-        histProjSumPsi2B[iCent] -> SetMarkerSize(0.5);
-        histProjSumPsi2B[iCent] -> SetMarkerColor(kBlack);
-        histProjSumPsi2B[iCent] -> SetLineColor(kBlack);
-        histProjSumPsi2B[iCent] -> Scale(1. / histProjSumPsi2B[iCent] -> Integral());
-        histProjSumPsi2B[iCent] -> GetYaxis() -> SetRangeUser(0, 0.03);
-        histProjSumPsi2B[iCent] -> Draw("SAME EP");
+        histProjSumPsi2B[iCentr] -> SetMarkerStyle(20);
+        histProjSumPsi2B[iCentr] -> SetMarkerSize(0.5);
+        histProjSumPsi2B[iCentr] -> SetMarkerColor(kBlack);
+        histProjSumPsi2B[iCentr] -> SetLineColor(kBlack);
+        histProjSumPsi2B[iCentr] -> Scale(1. / histProjSumPsi2B[iCentr] -> Integral());
+        histProjSumPsi2B[iCentr] -> GetYaxis() -> SetRangeUser(0, 0.03);
+        histProjSumPsi2B[iCentr] -> Draw("SAME EP");
 
-        latexTitle -> DrawLatex(0.20, 0.80, Form("FT0C %s", centFT0C[iCent].c_str()));
+        latexTitle -> DrawLatex(0.20, 0.80, Form("FT0C %s", centFT0C[iCentr].c_str()));
     }
     canvasPsi2B -> SaveAs(Form("%s/Psi2B_vs_CentFT0.pdf", pathOut.c_str()));
 
     TCanvas *canvasPsi2C = new TCanvas("canvasPsi2C", "", 1800, 1800);
     canvasPsi2C -> Divide(3, 3);
-    for (int iCent = 0;iCent < 9;iCent++) {
-        canvasPsi2C -> cd(iCent+1);
+    for (int iCentr = 0;iCentr < 9;iCentr++) {
+        canvasPsi2C -> cd(iCentr+1);
         for (int i = 0;i < index;i++) {
-            histProjPsi2C[i][iCent] -> Scale(1. / histProjPsi2C[i][iCent] -> Integral());
-            histProjPsi2C[i][iCent] -> GetYaxis() -> SetRangeUser(0, 0.03);
-            histProjPsi2C[i][iCent] -> Draw("SAME PLC PMC");
+            histProjPsi2C[i][iCentr] -> Scale(1. / histProjPsi2C[i][iCentr] -> Integral());
+            histProjPsi2C[i][iCentr] -> GetYaxis() -> SetRangeUser(0, 0.03);
+            histProjPsi2C[i][iCentr] -> Draw("SAME PLC PMC");
         }
         gPad -> BuildLegend(0.6, 0.6, 0.980, 0.935, "", "L");
 
-        histProjSumPsi2C[iCent] -> SetMarkerStyle(20);
-        histProjSumPsi2C[iCent] -> SetMarkerSize(0.5);
-        histProjSumPsi2C[iCent] -> SetMarkerColor(kBlack);
-        histProjSumPsi2C[iCent] -> SetLineColor(kBlack);
-        histProjSumPsi2C[iCent] -> Scale(1. / histProjSumPsi2C[iCent] -> Integral());
-        histProjSumPsi2C[iCent] -> GetYaxis() -> SetRangeUser(0, 0.03);
-        histProjSumPsi2C[iCent] -> Draw("SAME EP");
+        histProjSumPsi2C[iCentr] -> SetMarkerStyle(20);
+        histProjSumPsi2C[iCentr] -> SetMarkerSize(0.5);
+        histProjSumPsi2C[iCentr] -> SetMarkerColor(kBlack);
+        histProjSumPsi2C[iCentr] -> SetLineColor(kBlack);
+        histProjSumPsi2C[iCentr] -> Scale(1. / histProjSumPsi2C[iCentr] -> Integral());
+        histProjSumPsi2C[iCentr] -> GetYaxis() -> SetRangeUser(0, 0.03);
+        histProjSumPsi2C[iCentr] -> Draw("SAME EP");
 
-        latexTitle -> DrawLatex(0.20, 0.80, Form("FT0C %s", centFT0C[iCent].c_str()));
+        latexTitle -> DrawLatex(0.20, 0.80, Form("FT0C %s", centFT0C[iCentr].c_str()));
     }
     canvasPsi2C -> SaveAs(Form("%s/Psi2C_vs_CentFT0.pdf", pathOut.c_str()));
+
+    TCanvas *canvasCrossQ2AB = new TCanvas("canvasCrossQ2AB", "", 800, 600);
+    canvasCrossQ2AB -> Divide(2, 2);
+    canvasCrossQ2AB -> cd(1);
+    for (int iRun = 0;iRun < index;iRun++) {
+        profQ2YYABCentFT0C[iRun] -> GetYaxis() -> SetRangeUser(-0.5, 0.5);
+        profQ2YYABCentFT0C[iRun] -> GetYaxis() -> SetTitle("Q_{2,YY}^{AB}");
+        profQ2YYABCentFT0C[iRun] -> SetTitle(Form("%i", runList[iRun]));
+        profQ2YYABCentFT0C[iRun] -> Draw("SAME PLC PMC");
+    }
+    canvasCrossQ2AB -> cd(2);
+    for (int iRun = 0;iRun < index;iRun++) {
+        profQ2XXABCentFT0C[iRun] -> GetYaxis() -> SetRangeUser(-0.5, 0.5);
+        profQ2XXABCentFT0C[iRun] -> GetYaxis() -> SetTitle("Q_{2,XX}^{AB}");
+        profQ2XXABCentFT0C[iRun] -> SetTitle(Form("%i", runList[iRun]));
+        profQ2XXABCentFT0C[iRun] -> Draw("SAME PLC PMC");
+    }
+    canvasCrossQ2AB -> cd(3);
+    for (int iRun = 0;iRun < index;iRun++) {
+        profQ2XYABCentFT0C[iRun] -> GetYaxis() -> SetRangeUser(-0.5, 0.5);
+        profQ2XYABCentFT0C[iRun] -> GetYaxis() -> SetTitle("Q_{2,XY}^{AB}");
+        profQ2XYABCentFT0C[iRun] -> SetTitle(Form("%i", runList[iRun]));
+        profQ2XYABCentFT0C[iRun] -> Draw("SAME PLC PMC");
+    }canvasCrossQ2AB -> cd(4);
+    for (int iRun = 0;iRun < index;iRun++) {
+        profQ2YXABCentFT0C[iRun] -> GetYaxis() -> SetRangeUser(-0.5, 0.5);
+        profQ2YXABCentFT0C[iRun] -> GetYaxis() -> SetTitle("Q_{2,YX}^{AB}");
+        profQ2YXABCentFT0C[iRun] -> SetTitle(Form("%i", runList[iRun]));
+        profQ2YXABCentFT0C[iRun] -> Draw("SAME PLC PMC");
+    }
+    canvasCrossQ2AB -> SaveAs(Form("%s/CrossQ2AB_vs_CentFT0.pdf", pathOut.c_str()));
+
+
+    TCanvas *canvasCrossQ2AC = new TCanvas("canvasCrossQ2AC", "", 800, 600);
+    canvasCrossQ2AC -> Divide(2, 2);
+    canvasCrossQ2AC -> cd(1);
+    for (int iRun = 0;iRun < index;iRun++) {
+        profQ2YYACCentFT0C[iRun] -> GetYaxis() -> SetRangeUser(-0.5, 0.5);
+        profQ2YYACCentFT0C[iRun] -> GetYaxis() -> SetTitle("Q_{2,YY}^{AC}");
+        profQ2YYACCentFT0C[iRun] -> SetTitle(Form("%i", runList[iRun]));
+        profQ2YYACCentFT0C[iRun] -> Draw("SAME PLC PMC");
+    }
+    canvasCrossQ2AC -> cd(2);
+    for (int iRun = 0;iRun < index;iRun++) {
+        profQ2XXACCentFT0C[iRun] -> GetYaxis() -> SetRangeUser(-0.5, 0.5);
+        profQ2XXACCentFT0C[iRun] -> GetYaxis() -> SetTitle("Q_{2,XX}^{AC}");
+        profQ2XXACCentFT0C[iRun] -> SetTitle(Form("%i", runList[iRun]));
+        profQ2XXACCentFT0C[iRun] -> Draw("SAME PLC PMC");
+    }
+    canvasCrossQ2AC -> cd(3);
+    for (int iRun = 0;iRun < index;iRun++) {
+        profQ2XYACCentFT0C[iRun] -> GetYaxis() -> SetRangeUser(-0.5, 0.5);
+        profQ2XYACCentFT0C[iRun] -> GetYaxis() -> SetTitle("Q_{2,XY}^{AC}");
+        profQ2XYACCentFT0C[iRun] -> SetTitle(Form("%i", runList[iRun]));
+        profQ2XYACCentFT0C[iRun] -> Draw("SAME PLC PMC");
+    }canvasCrossQ2AC -> cd(4);
+    for (int iRun = 0;iRun < index;iRun++) {
+        profQ2YXACCentFT0C[iRun] -> GetYaxis() -> SetRangeUser(-0.5, 0.5);
+        profQ2YXACCentFT0C[iRun] -> GetYaxis() -> SetTitle("Q_{2,YX}^{AC}");
+        profQ2YXACCentFT0C[iRun] -> SetTitle(Form("%i", runList[iRun]));
+        profQ2YXACCentFT0C[iRun] -> Draw("SAME PLC PMC");
+    }
+    canvasCrossQ2AC -> SaveAs(Form("%s/CrossQ2AC_vs_CentFT0.pdf", pathOut.c_str()));
+
+    TCanvas *canvasCrossQ2BC = new TCanvas("canvasCrossQ2BC", "", 800, 600);
+    canvasCrossQ2BC -> Divide(2, 2);
+    canvasCrossQ2BC -> cd(1);
+    for (int iRun = 0;iRun < index;iRun++) {
+        profQ2YYBCCentFT0C[iRun] -> GetYaxis() -> SetRangeUser(-0.5, 0.5);
+        profQ2YYBCCentFT0C[iRun] -> GetYaxis() -> SetTitle("Q_{2,YY}^{BC}");
+        profQ2YYBCCentFT0C[iRun] -> SetTitle(Form("%i", runList[iRun]));
+        profQ2YYBCCentFT0C[iRun] -> Draw("SAME PLC PMC");
+    }
+    canvasCrossQ2BC -> cd(2);
+    for (int iRun = 0;iRun < index;iRun++) {
+        profQ2XXBCCentFT0C[iRun] -> GetYaxis() -> SetRangeUser(-0.5, 0.5);
+        profQ2XXBCCentFT0C[iRun] -> GetYaxis() -> SetTitle("Q_{2,XX}^{BC}");
+        profQ2XXBCCentFT0C[iRun] -> SetTitle(Form("%i", runList[iRun]));
+        profQ2XXBCCentFT0C[iRun] -> Draw("SAME PLC PMC");
+    }
+    canvasCrossQ2BC -> cd(3);
+    for (int iRun = 0;iRun < index;iRun++) {
+        profQ2XYBCCentFT0C[iRun] -> GetYaxis() -> SetRangeUser(-0.5, 0.5);
+        profQ2XYBCCentFT0C[iRun] -> GetYaxis() -> SetTitle("Q_{2,XY}^{BC}");
+        profQ2XYBCCentFT0C[iRun] -> SetTitle(Form("%i", runList[iRun]));
+        profQ2XYBCCentFT0C[iRun] -> Draw("SAME PLC PMC");
+    }canvasCrossQ2BC -> cd(4);
+    for (int iRun = 0;iRun < index;iRun++) {
+        profQ2YXBCCentFT0C[iRun] -> GetYaxis() -> SetRangeUser(-0.5, 0.5);
+        profQ2YXBCCentFT0C[iRun] -> GetYaxis() -> SetTitle("Q_{2,YX}^{BC}");
+        profQ2YXBCCentFT0C[iRun] -> SetTitle(Form("%i", runList[iRun]));
+        profQ2YXBCCentFT0C[iRun] -> Draw("SAME PLC PMC");
+    }
+    canvasCrossQ2BC -> SaveAs(Form("%s/CrossQ2BC_vs_CentFT0.pdf", pathOut.c_str()));
 
 
     if (!skipZDC) {

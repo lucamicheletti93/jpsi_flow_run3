@@ -28,6 +28,7 @@ void projections() {
     //string pathToFiles = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/data/pass3/LHC23_full/train_235036"; // full Pb-Pb, muonLowPt 0.7 GeV/c
     //string pathToFiles = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/data/pass3/LHC23_full/train_235531"; // full Pb-Pb, matchedcedMchMid
     string pathToFiles = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/data/pass3/LHC23_full/train_test"; // test train to check projections, matchedcedMchMid
+    //string pathToFiles = "/Users/lucamicheletti/cernbox/JPSI/Run3/2023/PbPb/pass4/train_247835"; // test train to check J/psi signal for MC, NO MIXING!, matchedcedMchMid
 
     string histName = "Mass_Pt_centrFT0C_V2";
     //string histName = "Mass_Pt";
