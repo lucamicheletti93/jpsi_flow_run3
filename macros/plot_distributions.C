@@ -59,8 +59,8 @@ void plot_track_distributions() {
     bool skipZDC = false;
     */
 
-    //string pathToFiles = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/data/pass3/LHC23_full/train_230427";
-    string pathToFiles = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/data/pass3/LHC23_golden/train_230426/merged_files";
+    string pathToFiles = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/data/pass3/LHC23_full/train_230427";
+    //string pathToFiles = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/data/pass3/LHC23_golden/train_230426/merged_files";
     ifstream fRunList(Form("%s/run_list.txt", pathToFiles.c_str()));
     int nRuns = 100;
     int runNumber;
@@ -70,8 +70,8 @@ void plot_track_distributions() {
         fRunList >> runNumber;
         runList.push_back(runNumber);
     }
-    //string pathOut = "LHC23_full/pass3";
-    string pathOut = "LHC23_golden/pass3";
+    string pathOut = "LHC23_full/pass3";
+    //string pathOut = "LHC23_golden/pass3";
     string rootDirName = "Event_AfterCuts_centralFW";
     bool skipZDC = true;
 
@@ -261,6 +261,18 @@ void plot_track_distributions() {
         latexTitle -> DrawLatex(0.20, 0.80, Form("FT0C %s", centFT0C[iCentr].c_str()));
     }
     canvasPsi2A -> SaveAs(Form("%s/Psi2A_vs_CentFT0.pdf", pathOut.c_str()));
+
+    TCanvas *canvasAllRunsPsi2A = new TCanvas("canvasAllRunsPsi2A", "", 1800, 1800);
+    canvasAllRunsPsi2A -> Divide(3, 3);
+    for (int iCentr = 0;iCentr < 9;iCentr++) {
+        canvasAllRunsPsi2A -> cd(iCentr+1);
+        histProjSumPsi2A[iCentr] -> SetStats(0);
+        histProjSumPsi2A[iCentr] -> Draw("SAME EP");
+        latexTitle -> DrawLatex(0.20, 0.80, Form("FT0C %s", centFT0C[iCentr].c_str()));
+    }
+    canvasAllRunsPsi2A -> SaveAs(Form("%s/allRunsPsi2A_vs_CentFT0.pdf", pathOut.c_str()));
+
+
 
     TCanvas *canvasPsi2B = new TCanvas("canvasPsi2B", "", 1800, 1800);
     canvasPsi2B -> Divide(3, 3);
@@ -524,9 +536,14 @@ void plot_track_distributions() {
     gStyle -> SetOptStat(0);
     gPad -> SetLogy();
     histCentFT0C -> GetXaxis() -> SetRangeUser(0, 90);
-    histCentFT0C -> GetXaxis() -> SetTitle("Cent. FT0C");
+    histCentFT0C -> SetMarkerStyle(20);
+    histCentFT0C -> SetMarkerSize(0.5);
+    histCentFT0C -> SetMarkerColor(kBlack);
+    histCentFT0C -> SetLineColor(kBlack);
+    histCentFT0C -> GetXaxis() -> SetTitle("Cent. FT0C (%)");
     histCentFT0C -> Scale(1. / histCentFT0C -> Integral());
     histCentFT0C -> Draw("H");
+    latexTitle -> DrawLatex(0.15, 0.80, Form("Pb-Pb #sqrt{s}_{NN} = 5.36 TeV, LHC23 pass3"));
 
     canvasColCounterAcc -> SaveAs(Form("%s/collision_counter.pdf", pathOut.c_str()));
     canvasCounterTVX -> SaveAs(Form("%s/TVX_counter.pdf", pathOut.c_str()));
