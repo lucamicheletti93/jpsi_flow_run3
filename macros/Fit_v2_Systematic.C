@@ -39,9 +39,12 @@ Double_t FitFunctionBackgroundPol2Cheb(Double_t *x, Double_t *par);
 Double_t FitFunctionFlowS2CB2VWGPol3Cheb(Double_t *x, Double_t *par);
 Double_t FitFunctionFlowS2NA60NEWPOL4EXPPOL2(Double_t *x, Double_t *par);
 Double_t FitFunctionFlowS2CB2POL4EXPPOL2(Double_t *x, Double_t *par);
+Double_t fitFunctionCB2VWG(Double_t *x, Double_t *par);
+Double_t fitFunctionCB2Pol4Exp(Double_t *x, Double_t *par);
+Double_t fitFunctionNA60NEWVWG(Double_t *x, Double_t *par);
+Double_t fitFunctionNA60NEWPol4Exp(Double_t *x, Double_t *par);
 
-TF1* v2Fit(TProfile *v2prof, int type,Double_t parLimit[3]);
-std::vector<TH1*> Uncertainities(std::vector<TH1*> histlist, vector<double> parameter, vector<double> parameter_er, double value[8][3]);
+TF1* v2Fit(int iPt,TProfile *v2prof, int type,Double_t parLimit[3]);
 
 Double_t xmin= 2.5;
 Double_t xmax= 4.8;
@@ -66,12 +69,12 @@ std::string Fit_subStr3 = "NA60_Pol4Exp";
 std::string Fit_subStr4 = "NA60_VWG";
 
 
-const int nFits_fun = 1;
+const int nFits_fun = 6;
 string mass_sig[] = {"CB2","CB2","CB2","CB2","NA60","NA60"};
-string mass_bkg[] = {"VWG_data","VWG_MC","Pol4Exp_data","Pol4Exp_MC","Pol4Exp_MC","VWG_MC"};
+string mass_bkg[] = {"VWG_data","VWG_MC","Pol4Exp_data","Pol4Exp_MC","VWG_MC","Pol4Exp_MC"};
 
 string func_sig[] = {"CB2","CB2","CB2","CB2","NA60","NA60"};
-string func_bkg[] = {"VWG","VWG","Pol4Exp","Pol4Exp","Pol4Exp","VWG"};
+string func_bkg[] = {"VWG","VWG","Pol4Exp","Pol4Exp","VWG","Pol4Exp"};
 
 
 /*
@@ -82,16 +85,20 @@ string func_bkg[] = {"VWG","VWG","Pol4Exp","Pol4Exp","Pol4Exp","VWG"};
   string func_sig[] = {"NA60"};
   string func_bkg[] = {"Pol4Exp"};
 */
+
+//CB2+VWG, 2.3-4.7, datatail, fixed-mixing
+////CB2+VWG, 2.3-4.7, same combination
 double minCentrBins[] = {10};
 double maxCentrBins[] = {50};
 
-const int nPtBins = 8;
-double minPtBins[] = {0.0,1.0,2,3,4,5,6,8};
-double maxPtBins[] = {1.0,2.0,3,4,5,6,8,10};
+
+const int nPtBins = 10;
+double minPtBins[] = {0.0,1.0,2,3,4,5,6,8,10,12};
+double maxPtBins[] = {1.0,2.0,3,4,5,6,8,10,12,15};
 
 //const int nPtBins = 1;
-//double minPtBins[] = {5.0};
-//double maxPtBins[] = {6.0};
+//double minPtBins[] = {12};
+//double maxPtBins[] = {15};
 
 const int nRanges = 3;
 double min_range[] = {2.3,2.4,2.5};
@@ -105,16 +112,21 @@ int nSysbins = nFits_fun*nRanges*nbck_type;
 
 double resolution = 1.3093;
 
+double norm_sig[] = {2.12944e+04,3.61983e+04,2.49511e+04,1.24006e+04,6.77359e+03,3.69119e+03,3.02467e+03,9.84673e+02,2.90510e+02,100,10};
+double norm_bkg[] = {8.12173e+06,1.13264e+07,1.48518e+06,2.21428e+05,4.73500e+04,1.51403e+04,8.22036e+03,2.02200e+03,5.60000e+02,100,10};
+
+TProfile *prof_v2EP[20];
+TProfile *prof_MEv2EP[20];
+TH1D *hT_mass[20];
+TH1D *hT_mass2[20];
+TCanvas *m_plot[20];
+TF1 *fitv2[20][20][20];
+
+std::vector<TH1*> Uncertainities(std::vector<TH1*> histlist, vector<double> parameter, vector<double> parameter_er, double value[nPtBins][3]);
 
 void Fit_v2_Systematic()
 {
   TCanvas *c1 = new TCanvas("c1", "c1",75,70,1309,696);
-  TProfile *prof_v2EP[20];
-  TProfile *prof_MEv2EP[20];
-  TH1D *hT_mass[20];
-  TCanvas *hT_plot[20];
-  TF1 *fitv2[20][20][20];
-  
   double par[19];
 
   string sig_plus_bkg[] = {"bkg","aa","bb","cc","sig_Jpsi","mean_Jpsi","width_Jpsi","a_Jpsi","b_Jpsi","c_Jpsi","d_Jpsi"};
@@ -123,10 +135,10 @@ void Fit_v2_Systematic()
   string cb2sig_plus_pol4expbkg[] = {"bkg","aa","bb","cc","dd","ee","ff","sig_Jpsi","mean_Jpsi","width_Jpsi","a_Jpsi","b_Jpsi","c_Jpsi","d_Jpsi"};
                            //("kVWG","mVWG","sVWG1","sVWG2","kPsi","mPsi","sPsi","alPsi","nlPsi","auPsi","nuPsi");
 
- string signa60_plus_bkg[] = {"bkg","aa","bb","cc","sig_Jpsi","mean_Jpsi","width_Jpsi","a_Jpsi","b_Jpsi","c_Jpsi","d_Jpsi","e_Jpsi","f_Jpsi","g_Jpsi","h_Jpsi"};
+  string signa60_plus_bkg[] = {"bkg","aa","bb","cc","sig_Jpsi","mean_Jpsi","width_Jpsi","b_Jpsi","c_Jpsi","d_Jpsi","f_Jpsi","g_Jpsi","h_Jpsi","a_Jpsi","e_Jpsi"};
                          //("kVWG","mVWG","sVWG1","sVWG2","kJPsi","mJPsi","sJPsi", "p1LJPsi","p2LJPsi","p3LJPsi","p1RJPsi","p2RJPsi","p3RJPsi","aLJPsi","aRJPsi");
 
- string signa60_plus_pol4expbkg[] = {"bkg","aa","bb","cc","dd","ee","ff","sig_Jpsi","mean_Jpsi","width_Jpsi","a_Jpsi","b_Jpsi","c_Jpsi","d_Jpsi","e_Jpsi","f_Jpsi","g_Jpsi","h_Jpsi"};
+  string signa60_plus_pol4expbkg[] = {"bkg","aa","bb","cc","dd","ee","ff","sig_Jpsi","mean_Jpsi","width_Jpsi","b_Jpsi","c_Jpsi","d_Jpsi","f_Jpsi","g_Jpsi","h_Jpsi","a_Jpsi","e_Jpsi"};
                          //("kVWG","mVWG","sVWG1","sVWG2","kJPsi","mJPsi","sJPsi", "p1LJPsi","p2LJPsi","p3LJPsi","p1RJPsi","p2RJPsi","p3RJPsi","aLJPsi","aRJPsi");
   
 
@@ -141,41 +153,56 @@ void Fit_v2_Systematic()
   //v2 Fitting Limits ======
   Double_t parLimit0[3];
   parLimit0[0] = 0.0040; 
-  parLimit0[1] = 0.0037;
-  parLimit0[2] = 0.0045;
+  parLimit0[1] = 0.0034;
+  parLimit0[2] = 0.0041;
   
   Double_t parLimit1[3];
-  parLimit1[0] = 0.035; 
+  parLimit1[0] = 0.036405; 
   parLimit1[1] = 0.034;
   parLimit1[2] = 0.038;
 
   Double_t parLimit2[3];
-  parLimit2[0] = 0.084; 
-  parLimit2[1] = 0.0584;
-  parLimit2[2] = 0.0885;
+  parLimit2[0] = 0.077; 
+  parLimit2[1] = 0.072;
+  parLimit2[2] = 0.087;
 
   Double_t parLimit3[3];
-  parLimit3[0] = 0.094; 
-  parLimit3[1] = 0.091;
-  parLimit3[2] = 0.099;
+  parLimit3[0] = 0.091; 
+  parLimit3[1] = 0.09014;
+  parLimit3[2] = 0.096;
 
   Double_t parLimit4[3];
-  parLimit4[0] = 0.14; 
-  parLimit4[1] = 0.11;
-  parLimit4[2] = 0.16;
+  parLimit4[0] = 0.096; 
+  parLimit4[1] = 0.094002;
+  parLimit4[2] = 0.098;
 
    Double_t parLimit5[3];
-  parLimit5[0] = 0.25; 
-  parLimit5[1] = 0.22;
-  parLimit5[2] = 0.28;
+  parLimit5[0] = 0.13; 
+  parLimit5[1] = 0.12;
+  parLimit5[2] = 0.130103;
 
   Double_t parLimit6[3];
-  parLimit6[0] = 0.09; 
-  parLimit6[1] = 0.07;
-  parLimit6[2] = 0.12;
+  parLimit6[0] = 0.079; 
+  parLimit6[1] = 0.072623;
+  parLimit6[2] = 0.082;
+
+  Double_t parLimit7[3];
+  parLimit7[0] = 0.09; 
+  parLimit7[1] = 0.088;
+  parLimit7[2] = 0.092;
+
+  Double_t parLimit8[3];
+  parLimit8[0] = 0.066; 
+  parLimit8[1] = 0.058;
+  parLimit8[2] = 0.072;
+
+  Double_t parLimit9[3];
+  parLimit9[0] = 0.036; 
+  parLimit9[1] = 0.028;
+  parLimit9[2] = 0.072;
   
   
-  TFile *f_hist = new TFile("Histograms_Fullpass3matchedMchMid_3cent.root");
+  TFile *f_hist = new TFile("Histograms_Fullpass3matchedMchMid_centr_Add_Pt_bin_10_50.root");
   if (f_hist->IsOpen()) cout << "File opened successfully" << endl;
  
  for(int iPt = 0;iPt<nPtBins;iPt++) //Loop over mass and v2 histograms in different pT ranges
@@ -195,11 +222,12 @@ void Fit_v2_Systematic()
       for(int iR = 0; iR < nRanges ; iR++) //Loop over Signal Range
 	{
 	   cout<<" Strig name "<<func_sig[iPt].data()<<endl;
+	   hT_mass2[iPt] = (TProfile*) f_hist->Get(Form("histMassSEPM_%1.0f_%1.0f__%1.0f_%1.0f", minPtBins[iPt], maxPtBins[iPt], minCentrBins[0], maxCentrBins[0]));
 	   prof_v2EP[iPt] = (TProfile*) f_hist->Get(Form("histV2SEPM_%1.0f_%1.0f__%1.0f_%1.0f", minPtBins[iPt], maxPtBins[iPt], minCentrBins[0], maxCentrBins[0]));
 	   prof_MEv2EP[iPt] = (TProfile*) f_hist->Get(Form("histV2MEPM_%1.0f_%1.0f__%1.0f_%1.0f", minPtBins[iPt], maxPtBins[iPt], minCentrBins[0], maxCentrBins[0]));
 	   hT_mass[iPt] = (TH1D*)f_fit->Get(Form("fit_results_%s_%s__%0.1f_%0.1f_histMassSEPM_%1.0f_%1.0f__%1.0f_%1.0f",func_sig[kfun].data(),func_bkg[kfun].data(), min_range[iR],max_range[iR],minPtBins[iPt], maxPtBins[iPt], minCentrBins[0], maxCentrBins[0]));
 
-	   hT_plot[iPt] = (TCanvas*)f_fit->Get(Form("fit_plot_%s_%s__%0.1f_%0.1f_histMassSEPM_%1.0f_%1.0f__%1.0f_%1.0f",func_sig[kfun].data(),func_bkg[kfun].data(), min_range[iR],max_range[iR],minPtBins[iPt], maxPtBins[iPt], minCentrBins[0], maxCentrBins[0]));
+	   m_plot[iPt] = (TCanvas*)f_fit->Get(Form("fit_plot_%s_%s__%0.1f_%0.1f_histMassSEPM_%1.0f_%1.0f__%1.0f_%1.0f",func_sig[kfun].data(),func_bkg[kfun].data(), min_range[iR],max_range[iR],minPtBins[iPt], maxPtBins[iPt], minCentrBins[0], maxCentrBins[0]));
 
 	   //hT_mass[iPt]->Draw();
 	  
@@ -213,16 +241,16 @@ void Fit_v2_Systematic()
 	   
 	   if(found_cb2_vwg != std::string::npos)
 	     {
-	       for (int i = 0; i < 11; i++)
+	       for (int i = 0; i < 11; i++) 
 	       Fitpar.push_back(hT_mass[iPt]->GetBinContent(hT_mass[iPt]->GetXaxis()->FindBin(Form("%s",sig_plus_bkg[i].data()))));
-	       Fitpar.push_back(1.0);
+	       Fitpar.push_back(0.0);
 	     }
 
 	   if(found_cb2_pol4exp != std::string::npos)
 	     {
 	       for (int i = 0; i < 14; i++)
 	       Fitpar.push_back(hT_mass[iPt]->GetBinContent(hT_mass[iPt]->GetXaxis()->FindBin(Form("%s",cb2sig_plus_pol4expbkg[i].data()))));
-	       Fitpar.push_back(1.0);
+	       Fitpar.push_back(0.0);
 	       //parLimit5[3] = {0.12,0.1,0.14};
 	     }
 
@@ -230,14 +258,14 @@ void Fit_v2_Systematic()
 	     {
 	       for (int i = 0; i < 15; i++)
 	       Fitpar.push_back(hT_mass[iPt]->GetBinContent(hT_mass[iPt]->GetXaxis()->FindBin(Form("%s",signa60_plus_bkg[i].data()))));
-	       Fitpar.push_back(1.0);
+	       Fitpar.push_back(0.0);
 	     }
 
 	   if(found_na60_pol4exp != std::string::npos)
 	     {
 	       for (int i = 0; i < 18; i++)
 	       Fitpar.push_back(hT_mass[iPt]->GetBinContent(hT_mass[iPt]->GetXaxis()->FindBin(Form("%s",signa60_plus_pol4expbkg[i].data()))));
-	       Fitpar.push_back(1.0);
+	       Fitpar.push_back(0.0);
 	     }
 	   
 	   //hT_mass[iPt]->Draw();
@@ -245,13 +273,16 @@ void Fit_v2_Systematic()
 	   prof_v2EP[iPt]->SetName(Form("fitv2_Sig_Bkg:%s_%s__FitRange:%0.1f_%0.1f__Pt:%1.0f_%1.0f__CENT:%1.0f_%1.0f",mass_sig[kfun].data(),mass_bkg[kfun].data(), min_range[iR],max_range[iR],minPtBins[iPt], maxPtBins[iPt], minCentrBins[0], maxCentrBins[0]));
 	   prof_v2EP[iPt]->SetTitle(Form("fitv2_Sig_Bkg:%s_%s__Pt:%1.0f_%1.0f",mass_sig[kfun].data(),mass_bkg[kfun].data(),minPtBins[iPt], maxPtBins[iPt]));
 	  
-	  if(iPt ==0) fitv2[iPt][kfun][iR] = v2Fit(prof_v2EP[iPt], type,parLimit0);
-	  else if(iPt ==1) fitv2[iPt][kfun][iR] = v2Fit(prof_v2EP[iPt], type,parLimit1);
-	  else if(iPt ==2) fitv2[iPt][kfun][iR] = v2Fit(prof_v2EP[iPt], type,parLimit2);
-	  else if(iPt ==3) fitv2[iPt][kfun][iR] = v2Fit(prof_v2EP[iPt], type,parLimit3);
-	  else if(iPt ==4) fitv2[iPt][kfun][iR] = v2Fit(prof_v2EP[iPt], type,parLimit4);
-	  else if(iPt ==5) fitv2[iPt][kfun][iR] = v2Fit(prof_v2EP[iPt], type,parLimit5);
-	  else fitv2[iPt][kfun][iR] = v2Fit(prof_v2EP[iPt], type,parLimit6);
+	   if(iPt ==0) fitv2[iPt][kfun][iR] = v2Fit(iPt,prof_v2EP[iPt], type,parLimit0);
+	  else if(iPt ==1) fitv2[iPt][kfun][iR] = v2Fit(iPt, prof_v2EP[iPt], type,parLimit1);
+	  else if(iPt ==2) fitv2[iPt][kfun][iR] = v2Fit(iPt,prof_v2EP[iPt], type,parLimit2);
+	  else if(iPt ==3) fitv2[iPt][kfun][iR] = v2Fit(iPt,prof_v2EP[iPt], type,parLimit3);
+	  else if(iPt ==4) fitv2[iPt][kfun][iR] = v2Fit(iPt,prof_v2EP[iPt], type,parLimit4);
+	  else if(iPt ==5) fitv2[iPt][kfun][iR] = v2Fit(iPt,prof_v2EP[iPt], type,parLimit5);
+	  else if(iPt ==6) fitv2[iPt][kfun][iR] = v2Fit(iPt,prof_v2EP[iPt], type,parLimit6);
+	  else if(iPt ==7) fitv2[iPt][kfun][iR] = v2Fit(iPt,prof_v2EP[iPt], type,parLimit7);
+	  else if(iPt ==8) fitv2[iPt][kfun][iR] = v2Fit(iPt,prof_v2EP[iPt], type,parLimit8);
+	  else if(iPt ==9) fitv2[iPt][kfun][iR] = v2Fit(iPt,prof_v2EP[iPt], type,parLimit9);
 
 	   prof_v2EP[iPt]->Draw("p");
            //prof_MEv2EP[iPt]->Draw("psame");
@@ -287,7 +318,7 @@ void Fit_v2_Systematic()
 
 
  //=======Systematic uncertainities ===============
- double value[8][3];
+ double value[nPtBins][3];
  std::vector<TH1*> myHist = Uncertainities(histsys,v2par, v2par_er, value);
 
  for(int iPt = 0;iPt<nPtBins;iPt++) //Loop over v2_signal and background
@@ -339,35 +370,24 @@ void Fit_v2_Systematic()
  display1->Draw("same");
 
    }
+
  
  //=======Plotting ==================
  gStyle->SetOptStat(0);
  gStyle->SetOptFit(1);
  fOut = new TFile("Systematic_Cent10-50.root","RECREATE");
- cPt[0]->Write();
- cPt[1]->Write();
- cPt[2]->Write();
- cPt[3]->Write();
- cPt[4]->Write();
- cPt[5]->Write();
- cPt[6]->Write();
- cPt[7]->Write();
+ for(int i =0; i<nPtBins; i++)
+ cPt[i]->Write();
  fOut->Close();
 
  fv2fit = new TFile("FitResults_v2-50.root","RECREATE");
- prof_v2EP[0]->Write();
- prof_v2EP[1]->Write();
- prof_v2EP[2]->Write();
- prof_v2EP[3]->Write();
- prof_v2EP[4]->Write();
- prof_v2EP[5]->Write();
- prof_v2EP[6]->Write();
- prof_v2EP[7]->Write();
+ for(int i =0; i<nPtBins; i++)
+ prof_v2EP[i]->Write();
  fv2fit->Close();
 
  
 TCanvas *c2 = new TCanvas("c2", "c2",75,70,1309,696);
- c2->Divide(4,2);
+ c2->Divide(5,2);
  for(int i =0; i<nPtBins; i++)
    {
      c2->cd(i+1);
@@ -380,11 +400,11 @@ TCanvas *c2 = new TCanvas("c2", "c2",75,70,1309,696);
      prof_MEv2EP[i]->SetMarkerColor(kRed);
      prof_MEv2EP[i]->SetMarkerStyle(20);
      prof_MEv2EP[i]->SetMarkerSize(0.7);
-     prof_MEv2EP[i]->Rebin(2);
+     //prof_MEv2EP[i]->Rebin(2);
      prof_MEv2EP[i]->Scale(2.8);
      prof_v2EP[i]->Draw("e");
      //prof_MEv2EP[i]->Draw("psame");
-     //hT_plot[i]->Draw();
+     //m_plot[i]->Draw();
 }
  
 
@@ -392,7 +412,7 @@ TCanvas *c2 = new TCanvas("c2", "c2",75,70,1309,696);
 }
 
 
-TF1* v2Fit(TProfile *v2prof, int type, Double_t parLimit[3])
+TF1* v2Fit(int iPt,TProfile *v2prof, int type, Double_t parLimit[3])
 {
   cout << "Output of para begin and end: "<<endl;
   for (int i = 0; i < Fitpar.size(); i++)
@@ -405,7 +425,7 @@ TF1* v2Fit(TProfile *v2prof, int type, Double_t parLimit[3])
   v2prof->Draw();
 
   //=============================== v2 Fitting =================
-  TF1* bck = new TF1("bck",FitFunctionBackgroundPol2,xmin,xmax,4);
+  TF1* bck = new TF1("bck",FitFunctionBackgroundPol2,xmin,xmax,3);
   bck->FixParameter(3,type);
   bck->SetLineColor(kBlue);
   bck->SetLineStyle(9);
@@ -428,6 +448,16 @@ TF1* v2Fit(TProfile *v2prof, int type, Double_t parLimit[3])
 
  if(found_cb2_vwg != std::string::npos) 
    {
+
+  //Fit mass spectra and get normalization parameters ..........
+  TF1 *fitFctCB2VWG = new TF1("fitFctCB2VWG", fitFunctionCB2VWG,v2xmin,v2xmax,11);
+  fitFctCB2VWG->SetParameter(0,norm_bkg[iPt]);
+  for (int i = 1; i < 4; i++) fitFctCB2VWG->FixParameter(i,Fitpar[i]);
+  fitFctCB2VWG->SetParameter(4,norm_sig[iPt]);
+  for (int i = 5; i < 11; i++) fitFctCB2VWG->FixParameter(i,Fitpar[i]);
+  hT_mass2[iPt]->Fit(fitFctCB2VWG,"REMSI");
+  //for (int i = 0; i < Fitpar.size(); i++) cout<<" PARAMETERS COMPARISION \\\\\\\\\\  "<<fitFctCB2VWG->GetParameter(i)<<"   "<<Fitpar[i]<<endl;
+  
   fitv2 = new TF1("fitv2",FitFunctionFlowS2CB2VWGPOL2,v2xmin,v2xmax,17);
   fitv2->SetParNames("kVWG","mVWG","sVWG1","sVWG2","kJPsi","mJPsi","sJPsi","alJPsi","nlJPsi","auJPsi","nuJPsi");
   fitv2->SetLineColor(kRed);
@@ -439,21 +469,23 @@ TF1* v2Fit(TProfile *v2prof, int type, Double_t parLimit[3])
   fitv2->FixParameter(16,type);
   
   for (int i = 0; i < Fitpar.size(); i++) fitv2->FixParameter(i,Fitpar[i]);
-  for (int i = 0; i < Fitpar.size(); i++) cout<<" ================== \\\\\\\\\\  "<<fitv2->GetParameter(i,Fitpar[i])<<endl;
+  //for (int i = 0; i < Fitpar.size(); i++) cout<<" ================== \\\\\\\\\\  "<<fitv2->GetParameter(i)<<endl;
   //for( Int_t i = 0; i < 12; ++i ) fitv2->FixParameter(i,par[i]);
   fitv2->SetParameter(12, parLimit[0]);
   fitv2->SetParLimits(12, parLimit[1],parLimit[2]);
+  fitv2->FixParameter(0,fitFctCB2VWG->GetParameter(0));
+  fitv2->FixParameter(4,fitFctCB2VWG->GetParameter(4));
   
   for ( Int_t i = 0; i < 3; ++i ) { fitv2->SetParameter(i + 13, bck->GetParameter(i));}
-
-  TFitResultPtr r2 = v2prof->Fit(fitv2,"RESI");
+ 
+  TFitResultPtr r2 = v2prof->Fit(fitv2,"REI");
 
   TF1* bck2 = new TF1("bck2",FitFunctionBackgroundPol2,v2xmin,v2xmax,4);
   bck2->FixParameter(3,type);
-  for ( Int_t i = 0; i < 3; ++i ) { bck2->SetParameter(i, fitv2->GetParameter(i + 13));}
+  for ( Int_t i = 0; i < 3; ++i ) { bck2->FixParameter(i, fitv2->GetParameter(i + 13));}
   bck2->SetLineColor(kBlue);
   bck2->SetLineStyle(2);
-  v2prof->Fit(bck2,"RESI+");
+  v2prof->Fit(bck2,"RE+");
   bck2->Draw("same");
 
   Jpsiv2 =  fitv2->GetParameter(12);
@@ -464,6 +496,15 @@ TF1* v2Fit(TProfile *v2prof, int type, Double_t parLimit[3])
  if (found_cb2_pol4exp != std::string::npos) 
     {
       cout<<"CB2_Pol4Exp EXIST"<<endl;
+      //Fit mass spectra and get normalization parameters ..........
+      TF1 *fitFctCB2Pol4Exp = new TF1("fitFctCB2Pol4Exp",fitFunctionCB2Pol4Exp,v2xmin,v2xmax,14);
+      fitFctCB2Pol4Exp->SetParameter(0,norm_bkg[iPt]);
+      for (int i = 1; i < 7; i++) fitFctCB2Pol4Exp->FixParameter(i,Fitpar[i]);
+      fitFctCB2Pol4Exp->SetParameter(7,norm_sig[iPt]);
+      for (int i = 8; i < 14; i++) fitFctCB2Pol4Exp->FixParameter(i,Fitpar[i]);
+      hT_mass2[iPt]->Fit(fitFctCB2Pol4Exp,"REMSI");
+      //for (int i = 0; i < Fitpar.size(); i++) cout<<" PARAMETERS COMPARISION \\\\\\\\\\  "<<fitFctCB2Pol4Exp->GetParameter(i)<<"   "<<Fitpar[i]<<endl;
+
       fitv2 = new TF1("fitv2",FitFunctionFlowS2CB2POL4EXPPOL2,v2xmin,v2xmax,20);
       fitv2->SetParNames("pol0","pol1","pol2","pol3","exp1","exp2","exp3","kJPsi","mJPsi","sJPsi","alJPsi");
       fitv2->SetParName(11,"nlJPsi");
@@ -482,18 +523,18 @@ TF1* v2Fit(TProfile *v2prof, int type, Double_t parLimit[3])
       //for( Int_t i = 0; i < 15; ++i ) fitv2->FixParameter(i,par[i]);
       fitv2->SetParameter(15,parLimit[0]);
       fitv2->SetParLimits(15,parLimit[1],parLimit[2]);
-      //fitv2->SetParameter(15, 0.12);
-      //fitv2->SetParLimits(15, 0.1,0.14);
+      fitv2->FixParameter(0,fitFctCB2Pol4Exp->GetParameter(0));
+      fitv2->FixParameter(7,fitFctCB2Pol4Exp->GetParameter(7));
   
      for ( Int_t i = 0; i < 3; ++i ) { fitv2->SetParameter(i + 16, bck->GetParameter(i));}
 
-     TFitResultPtr r2 = v2prof->Fit(fitv2,"RESI");
+     TFitResultPtr r2 = v2prof->Fit(fitv2,"REI");
 
      TF1* bck2 = new TF1("bck2",FitFunctionBackgroundPol2,v2xmin,v2xmax,4);
-     for ( Int_t i = 0; i < 3; ++i ) { bck2->SetParameter(i, fitv2->GetParameter(i + 16));}
+     for ( Int_t i = 0; i < 3; ++i ) { bck2->FixParameter(i, fitv2->GetParameter(i + 16));}
      bck2->SetLineColor(kBlue);
      bck2->SetLineStyle(2);
-     //v2prof->Fit(bck,"RESI+");
+     v2prof->Fit(bck2,"RE+");
      //bck2->Draw("same");
 
      Jpsiv2 =  fitv2->GetParameter(15);
@@ -505,6 +546,16 @@ TF1* v2Fit(TProfile *v2prof, int type, Double_t parLimit[3])
  if (found_na60_vwg != std::string::npos) 
    {
      cout<<"NA60_VWG EXIST"<<endl;
+     //Fit mass spectra and get normalization parameters NA60..........
+     TF1 *fitFctna60vwg = new TF1("fitFctna60vwg",fitFunctionNA60NEWVWG,v2xmin,v2xmax,15);
+     fitFctna60vwg->SetParameter(0,norm_bkg[iPt]);
+     for (int i = 1; i < 4; i++) fitFctna60vwg->FixParameter(i,Fitpar[i]);
+     fitFctna60vwg->SetParameter(4,norm_sig[iPt]);
+     for (int i = 5; i < 15; i++) fitFctna60vwg->FixParameter(i,Fitpar[i]);
+     hT_mass2[iPt]->Fit(fitFctna60vwg,"REMSI");
+     //for (int i = 0; i < Fitpar.size(); i++) cout<<" PARAMETERS COMPARISION NA60\\\\\\\\\\  "<<fitFctna60vwg->GetParameter(i)<<"   "<<Fitpar[i]<<endl;
+
+       
      fitv2 = new TF1("fitv2",FitFunctionFlowS2NA60NEWVWGPOL2,v2xmin,v2xmax,21);
      fitv2->SetParNames("kVWG","mVWG","sVWG1","sVWG2","kJPsi","mJPsi","sJPsi","p1LJPsi","p2LJPsi","p3LJPsi","p1RJPsi");
      fitv2->SetParName(11,"p2RJPsi");
@@ -522,17 +573,19 @@ TF1* v2Fit(TProfile *v2prof, int type, Double_t parLimit[3])
      //for( Int_t i = 0; i < 16; ++i ) fitv2->FixParameter(i,par[i]);
      fitv2->SetParameter(16,parLimit[0]);
      fitv2->SetParLimits(16,parLimit[1],parLimit[2]);
-  
+     fitv2->FixParameter(0,fitFctna60vwg->GetParameter(0));
+     fitv2->FixParameter(4,fitFctna60vwg->GetParameter(4));
+     
      for ( Int_t i = 0; i < 3; ++i ) { fitv2->SetParameter(i + 17, bck->GetParameter(i));}
 
-     TFitResultPtr r2 = v2prof->Fit(fitv2,"RESI");
+     TFitResultPtr r2 = v2prof->Fit(fitv2,"REI");
 
      TF1* bck2 = new TF1("bck2",FitFunctionBackgroundPol2,v2xmin,v2xmax,4);
-     for ( Int_t i = 0; i < 3; ++i ) { bck2->SetParameter(i, fitv2->GetParameter(i + 17));}
+     for ( Int_t i = 0; i < 3; ++i ) { bck2->FixParameter(i, fitv2->GetParameter(i + 17));}
      bck2->SetLineColor(kBlue);
      bck2->SetLineStyle(2);
-     v2prof->Fit(bck,"RESI+");
-     bck2->Draw("same");
+     //v2prof->Fit(bck2,"RE+");
+     //bck2->Draw("same");
 
      Jpsiv2 =  fitv2->GetParameter(16);
      Jpsiv2_err =  fitv2->GetParError(16);
@@ -541,6 +594,16 @@ TF1* v2Fit(TProfile *v2prof, int type, Double_t parLimit[3])
  if (found_na60_pol4exp != std::string::npos) 
    {
      cout<<"NA60_EXPPol EXIST"<<endl;
+     //Fit mass spectra and get normalization parameters NA60..........
+     TF1 *fitFctna60pol4exp = new TF1("fitFctna60pol4exp",fitFunctionNA60NEWPol4Exp,v2xmin,v2xmax,18);
+     fitFctna60pol4exp->SetParameter(0,norm_bkg[iPt]);
+     for (int i = 1; i < 7; i++) fitFctna60pol4exp->FixParameter(i,Fitpar[i]);
+     fitFctna60pol4exp->SetParameter(7,norm_sig[iPt]);
+     for (int i = 8; i < 18; i++) fitFctna60pol4exp->FixParameter(i,Fitpar[i]);
+     hT_mass2[iPt]->Fit(fitFctna60pol4exp,"REMSI");
+     //for (int i = 0; i < Fitpar.size(); i++) cout<<" PARAMETERS COMPARISION NA60PLO4EXP\\\\\\\\\\  "<<fitFctna60pol4exp->GetParameter(i)<<"   "<<Fitpar[i]<<endl;
+
+     
      fitv2 = new TF1("fitv2",FitFunctionFlowS2NA60NEWPOL4EXPPOL2,v2xmin,v2xmax,24);
      fitv2->SetParNames("pol0","pol1","pol2","pol3","exp1","exp2","exp3","kJPsi","mJPsi","sJPsi","p1LJPsi");
      fitv2->SetParName(11,"p2LJPsi");
@@ -562,17 +625,19 @@ TF1* v2Fit(TProfile *v2prof, int type, Double_t parLimit[3])
      //fitv2->FixParameter(0,0.06);
      fitv2->SetParameter(19, parLimit[0]);
      fitv2->SetParLimits(19, parLimit[1],parLimit[2]);
+     fitv2->FixParameter(0,fitFctna60pol4exp->GetParameter(0));
+     fitv2->FixParameter(7,fitFctna60pol4exp->GetParameter(7));
   
      for ( Int_t i = 0; i < 3; ++i ) { fitv2->SetParameter(i + 20, bck->GetParameter(i));}
 
-     TFitResultPtr r2 = v2prof->Fit(fitv2,"RESI");
+     TFitResultPtr r2 = v2prof->Fit(fitv2,"REI");
 
      TF1* bck2 = new TF1("bck2",FitFunctionBackgroundPol2,v2xmin,v2xmax,4);
-     for ( Int_t i = 0; i < 3; ++i ) { bck2->SetParameter(i, fitv2->GetParameter(i + 20));}
+     for ( Int_t i = 0; i < 3; ++i ) { bck2->FixParameter(i, fitv2->GetParameter(i + 20));}
      bck2->SetLineColor(kBlue);
      bck2->SetLineStyle(2);
-     v2prof->Fit(bck,"RESI+");
-     bck2->Draw("same");
+     //v2prof->Fit(bck2,"RE+");
+     //bck2->Draw("same");
 
      Jpsiv2 =  fitv2->GetParameter(19);
      Jpsiv2_err =  fitv2->GetParError(19);
@@ -588,10 +653,10 @@ TF1* v2Fit(TProfile *v2prof, int type, Double_t parLimit[3])
 }
 
 
-std::vector<TH1*> Uncertainities(std::vector<TH1*> histlist, vector<double> parameter, vector<double> parameter_er, double value[8][3])
+std::vector<TH1*> Uncertainities(std::vector<TH1*> histlist, vector<double> parameter, vector<double> parameter_er, double value[nPtBins][3])
 {
   std::vector<TH1*> histograms;
-  int ncombination = parameter.size()/8;
+  int ncombination = parameter.size()/nPtBins;
 
   int nbin =0;
   for (int i = 0; i < parameter.size(); i++)
@@ -675,7 +740,7 @@ Double_t FitFunctionBackgroundPol4Exp(Double_t *x, Double_t *par)
  //return par[0]*(par[1]+par[2]*x[0]+par[3]*x[0]*x[0]+par[4]*x[0]*x[0]*x[0]+par[5]*x[0]*x[0]*x[0]*x[0])*TMath::Exp(par[6]/x[0]);
  //return (par[0]+par[1]*x[0]+par[2]*x[0]*x[0]+par[3]*x[0]*x[0]*x[0]+par[4]*x[0]*x[0]*x[0]*x[0])*TMath::Exp(par[5]/x[0]);
  //return par[0]*(par[1]+par[2]*x[0]+par[3]*x[0]*x[0]+par[4]*x[0]*x[0]*x[0]+par[5]*x[0]*x[0]*x[0]*x[0])*TMath::Exp(par[6]*x[0]);
-  return par[0]*(par[1]+par[2]*x[0]+par[3]*x[0]*x[0]+par[4]*x[0]*x[0]*x[0]+par[5]*x[0]*x[0]*x[0]*x[0])*TMath::Exp(par[6]*x[0]);
+  return par[0]*(par[1]+par[2]*x[0]+par[3]*x[0]*x[0]+par[4]*x[0]*x[0]*x[0]+par[5]*x[0]*x[0]*x[0]*x[0])*TMath::Exp(-par[6]*x[0]);
   
 }
 
@@ -881,6 +946,30 @@ Double_t FitFunctionNA60New(Double_t *x,Double_t *par)
 
 }
 
+//Mass Fits
+//------------------------------------------------------------------------------
+Double_t fitFunctionCB2VWG(Double_t *x, Double_t *par)
+{
+  return FitFunctionBackgroundVWG(x, par) + FitFunctionSignalCrystalBallExtended(x, &par[4]);
+}
+
+//------------------------------------------------------------------------------
+Double_t fitFunctionNA60NEWVWG(Double_t *x, Double_t *par)
+{
+  return FitFunctionBackgroundVWG(x, par) + FitFunctionNA60New(x, &par[4]);
+}
+
+//------------------------------------------------------------------------------
+Double_t fitFunctionCB2Pol4Exp(Double_t *x, Double_t *par)
+{
+  return FitFunctionBackgroundPol4Exp(x, par) + FitFunctionSignalCrystalBallExtended(x, &par[7]);
+}
+
+//------------------------------------------------------------------------------
+Double_t fitFunctionNA60NEWPol4Exp(Double_t *x, Double_t *par)
+{
+  return FitFunctionBackgroundPol4Exp(x, par) + FitFunctionNA60New(x, &par[7]);
+}
 
 //------------------------------------------------------------------------------
 Double_t alphaNA60NEWVWG(Double_t*x, Double_t* par)
