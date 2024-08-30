@@ -124,7 +124,7 @@ string signa60_plus_pol4expbkg[] = {"bkg","aa","bb","cc","dd","ee","ff","sig_Jps
 std::vector<TH1*> Uncertainities(std::vector<TH1*> histlist, vector<double> parameter, vector<double> parameter_er, double value[nPtBins][3]);
 
 void v2_fitter() {
-    string dirPath = "/Users/lucamicheletti/GITHUB/jpsi_flow_run3/macros/systematics2";
+    string dirPath = "/Users/lucamicheletti/GITHUB/jpsi_flow_run3/macros/systematics";
     if (!gSystem -> AccessPathName(dirPath.c_str())) {
         std::cout << "The output directory already exists! " << std::endl;
     } else {
