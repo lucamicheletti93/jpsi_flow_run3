@@ -14,6 +14,7 @@
 #include "TFitResult.h"
 #include "TPaveText.h"
 #include <vector>
+#include "TSystem.h"
 
 Double_t FitFunctionBackgroundPol2(Double_t *x, Double_t *par);
 Double_t FitFunctionBackgroundPol3(Double_t *x, Double_t *par);
@@ -44,86 +45,43 @@ Double_t fitFunctionCB2Pol4Exp(Double_t *x, Double_t *par);
 Double_t fitFunctionNA60NEWVWG(Double_t *x, Double_t *par);
 Double_t fitFunctionNA60NEWPol4Exp(Double_t *x, Double_t *par);
 
-TF1* v2Fit(int iPt,TProfile *v2prof, int type,Double_t parLimit[3], Double_t minFitRange, Double_t maxFitRange);
 double* DoFlowFit(TH1D *, TH1D *, TProfile *, double , double , bool , string , TFile *);
+std::vector<TH1*> Uncertainities(std::vector<TH1*> histlist, vector<double> parameter, vector<double> parameter_er, double value[10][3]);
 
 Double_t xmin= 2.3;
 Double_t xmax= 4.8;
 
-const Double_t v2xmin= 2.3;
-const Double_t v2xmax= 4.8;
-
-vector<double> fitPars;
-TFile *fOut;
-TFile *fv2fit;
-Double_t Jpsiv2 ;
-Double_t Jpsiv2_err ;
-Double_t v2_ch_ndf;
-
-vector<double> v2par;
-vector<double> v2par_er;
-std::vector<TH1*> histSystematics;
-
-std::string Fit_subStr1 = "CB2_VWG";
-std::string Fit_subStr2 = "CB2_Pol4Exp";
-std::string Fit_subStr3 = "NA60_Pol4Exp";
-std::string Fit_subStr4 = "NA60_VWG";
-
-
-const int nMassFitTrials = 1;
-string massSigTrials[] = {"CB2", "CB2", "CB2", "CB2", "NA60", "NA60"};
-string massBkgTrials[] = {"VWG_data", "VWG_MC", "Pol4Exp_data", "Pol4Exp_MC", "VWG_MC", "Pol4Exp_MC"};
-
-string func_sig[] = {"CB2", "CB2", "CB2", "CB2", "NA60", "NA60"};
-string func_bkg[] = {"VWG", "VWG", "Pol4Exp", "Pol4Exp", "VWG", "Pol4Exp"};
-
-const int nSigFuncs = 1;
+const int nSigFuncs = 2;
 string sigFuncs[] = {"CB2", "NA60"};
 const int nBkgFuncs = 2;
 string bkgFuncs[] = {"VWG", "Pol4Exp"};
+const int nBkgV2Funcs = 2;
+string bkgV2Funcs[] = {"Pol2", "Cheb"};
 const int nTailSets = 2;
 string tailSets[] = {"data", "MC"};
 
-double minCentrBins[] = {10};
-double maxCentrBins[] = {50};
-
-const int nPtBins = 10;
-double minPtBins[] = {0, 1, 2, 3, 4, 5, 6, 8, 10, 12};
-double maxPtBins[] = {1, 2, 3, 4, 5, 6, 8, 10, 12, 15};
-double ptBins[] = {0, 1, 2, 3, 4, 5, 6, 8, 10, 12, 15};
-//double minPtBins[] = {0, 1, 2, 3, 4, 5};
-//double maxPtBins[] = {1, 2, 3, 4, 5, 6};
-
-const int nFitRanges = 3;
-double minFitRanges[] = {2.3, 2.4, 2.5};
-double maxFitRanges[] = {4.7, 4.6, 4.5};
-
-const int nbck_type = 1;
-int bck_type[2] = {0,1};
-string func_v2bck[] = {"Pol2", "Cheb"};
-
-int nSystBins = nSigFuncs * nBkgFuncs * nTailSets * nFitRanges * nbck_type;
-
-double resolution = 1.28004;
-
-double norm[] = {2.12944e+04,3.61983e+04,2.49511e+04,1.24006e+04,6.77359e+03,3.69119e+03,3.02467e+03,9.84673e+02,2.90510e+02,100,10};
-double norm_bkg[] = {8.12173e+06,1.13264e+07,1.48518e+06,2.21428e+05,4.73500e+04,1.51403e+04,8.22036e+03,2.02200e+03,5.60000e+02,100,10};
-
-
-//funcMassSigBkg->SetParameter(0, 1e6); // Bkg normalization
-//funcMassSigBkg->SetParameter(4, 300000); // Jpsi normalization
-//funcMassSigBkg->SetParameter(0, 1800); // Bkg normalization
-//funcMassSigBkg->SetParameter(4, 900); // Jpsi normalization
-
-
-
-double par[19];
 string parNames_CB2_VWG[] = {"bkg","aa","bb","cc","sig_Jpsi","mean_Jpsi","width_Jpsi","a_Jpsi","b_Jpsi","c_Jpsi","d_Jpsi"};
 string parNames_CB2_Pol4Exp[] = {"bkg","aa","bb","cc","dd","ee","ff","sig_Jpsi","mean_Jpsi","width_Jpsi","a_Jpsi","b_Jpsi","c_Jpsi","d_Jpsi"};
 string parNames_NA60_VWG[] = {"bkg","aa","bb","cc","sig_Jpsi","mean_Jpsi","width_Jpsi","b_Jpsi","c_Jpsi","d_Jpsi","f_Jpsi","g_Jpsi","h_Jpsi","a_Jpsi","e_Jpsi"};
 string parNames_NA60_Pol4Exp[] = {"bkg","aa","bb","cc","dd","ee","ff","sig_Jpsi","mean_Jpsi","width_Jpsi","b_Jpsi","c_Jpsi","d_Jpsi","f_Jpsi","g_Jpsi","h_Jpsi","a_Jpsi","e_Jpsi"};
 
-std::vector<TH1*> Uncertainities(std::vector<TH1*> histlist, vector<double> parameter, vector<double> parameter_er, double value[nPtBins][3]);
+double minCentrBins[] = {10};
+double maxCentrBins[] = {50};
+
+const int nPtBins = 1;
+//double minPtBins[] = {0, 1, 2, 3, 4, 5, 6, 8, 10, 12};
+//double maxPtBins[] = {1, 2, 3, 4, 5, 6, 8, 10, 12, 15};
+double ptBins[] = {0, 1, 2, 3, 4, 5, 6, 8, 10, 12, 15};
+double minPtBins[] = {3};
+double maxPtBins[] = {4};
+
+const int nFitRanges = 3;
+double minFitRanges[] = {2.3, 2.4, 2.5};
+double maxFitRanges[] = {4.7, 4.6, 4.5};
+
+int nTrials = 0;
+
+double resolution = 1.28004;
 
 void v2_fitter() {
     string dirPath = "/Users/lucamicheletti/GITHUB/jpsi_flow_run3/macros/systematics";
@@ -157,20 +115,27 @@ void v2_fitter() {
     for (int iPt = 0;iPt < nPtBins;iPt++) {
         vector<double> jpsiV2s;
         vector<double> errJpsiV2s;
+        vector<double> chi2Ndfs;
         vector<string> trialSetNames;
 
         double minPtBin = minPtBins[iPt];
         double maxPtBin = maxPtBins[iPt];
+        nTrials = 0;
 
         TFile *fIn = new TFile("/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/data/pass3/LHC23_full/Histograms_Fullpass3matchedMchMid_centr_Add_Pt_bin_10_50.root");
         TFile *fOut = new TFile(Form("systematics/fitResults_Pt_%2.1f_%2.1f.root", minPtBin, maxPtBin), "RECREATE");
 
-        for (int iSigFunc = 0;iSigFunc < nSigFuncs;iSigFunc++) {
-            for (int iBkgFunc = 0;iBkgFunc < nBkgFuncs;iBkgFunc++) {
-                for (int iTailSet = 0;iTailSet < nTailSets;iTailSet++) {
+        for (int iSigFunc = 0;iSigFunc < nSigFuncs;iSigFunc++) { // loop on mass signal funcs
+            for (int iBkgFunc = 0;iBkgFunc < nBkgFuncs;iBkgFunc++) { // loop on mass background funcs
+                for (int iTailSet = 0;iTailSet < nTailSets;iTailSet++) { // loop on tail parameters
                     string sigFunc = sigFuncs[iSigFunc];
                     string bkgFunc = bkgFuncs[iBkgFunc];
                     string tailSet = tailSets[iTailSet];
+
+                    if (sigFunc == "NA60" && tailSet == "data") {
+                        continue;
+                    }
+
                     TFile *fInMassFit = new TFile(Form("/Users/lucamicheletti/GITHUB/dq_fitter/analysis/LHC23_pass3_full/centrality_10_50/pt_dependence/Pt_%2.1f_%2.1f/multi_trial_%s_%s_%s_tails.root", minPtBin, maxPtBin, sigFunc.c_str(), bkgFunc.c_str(), tailSet.c_str()));
 
                     for (int iFitRange = 0;iFitRange < nFitRanges;iFitRange++) {
@@ -197,12 +162,19 @@ void v2_fitter() {
                         profV2 -> SetMarkerColor(kBlack);
                         profV2 -> SetLineColor(kBlack);
 
-                        double *results = DoFlowFit(histMassFitPars, histMass, profV2, minFitRange, maxFitRange, kFALSE, Form("%s_%s_%s", sigFunc.c_str(), bkgFunc.c_str(), tailSet.c_str()), fOut);
+                        for (int iBkgV2Func = 0;iBkgV2Func < nBkgV2Funcs;iBkgV2Func++) { // loop on v2 background types
+                            string bkgV2Func = bkgV2Funcs[iBkgV2Func];
+                            double *results = DoFlowFit(histMassFitPars, histMass, profV2, minFitRange, maxFitRange, kFALSE, Form("%s_%s_%s_%s_v2bkg", sigFunc.c_str(), bkgFunc.c_str(), tailSet.c_str(), bkgV2Func.c_str()), fOut);
 
-                        // WARNING! v2 from the fit is scaled by the RESOLUTION
-                        jpsiV2s.push_back(results[0] * resolution);
-                        errJpsiV2s.push_back(results[1] * resolution);
-                        trialSetNames.push_back(Form("%s + %s + %s tails, %2.1f - %2.1f, Pol2[v2 bkg]", sigFunc.c_str(), bkgFunc.c_str(), tailSet.c_str(), minFitRange, maxFitRange));
+                            // WARNING! v2 from the fit is scaled by the RESOLUTION
+                            jpsiV2s.push_back(results[0] * resolution);
+                            errJpsiV2s.push_back(results[1] * resolution);
+                            chi2Ndfs.push_back(results[2]);
+                            trialSetNames.push_back(Form("%s + %s + %s tails, %2.1f - %2.1f, %s[v2 bkg]", sigFunc.c_str(), bkgFunc.c_str(), tailSet.c_str(), minFitRange, maxFitRange, bkgV2Func.c_str()));
+
+                            // Update the number of trials
+                            nTrials++;
+                        }
                     }
                 }
             }
@@ -211,25 +183,39 @@ void v2_fitter() {
         double sumJpsiV2s = 0; 
         double statErrJpsiV2s = 0;
 
-        TH1D *histSyst = new TH1D("histSyst", "", nSystBins, 0, nSystBins);
-        histSyst -> GetYaxis() -> SetRangeUser(0, 0.2);
-        for (int iBin = 0;iBin < nSystBins;iBin++) {
-            histSyst -> SetBinContent(iBin+1, jpsiV2s[iBin]);
-            histSyst -> SetBinError(iBin+1, errJpsiV2s[iBin]);
-            histSyst -> GetXaxis() -> SetBinLabel(iBin+1, trialSetNames[iBin].c_str());
+        TH1D *histSyst = new TH1D("histSyst", "", nTrials, 0, nTrials);
+        histSyst -> SetMarkerStyle(20);
+        histSyst -> SetMarkerColor(kBlack);
+        histSyst -> SetLineColor(kBlack);
 
-            sumJpsiV2s = sumJpsiV2s + jpsiV2s[iBin];
+        TH1D *histChi2Ndf = new TH1D("histChi2Ndf", "", nTrials, 0, nTrials);
+        histChi2Ndf -> SetMarkerStyle(20);
+        histChi2Ndf -> SetMarkerColor(kBlack);
+        histChi2Ndf -> SetLineColor(kBlack);
+
+        histSyst -> GetYaxis() -> SetRangeUser(0, 0.2);
+        for (int iBin = 0;iBin < nTrials;iBin++) {
+
+          cout << iBin << ") " << jpsiV2s[iBin] << " +/- " << errJpsiV2s[iBin] << " -> " << trialSetNames[iBin].c_str() << endl;
+          histSyst -> SetBinContent(iBin+1, jpsiV2s[iBin]);
+          histSyst -> SetBinError(iBin+1, errJpsiV2s[iBin]);
+          histSyst -> GetXaxis() -> SetBinLabel(iBin+1, trialSetNames[iBin].c_str());
+
+          sumJpsiV2s = sumJpsiV2s + jpsiV2s[iBin];
 	        statErrJpsiV2s = statErrJpsiV2s + errJpsiV2s[iBin];
+
+          histChi2Ndf -> SetBinContent(iBin+1, chi2Ndfs[iBin]);
+          histChi2Ndf -> GetXaxis() -> SetBinLabel(iBin+1, trialSetNames[iBin].c_str());
         }
-        double meanJpsiV2 = sumJpsiV2s / nSystBins;
-        double meanStatErrJpsiV2 = statErrJpsiV2s / nSystBins;
+        double meanJpsiV2 = sumJpsiV2s / nTrials;
+        double meanStatErrJpsiV2 = statErrJpsiV2s / nTrials;
 
         double sumSyst = 0;
-        for (int iBin = 0;iBin < nSystBins;iBin++) {
+        for (int iBin = 0;iBin < nTrials;iBin++) {
             double dev = (jpsiV2s[iBin] - meanJpsiV2);
 	        sumSyst = sumSyst + dev * dev;
         }
-        double meanSystErrJpsiV2 = TMath::Sqrt(sumSyst / nSystBins);
+        double meanSystErrJpsiV2 = TMath::Sqrt(sumSyst / nTrials);
 
         histStatJpsiV2 -> SetBinContent(iPt+1, meanJpsiV2);
         histStatJpsiV2 -> SetBinError(iPt+1, meanStatErrJpsiV2);
@@ -239,34 +225,35 @@ void v2_fitter() {
         double meanStatErrJpsiV2Perc = (meanStatErrJpsiV2 / meanJpsiV2) * 100;
         double meanSystErrJpsiV2Perc = (meanSystErrJpsiV2 / meanJpsiV2) * 100;
 
-        TLine *lineMean = new TLine(0, meanJpsiV2, nSystBins, meanJpsiV2);
+        TLine *lineMean = new TLine(0, meanJpsiV2, nTrials, meanJpsiV2);
         lineMean -> SetLineStyle(1);
         lineMean -> SetLineColor(kBlue);
         lineMean -> SetLineWidth(2);
 
-        TLine *lineSystUp = new TLine(0, meanJpsiV2 + meanSystErrJpsiV2, nSystBins, meanJpsiV2 + meanSystErrJpsiV2);
+        TLine *lineSystUp = new TLine(0, meanJpsiV2 + meanSystErrJpsiV2, nTrials, meanJpsiV2 + meanSystErrJpsiV2);
         lineSystUp-> SetLineStyle(2);
         lineSystUp-> SetLineColor(kBlue);
         lineSystUp-> SetLineWidth(2);
 
-        TLine *lineSystLw = new TLine(0, meanJpsiV2 - meanSystErrJpsiV2, nSystBins, meanJpsiV2 - meanSystErrJpsiV2);
+        TLine *lineSystLw = new TLine(0, meanJpsiV2 - meanSystErrJpsiV2, nTrials, meanJpsiV2 - meanSystErrJpsiV2);
         lineSystLw -> SetLineStyle(2);
         lineSystLw -> SetLineColor(kBlue);
         lineSystLw -> SetLineWidth(2);
 
-        TLine *lineStatUp = new TLine(0, meanJpsiV2 + meanStatErrJpsiV2, nSystBins, meanJpsiV2 + meanStatErrJpsiV2);
+        TLine *lineStatUp = new TLine(0, meanJpsiV2 + meanStatErrJpsiV2, nTrials, meanJpsiV2 + meanStatErrJpsiV2);
         lineStatUp-> SetLineStyle(2);
         lineStatUp-> SetLineColor(kGray+1);
         lineStatUp-> SetLineWidth(2);
 
-        TLine *lineStatLw = new TLine(0, meanJpsiV2 - meanStatErrJpsiV2, nSystBins, meanJpsiV2 - meanStatErrJpsiV2);
+        TLine *lineStatLw = new TLine(0, meanJpsiV2 - meanStatErrJpsiV2, nTrials, meanJpsiV2 - meanStatErrJpsiV2);
         lineStatLw -> SetLineStyle(2);
         lineStatLw -> SetLineColor(kGray+1);
         lineStatLw -> SetLineWidth(2);
 
         TCanvas *canvasSyst = new TCanvas("canvasSyst", "", 800, 600);
-        canvasSyst -> SetBottomMargin(0.3);
-        canvasSyst -> SetRightMargin(0.2);
+        canvasSyst -> SetBottomMargin(0.5);
+        histSyst -> SetStats(0);
+        histSyst -> GetXaxis() -> LabelsOption("v");
         histSyst -> GetYaxis() -> SetRangeUser(meanJpsiV2 -  (meanJpsiV2 / 2.), meanJpsiV2 + (meanJpsiV2 / 2.));
         histSyst -> Draw();
         lineMean -> Draw();
@@ -275,17 +262,18 @@ void v2_fitter() {
         lineStatUp-> Draw();
         lineStatLw -> Draw();
 
-        TPaveText *display1 = new TPaveText(0.15, 0.75, 0.70, 0.80, "blNDC");
+        TPaveText *display1 = new TPaveText(0.22, 0.80, 0.80, 0.85, "blNDC");
         display1 -> SetTextFont(42);
         display1 -> SetTextSize(0.036);
         display1 -> SetTextColor(kBlack);
         display1 -> SetBorderSize(0);
         display1 -> SetFillColor(0);
 
-        TText *text1 = display1 -> AddText(Form(" v_{2}^{J/#psi} =%.3f +/- %.3f (%.2f %%) +/- %.3f (%.2f %% ) ", meanJpsiV2, meanStatErrJpsiV2, meanStatErrJpsiV2Perc, meanSystErrJpsiV2, meanSystErrJpsiV2Perc));
+        TText *text1 = display1 -> AddText(Form(" v_{2}^{J/#psi} [%1.0f < #it{p}_{T} < %1.0f GeV/#it{c}] = %5.4f #pm %5.4f (%4.3f %%) #pm %5.4f (%4.3f %%)", minPtBin, maxPtBin, meanJpsiV2, meanStatErrJpsiV2, meanStatErrJpsiV2Perc, meanSystErrJpsiV2, meanSystErrJpsiV2Perc));
         display1 -> Draw("same");
 
         canvasSyst -> Write();
+        histChi2Ndf -> Write();
 
 
         fOut -> Close();
@@ -300,7 +288,7 @@ double* DoFlowFit(TH1D *histMassFitPars, TH1D *histMass, TProfile *profV2, doubl
     // Get signal shape from previous fit
     vector<double> fitPars;
     fitPars.clear();
-    double* results = new double[2];
+    double* results = new double[3];
 
     TF1 *funcMassBkg;
     TF1 *funcMassSig;
@@ -324,12 +312,6 @@ double* DoFlowFit(TH1D *histMassFitPars, TH1D *histMass, TProfile *profV2, doubl
             funcMassSigBkg->FixParameter(i, fitPars[i]);
         }
 
-        //funcMassSigBkg->SetParameter(0, 1e6); // Bkg normalization
-        //funcMassSigBkg->SetParameter(4, 300000); // Jpsi normalization
-        //funcMassSigBkg->SetParameter(0, 1800); // Bkg normalization
-        //funcMassSigBkg->SetParameter(4, 900); // Jpsi normalization
-
-        //histMass -> Fit(funcMassSigBkg, "RL0"); // Get the normalization from the fit
         for (int iter = 0;iter < 100;iter++) {
             if (iter == 0) {
                 funcMassSigBkg -> SetParameter(0, 1e6); // Bkg normalization
@@ -363,29 +345,41 @@ double* DoFlowFit(TH1D *histMassFitPars, TH1D *histMass, TProfile *profV2, doubl
             funcMassSig -> FixParameter(iPar, funcMassSigBkg -> GetParameter(iPar+4));
         }
         
-        funcFlowSigBkg  = new TF1("funcFlowSigBkg ", FitFunctionFlowS2CB2VWGPOL2, minFitRange, maxFitRange, 17);
+        funcFlowSigBkg  = new TF1("funcFlowSigBkg ", FitFunctionFlowS2CB2VWGPOL2, minFitRange, maxFitRange, 18);
         funcFlowSigBkg -> SetParNames("kVWG","mVWG","sVWG1","sVWG2","kJPsi","mJPsi","sJPsi","alJPsi","nlJPsi","auJPsi","nuJPsi");
         funcFlowSigBkg -> SetParName(11, "kPsiP");
         funcFlowSigBkg -> SetParName(12, "v_{2} JPsi");
         funcFlowSigBkg -> SetParName(13, "v_{2} BG0");
         funcFlowSigBkg -> SetParName(14, "v_{2} BG1");
         funcFlowSigBkg -> SetParName(15, "v_{2} BG2");
-        funcFlowSigBkg -> SetParName(16, "type");
+        funcFlowSigBkg -> SetParName(16, "v_{2} BG3");
+        funcFlowSigBkg -> SetParName(17, "type");
         funcFlowSigBkg -> SetLineColor(kBlue);
 
         for (int iPar = 0;iPar < 11;iPar++) {
             funcFlowSigBkg -> FixParameter(iPar, funcMassSigBkg -> GetParameter(iPar));
         }
         funcFlowSigBkg -> FixParameter(11, 0);
-        funcFlowSigBkg -> SetParameter(12, 0.072);
-        funcFlowSigBkg -> SetParameter(13, 0.09);
-        funcFlowSigBkg -> SetParameter(14, -0.0252894);
-        funcFlowSigBkg -> SetParameter(15, 0.0022179);
-        funcFlowSigBkg -> FixParameter(16, 0);
+        if (fitFuncs.find("Pol2_v2bkg") != std::string::npos) {
+          funcFlowSigBkg -> SetParameter(12, 0.072);
+          funcFlowSigBkg -> SetParameter(13, 0.09);
+          funcFlowSigBkg -> SetParameter(14, -0.0252894);
+          funcFlowSigBkg -> SetParameter(15, 0.0022179);
+          funcFlowSigBkg -> FixParameter(16, 999); // Extra parameter for 3 degree cheby
+          funcFlowSigBkg -> FixParameter(17, 0); // v2 bkg is a Pol2
+        } else {
+          funcFlowSigBkg -> SetParameter(12, 0.072);
+          funcFlowSigBkg -> SetParameter(13, 0.0323879);
+          funcFlowSigBkg -> SetParameter(14, -0.0117933);
+          funcFlowSigBkg -> SetParameter(15, 0.000888077);
+          funcFlowSigBkg -> SetParameter(16, -0.000522725); // Extra parameter for 3 degree cheby
+          funcFlowSigBkg -> FixParameter(17, 1); // v2 bkg is a Cheby
+        }
         profV2 -> Fit (funcFlowSigBkg, "RI"); // Get the normalization from the fit
 
         results[0] = funcFlowSigBkg -> GetParameter(12);
         results[1] = funcFlowSigBkg -> GetParError(12);
+        results[2] = (double) funcFlowSigBkg -> GetChisquare() / (double) funcFlowSigBkg -> GetNDF();
     }
 
     //--------------------------------------------------//
@@ -404,11 +398,6 @@ double* DoFlowFit(TH1D *histMassFitPars, TH1D *histMass, TProfile *profV2, doubl
         for (int i = 8; i < 14; i++) {
             funcMassSigBkg->FixParameter(i, fitPars[i]);
         }
-        /*
-        funcMassSigBkg->SetParameter(0, 1e6); // Bkg normalization
-        funcMassSigBkg->SetParameter(7, 300000); // Jpsi normalization
-        histMass -> Fit(funcMassSigBkg, "RL0"); // Get the normalization from the fit
-        */
 
         for (int iter = 0;iter < 100;iter++) {
             if (iter == 0) {
@@ -429,7 +418,6 @@ double* DoFlowFit(TH1D *histMassFitPars, TH1D *histMass, TProfile *profV2, doubl
             }
         }
 
-
         funcMassBkg = new TF1("funcMassBkg", FitFunctionBackgroundPol4Exp, minFitRange, maxFitRange, 7);
         funcMassBkg -> SetLineColor(kGray+1);
         funcMassBkg -> SetLineStyle(kDashed);
@@ -444,7 +432,7 @@ double* DoFlowFit(TH1D *histMassFitPars, TH1D *histMass, TProfile *profV2, doubl
             funcMassSig -> FixParameter(iPar, funcMassSigBkg -> GetParameter(iPar+7));
         }
         
-        funcFlowSigBkg  = new TF1("funcFlowSigBkg ", FitFunctionFlowS2CB2POL4EXPPOL2, minFitRange, maxFitRange, 20);
+        funcFlowSigBkg  = new TF1("funcFlowSigBkg ", FitFunctionFlowS2CB2POL4EXPPOL2, minFitRange, maxFitRange, 21);
         funcFlowSigBkg -> SetParNames("pol0","pol1","pol2","pol3","exp1","exp2","exp3","kJPsi","mJPsi","sJPsi","alJPsi");
         funcFlowSigBkg -> SetParName(11,"nlJPsi");
         funcFlowSigBkg -> SetParName(12,"auJPsi");
@@ -454,23 +442,245 @@ double* DoFlowFit(TH1D *histMassFitPars, TH1D *histMass, TProfile *profV2, doubl
         funcFlowSigBkg -> SetParName(16, "v_{2} BG0");
         funcFlowSigBkg -> SetParName(17, "v_{2} BG1");
         funcFlowSigBkg -> SetParName(18, "v_{2} BG2");
-        funcFlowSigBkg -> SetParName(19, "type");
+        funcFlowSigBkg -> SetParName(19, "v_{2} BG3");
+        funcFlowSigBkg -> SetParName(20, "type");
         funcFlowSigBkg -> SetLineColor(kBlue);
 
         for (int iPar = 0;iPar < 14;iPar++) {
             funcFlowSigBkg -> FixParameter(iPar, funcMassSigBkg -> GetParameter(iPar));
         }
-        funcFlowSigBkg -> FixParameter(14, 0);
-        funcFlowSigBkg -> SetParameter(15, 0.072);
-        funcFlowSigBkg -> SetParameter(16, 0.09);
-        funcFlowSigBkg -> SetParameter(17, -0.0252894);
-        funcFlowSigBkg -> SetParameter(18, 0.0022179);
-        funcFlowSigBkg -> FixParameter(19, 0);
+        if (fitFuncs.find("Pol2_v2bkg") != std::string::npos) {
+          funcFlowSigBkg -> FixParameter(14, 0);
+          funcFlowSigBkg -> SetParameter(15, 0.072);
+          funcFlowSigBkg -> SetParameter(16, 0.09);
+          funcFlowSigBkg -> SetParameter(17, -0.0252894);
+          funcFlowSigBkg -> SetParameter(18, 0.0022179);
+          funcFlowSigBkg -> FixParameter(19, 999); // Extra parameter for 3 degree cheby
+          funcFlowSigBkg -> FixParameter(20, 0); // v2 bkg is a Pol2
+        } else {
+          funcFlowSigBkg -> FixParameter(14, 0);
+          funcFlowSigBkg -> SetParameter(15, 0.072);
+          funcFlowSigBkg -> SetParameter(16, 0.0323879);
+          funcFlowSigBkg -> SetParameter(17, -0.0117933);
+          funcFlowSigBkg -> SetParameter(18, 0.000888077);
+          funcFlowSigBkg -> SetParameter(19, -0.000522725); // Extra parameter for 3 degree cheby
+          funcFlowSigBkg -> FixParameter(20, 1); // v2 bkg is a Cheby
+        }
         profV2 -> Fit (funcFlowSigBkg, "RI"); // Get the normalization from the fit
 
         results[0] = funcFlowSigBkg -> GetParameter(15);
         results[1] = funcFlowSigBkg -> GetParError(15);
+        results[2] = (double) funcFlowSigBkg -> GetChisquare() / (double) funcFlowSigBkg -> GetNDF();
     }
+
+    //--------------------------------------------------//
+    //                    NA60+VWG                      //
+    //--------------------------------------------------//
+    if (fitFuncs.find("NA60_VWG") != std::string::npos) {
+        for (int i = 0; i < 15; i++) {
+            fitPars.push_back(histMassFitPars -> GetBinContent(histMassFitPars -> GetXaxis() -> FindBin(Form("%s",parNames_NA60_VWG[i].data()))));
+        }
+
+        // STARTING THE FIT TO THE INVARIANT MASS
+        funcMassSigBkg = new TF1("funcMassSigBkg", fitFunctionNA60NEWVWG, minFitRange, maxFitRange, 15);
+        for (int i = 1; i < 4; i++) {
+            funcMassSigBkg->FixParameter(i, fitPars[i]);
+        }
+        for (int i = 5; i < 15; i++) {
+            funcMassSigBkg->FixParameter(i, fitPars[i]);
+        }
+
+        for (int iter = 0;iter < 100;iter++) {
+            if (iter == 0) {
+                funcMassSigBkg -> SetParameter(0, 1e6); // Bkg normalization
+                funcMassSigBkg -> SetParameter(4, 300000); // Jpsi normalization
+            } else {
+                funcMassSigBkg -> SetParLimits(0, 0, 1e10);
+                funcMassSigBkg -> SetParLimits(4, 0, 1e10);
+                funcMassSigBkg -> SetParameter(0, funcMassSigBkg -> GetParameter(0)); // Bkg normalization
+                funcMassSigBkg -> SetParameter(4, funcMassSigBkg -> GetParameter(7)); // Jpsi normalization
+            }
+            TFitResultPtr fitResult = histMass -> Fit(funcMassSigBkg, "RL0S");
+            int fitStatus = fitResult;  // Fit status
+            int covMatrixStatus = fitResult -> CovMatrixStatus(); // cov. matrix status
+
+            if (fitStatus == 0 && covMatrixStatus == 3) {
+                break;
+            }
+        }
+
+        funcMassBkg = new TF1("funcMassBkg", FitFunctionBackgroundVWG, minFitRange, maxFitRange, 4);
+        funcMassBkg -> SetLineColor(kGray+1);
+        funcMassBkg -> SetLineStyle(kDashed);
+        for (int iPar = 0;iPar < 7;iPar++) {
+            funcMassBkg -> FixParameter(iPar, funcMassSigBkg -> GetParameter(iPar));
+        }
+
+        funcMassSig = new TF1("funcMassSig", FitFunctionNA60New, minFitRange, maxFitRange, 11);
+        funcMassSig -> SetLineColor(kAzure+2);
+        funcMassSig -> SetLineStyle(kSolid);
+        for (int iPar = 0;iPar < 11;iPar++) {
+            funcMassSig -> FixParameter(iPar, funcMassSigBkg -> GetParameter(iPar+7));
+        }
+        
+        funcFlowSigBkg  = new TF1("funcFlowSigBkg ", FitFunctionFlowS2NA60NEWVWGPOL2, minFitRange, maxFitRange, 22);
+        funcFlowSigBkg -> SetParNames("kVWG","mVWG","sVWG1","sVWG2","kJPsi","mJPsi","sJPsi","p1LJPsi","p2LJPsi","p3LJPsi","p1RJPsi");
+        funcFlowSigBkg -> SetParName(11,"p2RJPsi");
+        funcFlowSigBkg -> SetParName(12,"p3RJPsi");
+        funcFlowSigBkg -> SetParName(13,"aLJPsi");
+        funcFlowSigBkg -> SetParName(14,"aRJPsi");
+        funcFlowSigBkg -> SetParName(15,"kPsiP");
+        funcFlowSigBkg -> SetParName(16,"v_{2} JPsi");
+        funcFlowSigBkg -> SetParName(17,"v_{2} BG0");
+        funcFlowSigBkg -> SetParName(18,"v_{2} BG1");
+        funcFlowSigBkg -> SetParName(19,"v_{2} BG2");
+        funcFlowSigBkg -> SetParName(20,"v_{2} BG3");
+        funcFlowSigBkg -> SetParName(21, "type");
+        funcFlowSigBkg -> SetLineColor(kBlue);
+
+        for (int iPar = 0;iPar < 15;iPar++) {
+            funcFlowSigBkg -> FixParameter(iPar, funcMassSigBkg -> GetParameter(iPar));
+        }
+        if (fitFuncs.find("Pol2_v2bkg") != std::string::npos) {
+          funcFlowSigBkg -> FixParameter(15, 0);
+          funcFlowSigBkg -> SetParameter(16, 0.072);
+          funcFlowSigBkg -> SetParameter(17, 0.09);
+          funcFlowSigBkg -> SetParameter(18, -0.0252894);
+          funcFlowSigBkg -> SetParameter(19, 0.0022179);
+          funcFlowSigBkg -> FixParameter(20, 999); // Extra parameter for 3 degree cheby
+          funcFlowSigBkg -> FixParameter(21, 0); // v2 bkg is a Pol2
+        } else {
+          funcFlowSigBkg -> FixParameter(15, 0);
+          funcFlowSigBkg -> SetParameter(16, 0.072);
+          funcFlowSigBkg -> SetParameter(17, 0.0323879);
+          funcFlowSigBkg -> SetParameter(18, -0.0117933);
+          funcFlowSigBkg -> SetParameter(19, 0.000888077);
+          funcFlowSigBkg -> SetParameter(20, -0.000522725); // Extra parameter for 3 degree cheby
+          funcFlowSigBkg -> FixParameter(21, 1); // v2 bkg is a Cheby
+        }
+        profV2 -> Fit (funcFlowSigBkg, "RI"); // Get the normalization from the fit
+
+        results[0] = funcFlowSigBkg -> GetParameter(16);
+        results[1] = funcFlowSigBkg -> GetParError(16);
+        results[2] = (double) funcFlowSigBkg -> GetChisquare() / (double) funcFlowSigBkg -> GetNDF();
+    }
+
+
+    //--------------------------------------------------//
+    //                   NA60+Pol4Exp                    //
+    //--------------------------------------------------//
+    if (fitFuncs.find("NA60_Pol4Exp") != std::string::npos) {
+        for (int i = 0; i < 18; i++) {
+            fitPars.push_back(histMassFitPars -> GetBinContent(histMassFitPars -> GetXaxis() -> FindBin(Form("%s",parNames_NA60_Pol4Exp[i].data()))));
+        }
+
+        // STARTING THE FIT TO THE INVARIANT MASS
+        funcMassSigBkg = new TF1("funcMassSigBkg", fitFunctionNA60NEWPol4Exp, minFitRange, maxFitRange, 18);
+        for (int i = 1; i < 7; i++) {
+            funcMassSigBkg->FixParameter(i, fitPars[i]);
+        }
+        for (int i = 8; i < 18; i++) {
+            funcMassSigBkg->FixParameter(i, fitPars[i]);
+        }
+
+        for (int iter = 0;iter < 100;iter++) {
+            if (iter == 0) {
+                funcMassSigBkg -> SetParameter(0, 1e6); // Bkg normalization
+                funcMassSigBkg -> SetParameter(7, 300000); // Jpsi normalization
+            } else {
+                funcMassSigBkg -> SetParLimits(0, 0, 1e10);
+                funcMassSigBkg -> SetParLimits(7, 0, 1e10);
+                funcMassSigBkg -> SetParameter(0, funcMassSigBkg -> GetParameter(0)); // Bkg normalization
+                funcMassSigBkg -> SetParameter(7, funcMassSigBkg -> GetParameter(7)); // Jpsi normalization
+            }
+            TFitResultPtr fitResult = histMass -> Fit(funcMassSigBkg, "RL0S");
+            int fitStatus = fitResult;  // Fit status
+            int covMatrixStatus = fitResult -> CovMatrixStatus(); // cov. matrix status
+
+            if (fitStatus == 0 && covMatrixStatus == 3) {
+                break;
+            }
+        }
+
+        funcMassBkg = new TF1("funcMassBkg", FitFunctionBackgroundPol4Exp, minFitRange, maxFitRange, 7);
+        funcMassBkg -> SetLineColor(kGray+1);
+        funcMassBkg -> SetLineStyle(kDashed);
+        for (int iPar = 0;iPar < 7;iPar++) {
+            funcMassBkg -> FixParameter(iPar, funcMassSigBkg -> GetParameter(iPar));
+        }
+
+        funcMassSig = new TF1("funcMassSig", FitFunctionNA60New, minFitRange, maxFitRange, 11);
+        funcMassSig -> SetLineColor(kAzure+2);
+        funcMassSig -> SetLineStyle(kSolid);
+        for (int iPar = 0;iPar < 11;iPar++) {
+            funcMassSig -> FixParameter(iPar, funcMassSigBkg -> GetParameter(iPar+7));
+        }
+        
+        funcFlowSigBkg  = new TF1("funcFlowSigBkg ", FitFunctionFlowS2NA60NEWPOL4EXPPOL2, minFitRange, maxFitRange, 25);
+        funcFlowSigBkg -> SetParNames("pol0","pol1","pol2","pol3","exp1","exp2","exp3","kJPsi","mJPsi","sJPsi","p1LJPsi");
+        funcFlowSigBkg -> SetParName(11,"p2LJPsi");
+        funcFlowSigBkg -> SetParName(12,"p3LJPsi");
+        funcFlowSigBkg -> SetParName(13,"p1RJPsi");   
+        funcFlowSigBkg -> SetParName(14,"p2RJPsi");
+        funcFlowSigBkg -> SetParName(15,"p3RJPsi");
+        funcFlowSigBkg -> SetParName(16,"aLJPsi");
+        funcFlowSigBkg -> SetParName(17,"aRJPsi");
+        funcFlowSigBkg -> SetParName(18,"kPsiP");
+        funcFlowSigBkg -> SetParName(19,"v_{2} JPsi");
+        funcFlowSigBkg -> SetParName(20,"v_{2} BG0");
+        funcFlowSigBkg -> SetParName(21,"v_{2} BG1");
+        funcFlowSigBkg -> SetParName(22,"v_{2} BG2");
+        funcFlowSigBkg -> SetParName(23,"v_{2} BG3");
+        funcFlowSigBkg -> SetParName(24, "type");
+        funcFlowSigBkg -> SetLineColor(kBlue);
+
+        for (int iPar = 0;iPar < 18;iPar++) {
+            funcFlowSigBkg -> FixParameter(iPar, funcMassSigBkg -> GetParameter(iPar));
+        }
+        if (fitFuncs.find("Pol2_v2bkg") != std::string::npos) {
+          funcFlowSigBkg -> FixParameter(18, 0);
+          funcFlowSigBkg -> SetParameter(19, 0.072);
+          funcFlowSigBkg -> SetParameter(20, 0.09);
+          funcFlowSigBkg -> SetParameter(21, -0.0252894);
+          funcFlowSigBkg -> SetParameter(22, 0.0022179);
+          funcFlowSigBkg -> FixParameter(23, 999); // Extra parameter for 3 degree cheby
+          funcFlowSigBkg -> FixParameter(24, 0); // v2 bkg is a Pol2
+        } else {
+          funcFlowSigBkg -> FixParameter(18, 0);
+          funcFlowSigBkg -> SetParameter(19, 0.072);
+          funcFlowSigBkg -> SetParameter(20, 0.0323879);
+          funcFlowSigBkg -> SetParameter(21, -0.0117933);
+          funcFlowSigBkg -> SetParameter(22, 0.000888077);
+          funcFlowSigBkg -> SetParameter(23, -0.000522725); // Extra parameter for 3 degree cheby
+          funcFlowSigBkg -> FixParameter(24, 1); // v2 bkg is a Cheby
+        }
+        profV2 -> Fit (funcFlowSigBkg, "RI"); // Get the normalization from the fit
+
+        results[0] = funcFlowSigBkg -> GetParameter(19);
+        results[1] = funcFlowSigBkg -> GetParError(19);
+        results[2] = (double) funcFlowSigBkg -> GetChisquare() / (double) funcFlowSigBkg -> GetNDF();
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     TCanvas *canvasFit = new TCanvas("canvasFit", "", 600, 1200);
@@ -580,15 +790,17 @@ void SetFitRejectRange(Double_t a, Double_t b)
 //------------------------------------------------------------------------------
 Double_t FitFunctionBackgroundPol2(Double_t *x, Double_t *par)
 {
-  int type = par[3];
+  int type = par[4];
   // pol2 3 params
 
   //if (x[0] > 2.9 && x[0] < 3.3) TF1::RejectPoint();
   //if (x[0] > 3.5 && x[0] < 3.7) TF1::RejectPoint();
-  if(type==0) return par[0]+par[1]*x[0]+par[2]*x[0]*x[0];  //return pol2 function
-
-  //Return chebyshev Pol2 function
-  else return FitFunctionBackgroundPol2Cheb(x,par); 
+  if(type == 0) {
+    return par[0] + par[1]*x[0] + par[2]*x[0]*x[0];  //return pol2 function
+  } else {
+    //Return chebyshev Pol2 function
+    return FitFunctionBackgroundPol2Cheb(x,par); 
+  }
 }
 
 //------------------------------------------------------------------------------
@@ -614,10 +826,40 @@ Double_t FitFunctionBackgroundPol4Exp(Double_t *x, Double_t *par)
 }
 
 //____________________________________________________________________________
-Double_t FitFunctionBackgroundPol2Cheb(Double_t *x, Double_t *par)
+// Funzione per calcolare il polinomio di Chebyshev di primo tipo di grado n
+double ChebyshevT(int n, double x) {
+    if (n == 0)
+        return 1.0;
+    if (n == 1)
+        return x;
+    return 2 * x * ChebyshevT(n - 1, x) - ChebyshevT(n - 2, x);
+}
+
+// Funzione per mappare x da [a, b] a [-1, 1]
+double MapToChebyshevRange(double x, double a, double b) {
+    return (2 * x - (b + a)) / (b - a);
+}
+
+// Wrapper per TF1: combina i termini di Chebyshev con i coefficienti
+double FitFunctionBackgroundPol2Cheb(double *x, double *params) {
+    double a = 2.3;  // Limite inferiore dell'intervallo
+    double b = 4.7;  // Limite superiore dell'intervallo
+
+    double xPrime = MapToChebyshevRange(x[0], a, b);
+
+    // Somma i termini di Chebyshev con i rispettivi coefficienti
+    double result = params[0] * ChebyshevT(0, xPrime) +
+                    params[1] * ChebyshevT(1, xPrime) +
+                    params[2] * ChebyshevT(2, xPrime) +
+                    params[3] * ChebyshevT(3, xPrime);
+
+    return result;
+}
+
+/*Double_t FitFunctionBackgroundPol2Cheb(Double_t *x, Double_t *par)
 {
-  if(x[0] > 2.9 && x[0] < 3.3) TF1::RejectPoint();
-  Double_t xmin = 2.2;
+  //if(x[0] > 2.9 && x[0] < 3.3) TF1::RejectPoint();
+  Double_t xmin = 2.3;
   Double_t xmax = 4.7;
   double xx = (2.0 * x[0] - xmin -xmax)/(xmax-xmin);
   const int order = 2;
@@ -635,7 +877,7 @@ Double_t FitFunctionBackgroundPol2Cheb(Double_t *x, Double_t *par)
     sum += par[i] * fT[i];
   }
   return sum;
-}
+}*/
 //____________________________________________________________________________
 
 Double_t alphaCB2VWG(Double_t*x, Double_t* par)
