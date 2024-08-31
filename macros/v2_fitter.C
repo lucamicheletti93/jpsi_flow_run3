@@ -87,11 +87,12 @@ string tailSets[] = {"data", "MC"};
 double minCentrBins[] = {10};
 double maxCentrBins[] = {50};
 
-const int nPtBins = 1;
-//double minPtBins[] = {0, 1, 2, 3, 4, 5, 6, 8, 10, 12};
-//double maxPtBins[] = {1, 2, 3, 4, 5, 6, 8, 10, 12, 15};
-double minPtBins[] = {4};
-double maxPtBins[] = {5};
+const int nPtBins = 10;
+double minPtBins[] = {0, 1, 2, 3, 4, 5, 6, 8, 10, 12};
+double maxPtBins[] = {1, 2, 3, 4, 5, 6, 8, 10, 12, 15};
+double ptBins[] = {0, 1, 2, 3, 4, 5, 6, 8, 10, 12, 15};
+//double minPtBins[] = {0, 1, 2, 3, 4, 5};
+//double maxPtBins[] = {1, 2, 3, 4, 5, 6};
 
 const int nFitRanges = 3;
 double minFitRanges[] = {2.3, 2.4, 2.5};
@@ -105,21 +106,22 @@ int nSystBins = nSigFuncs * nBkgFuncs * nTailSets * nFitRanges * nbck_type;
 
 double resolution = 1.28004;
 
-double norm_sig[] = {2.12944e+04,3.61983e+04,2.49511e+04,1.24006e+04,6.77359e+03,3.69119e+03,3.02467e+03,9.84673e+02,2.90510e+02,100,10};
+double norm[] = {2.12944e+04,3.61983e+04,2.49511e+04,1.24006e+04,6.77359e+03,3.69119e+03,3.02467e+03,9.84673e+02,2.90510e+02,100,10};
 double norm_bkg[] = {8.12173e+06,1.13264e+07,1.48518e+06,2.21428e+05,4.73500e+04,1.51403e+04,8.22036e+03,2.02200e+03,5.60000e+02,100,10};
 
-TProfile *prof_v2EP[20];
-TProfile *prof_MEv2EP[20];
-TH1D *hT_mass[20];
-TH1D *hT_mass2[20];
-TCanvas *m_plot[20];
-TF1 *fitv2[20][20][20];
+
+//funcMassSigBkg->SetParameter(0, 1e6); // Bkg normalization
+//funcMassSigBkg->SetParameter(4, 300000); // Jpsi normalization
+//funcMassSigBkg->SetParameter(0, 1800); // Bkg normalization
+//funcMassSigBkg->SetParameter(4, 900); // Jpsi normalization
+
+
 
 double par[19];
-string sig_plus_bkg[] = {"bkg","aa","bb","cc","sig_Jpsi","mean_Jpsi","width_Jpsi","a_Jpsi","b_Jpsi","c_Jpsi","d_Jpsi"};
-string cb2sig_plus_pol4expbkg[] = {"bkg","aa","bb","cc","dd","ee","ff","sig_Jpsi","mean_Jpsi","width_Jpsi","a_Jpsi","b_Jpsi","c_Jpsi","d_Jpsi"};
-string signa60_plus_bkg[] = {"bkg","aa","bb","cc","sig_Jpsi","mean_Jpsi","width_Jpsi","b_Jpsi","c_Jpsi","d_Jpsi","f_Jpsi","g_Jpsi","h_Jpsi","a_Jpsi","e_Jpsi"};
-string signa60_plus_pol4expbkg[] = {"bkg","aa","bb","cc","dd","ee","ff","sig_Jpsi","mean_Jpsi","width_Jpsi","b_Jpsi","c_Jpsi","d_Jpsi","f_Jpsi","g_Jpsi","h_Jpsi","a_Jpsi","e_Jpsi"};
+string parNames_CB2_VWG[] = {"bkg","aa","bb","cc","sig_Jpsi","mean_Jpsi","width_Jpsi","a_Jpsi","b_Jpsi","c_Jpsi","d_Jpsi"};
+string parNames_CB2_Pol4Exp[] = {"bkg","aa","bb","cc","dd","ee","ff","sig_Jpsi","mean_Jpsi","width_Jpsi","a_Jpsi","b_Jpsi","c_Jpsi","d_Jpsi"};
+string parNames_NA60_VWG[] = {"bkg","aa","bb","cc","sig_Jpsi","mean_Jpsi","width_Jpsi","b_Jpsi","c_Jpsi","d_Jpsi","f_Jpsi","g_Jpsi","h_Jpsi","a_Jpsi","e_Jpsi"};
+string parNames_NA60_Pol4Exp[] = {"bkg","aa","bb","cc","dd","ee","ff","sig_Jpsi","mean_Jpsi","width_Jpsi","b_Jpsi","c_Jpsi","d_Jpsi","f_Jpsi","g_Jpsi","h_Jpsi","a_Jpsi","e_Jpsi"};
 
 std::vector<TH1*> Uncertainities(std::vector<TH1*> histlist, vector<double> parameter, vector<double> parameter_er, double value[nPtBins][3]);
 
@@ -136,6 +138,21 @@ void v2_fitter() {
             return;
         }
     }
+
+    // Histograms for plotting the results
+    TH1D *histStatJpsiV2 = new TH1D("histStatJpsiV2", "", 10, ptBins);
+    histStatJpsiV2 -> GetXaxis() -> SetTitle("#it{p}_{T} (GeV/#it{c})");
+    histStatJpsiV2 -> GetYaxis() -> SetRangeUser(-0.05, 0.4);
+    histStatJpsiV2 -> GetYaxis() -> SetTitle("#it{v}_{2}");
+    histStatJpsiV2 -> SetMarkerStyle(20);
+    histStatJpsiV2 -> SetMarkerColor(kRed+1);
+    histStatJpsiV2 -> SetLineColor(kRed+1);
+
+    TH1D *histSystJpsiV2 = new TH1D("histSystJpsiV2", "", 10, ptBins);
+    histSystJpsiV2 -> SetMarkerStyle(20);
+    histSystJpsiV2 -> SetMarkerColor(kRed+1);
+    histSystJpsiV2 -> SetLineColor(kRed+1);
+    histSystJpsiV2 -> SetFillStyle(0);
 
     for (int iPt = 0;iPt < nPtBins;iPt++) {
         vector<double> jpsiV2s;
@@ -182,8 +199,9 @@ void v2_fitter() {
 
                         double *results = DoFlowFit(histMassFitPars, histMass, profV2, minFitRange, maxFitRange, kFALSE, Form("%s_%s_%s", sigFunc.c_str(), bkgFunc.c_str(), tailSet.c_str()), fOut);
 
-                        jpsiV2s.push_back(results[0]);
-                        errJpsiV2s.push_back(results[1]);
+                        // WARNING! v2 from the fit is scaled by the RESOLUTION
+                        jpsiV2s.push_back(results[0] * resolution);
+                        errJpsiV2s.push_back(results[1] * resolution);
                         trialSetNames.push_back(Form("%s + %s + %s tails, %2.1f - %2.1f, Pol2[v2 bkg]", sigFunc.c_str(), bkgFunc.c_str(), tailSet.c_str(), minFitRange, maxFitRange));
                     }
                 }
@@ -213,6 +231,11 @@ void v2_fitter() {
         }
         double meanSystErrJpsiV2 = TMath::Sqrt(sumSyst / nSystBins);
 
+        histStatJpsiV2 -> SetBinContent(iPt+1, meanJpsiV2);
+        histStatJpsiV2 -> SetBinError(iPt+1, meanStatErrJpsiV2);
+        histSystJpsiV2 -> SetBinContent(iPt+1, meanJpsiV2);
+        histSystJpsiV2 -> SetBinError(iPt+1, meanSystErrJpsiV2);
+
         double meanStatErrJpsiV2Perc = (meanStatErrJpsiV2 / meanJpsiV2) * 100;
         double meanSystErrJpsiV2Perc = (meanSystErrJpsiV2 / meanJpsiV2) * 100;
 
@@ -231,6 +254,16 @@ void v2_fitter() {
         lineSystLw -> SetLineColor(kBlue);
         lineSystLw -> SetLineWidth(2);
 
+        TLine *lineStatUp = new TLine(0, meanJpsiV2 + meanStatErrJpsiV2, nSystBins, meanJpsiV2 + meanStatErrJpsiV2);
+        lineStatUp-> SetLineStyle(2);
+        lineStatUp-> SetLineColor(kGray+1);
+        lineStatUp-> SetLineWidth(2);
+
+        TLine *lineStatLw = new TLine(0, meanJpsiV2 - meanStatErrJpsiV2, nSystBins, meanJpsiV2 - meanStatErrJpsiV2);
+        lineStatLw -> SetLineStyle(2);
+        lineStatLw -> SetLineColor(kGray+1);
+        lineStatLw -> SetLineWidth(2);
+
         TCanvas *canvasSyst = new TCanvas("canvasSyst", "", 800, 600);
         canvasSyst -> SetBottomMargin(0.3);
         canvasSyst -> SetRightMargin(0.2);
@@ -239,6 +272,8 @@ void v2_fitter() {
         lineMean -> Draw();
         lineSystUp-> Draw();
         lineSystLw -> Draw();
+        lineStatUp-> Draw();
+        lineStatLw -> Draw();
 
         TPaveText *display1 = new TPaveText(0.15, 0.75, 0.70, 0.80, "blNDC");
         display1 -> SetTextFont(42);
@@ -252,12 +287,13 @@ void v2_fitter() {
 
         canvasSyst -> Write();
 
-        //double value[nPtBins][3];
-        //std::vector<TH1*> myHist = Uncertainities(histSystematics, jpsiV2s, errJpsiV2s, value);
-
 
         fOut -> Close();
     }
+
+    TCanvas *canvasJpsiV2 = new TCanvas("canvasJpsiV2", "", 800, 600);
+    histStatJpsiV2 -> Draw("EP");
+    histSystJpsiV2 -> Draw("E2P SAME");
 }
 ////////////////////////////////////////////////////////////
 double* DoFlowFit(TH1D *histMassFitPars, TH1D *histMass, TProfile *profV2, double minFitRange, double maxFitRange, bool debug, string fitFuncs, TFile *fOut) {
@@ -276,7 +312,7 @@ double* DoFlowFit(TH1D *histMassFitPars, TH1D *histMass, TProfile *profV2, doubl
     //--------------------------------------------------//
     if (fitFuncs.find("CB2_VWG") != std::string::npos) {
         for (int i = 0; i < 11; i++) {
-            fitPars.push_back(histMassFitPars -> GetBinContent(histMassFitPars -> GetXaxis() -> FindBin(Form("%s",sig_plus_bkg[i].data()))));
+            fitPars.push_back(histMassFitPars -> GetBinContent(histMassFitPars -> GetXaxis() -> FindBin(Form("%s", parNames_CB2_VWG[i].data()))));
         }
 
         // STARTING THE FIT TO THE INVARIANT MASS
@@ -287,9 +323,31 @@ double* DoFlowFit(TH1D *histMassFitPars, TH1D *histMass, TProfile *profV2, doubl
         for (int i = 5; i < 11; i++) {
             funcMassSigBkg->FixParameter(i, fitPars[i]);
         }
-        funcMassSigBkg->SetParameter(0, 1e6); // Bkg normalization
-        funcMassSigBkg->SetParameter(4, 300000); // Jpsi normalization
-        histMass -> Fit(funcMassSigBkg, "RL0"); // Get the normalization from the fit
+
+        //funcMassSigBkg->SetParameter(0, 1e6); // Bkg normalization
+        //funcMassSigBkg->SetParameter(4, 300000); // Jpsi normalization
+        //funcMassSigBkg->SetParameter(0, 1800); // Bkg normalization
+        //funcMassSigBkg->SetParameter(4, 900); // Jpsi normalization
+
+        //histMass -> Fit(funcMassSigBkg, "RL0"); // Get the normalization from the fit
+        for (int iter = 0;iter < 100;iter++) {
+            if (iter == 0) {
+                funcMassSigBkg -> SetParameter(0, 1e6); // Bkg normalization
+                funcMassSigBkg -> SetParameter(4, 300000); // Jpsi normalization
+            } else {
+                funcMassSigBkg -> SetParLimits(0, 0, 1e10);
+                funcMassSigBkg -> SetParLimits(4, 0, 1e10);
+                funcMassSigBkg -> SetParameter(0, funcMassSigBkg -> GetParameter(0)); // Bkg normalization
+                funcMassSigBkg -> SetParameter(4, funcMassSigBkg -> GetParameter(4)); // Jpsi normalization
+            }
+            TFitResultPtr fitResult = histMass -> Fit(funcMassSigBkg, "RL0S");
+            int fitStatus = fitResult;  // Fit status
+            int covMatrixStatus = fitResult -> CovMatrixStatus(); // cov. matrix status
+
+            if (fitStatus == 0 && covMatrixStatus == 3) {
+                break;
+            }
+        }
 
         funcMassBkg = new TF1("funcMassBkg", FitFunctionBackgroundVWG, minFitRange, maxFitRange, 4);
         funcMassBkg -> SetLineColor(kGray+1);
@@ -335,7 +393,7 @@ double* DoFlowFit(TH1D *histMassFitPars, TH1D *histMass, TProfile *profV2, doubl
     //--------------------------------------------------//
     if (fitFuncs.find("CB2_Pol4Exp") != std::string::npos) {
         for (int i = 0; i < 14; i++) {
-            fitPars.push_back(histMassFitPars -> GetBinContent(histMassFitPars -> GetXaxis() -> FindBin(Form("%s",cb2sig_plus_pol4expbkg[i].data()))));
+            fitPars.push_back(histMassFitPars -> GetBinContent(histMassFitPars -> GetXaxis() -> FindBin(Form("%s",parNames_CB2_Pol4Exp[i].data()))));
         }
 
         // STARTING THE FIT TO THE INVARIANT MASS
@@ -346,9 +404,31 @@ double* DoFlowFit(TH1D *histMassFitPars, TH1D *histMass, TProfile *profV2, doubl
         for (int i = 8; i < 14; i++) {
             funcMassSigBkg->FixParameter(i, fitPars[i]);
         }
+        /*
         funcMassSigBkg->SetParameter(0, 1e6); // Bkg normalization
         funcMassSigBkg->SetParameter(7, 300000); // Jpsi normalization
         histMass -> Fit(funcMassSigBkg, "RL0"); // Get the normalization from the fit
+        */
+
+        for (int iter = 0;iter < 100;iter++) {
+            if (iter == 0) {
+                funcMassSigBkg -> SetParameter(0, 1e6); // Bkg normalization
+                funcMassSigBkg -> SetParameter(7, 300000); // Jpsi normalization
+            } else {
+                funcMassSigBkg -> SetParLimits(0, 0, 1e10);
+                funcMassSigBkg -> SetParLimits(7, 0, 1e10);
+                funcMassSigBkg -> SetParameter(0, funcMassSigBkg -> GetParameter(0)); // Bkg normalization
+                funcMassSigBkg -> SetParameter(7, funcMassSigBkg -> GetParameter(7)); // Jpsi normalization
+            }
+            TFitResultPtr fitResult = histMass -> Fit(funcMassSigBkg, "RL0S");
+            int fitStatus = fitResult;  // Fit status
+            int covMatrixStatus = fitResult -> CovMatrixStatus(); // cov. matrix status
+
+            if (fitStatus == 0 && covMatrixStatus == 3) {
+                break;
+            }
+        }
+
 
         funcMassBkg = new TF1("funcMassBkg", FitFunctionBackgroundPol4Exp, minFitRange, maxFitRange, 7);
         funcMassBkg -> SetLineColor(kGray+1);
