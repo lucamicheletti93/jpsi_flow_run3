@@ -301,9 +301,9 @@ double* DoFlowFit(TH1D *histMassFitPars, TH1D *histMass, TH1D *histMassMix, TPro
     // Fit to Mixing
     //------------------------
     TF1* bck2 = new TF1("bck2",FitFunctionBackgroundPol2,v2xmin,v2xmax,3);
-    bck2 -> SetParameter(13, 0.09);
-    bck2 -> SetParameter(14, -0.0252894);
-    bck2 -> SetParameter(15, 0.0022179);
+    bck2 -> SetParameter(0, 0.09);
+    bck2 -> SetParameter(1, -0.0252894);
+    bck2 -> SetParameter(2, 0.0022179);
     bck2->SetLineColor(kBlack);
     bck2->SetLineStyle(2);
     histoV2Mix->Scale(Norm_factv2); //Normalization
