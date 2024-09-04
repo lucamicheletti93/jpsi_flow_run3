@@ -84,7 +84,7 @@ int nTrials = 0;
 double resolution = 1.28004;
 string dirPath = "/Users/dhananjaya/Desktop/ALICE_PbPb_Analysis/jpsi_flow_run3/Signal_Systematic/Small_pT_Bins";
 
-void v2_fitter_Mixing_syst() {
+void v2_fitter_mixing() {
   if (!gSystem -> AccessPathName(dirPath.c_str())) {
     std::cout << "The output directory already exists! " << std::endl;
   } else {
