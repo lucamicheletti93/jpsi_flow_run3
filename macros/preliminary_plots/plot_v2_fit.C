@@ -104,7 +104,7 @@ void plot_v2_fit(double minPtBin = 2, double maxPtBin = 3) {
     latexTitle -> SetNDC();
     latexTitle -> SetTextFont(42);
     latexTitle -> DrawLatex(0.27, 0.85, "ALICE Preliminary");
-    latexTitle -> DrawLatex(0.27, 0.75, "Pb#minusPb #sqrt{#it{s}_{NN}} = 5.36 TeV, 10#minus50\%");
+    latexTitle -> DrawLatex(0.27, 0.75, "Pb#minusPb, #sqrt{#it{s}_{NN}} = 5.36 TeV, 10#minus50\%");
     latexTitle -> DrawLatex(0.27, 0.65, Form("J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 < y < 4, %1.0f < #it{p}_{T} < %1.0f GeV/#it{c}", minPtBin, maxPtBin));
 
     canvasMassFlow -> cd();
@@ -147,7 +147,7 @@ void plot_v2_fit(double minPtBin = 2, double maxPtBin = 3) {
     legendFlowFit -> AddEntry(histFlowMEPM, "Mixed event", "PL");
     legendFlowFit -> Draw();
 
-    latexTitle -> DrawLatex(0.18, 0.87, Form("v_{2}^{Sig}(J/#psi) = %4.3f #pm %4.3f", jpsiV2, errJpsiV2));
+    latexTitle -> DrawLatex(0.18, 0.87, Form("v_{2}^{Sig}(J/#psi) = %4.3f#kern[0.5]{#pm} %4.3f", jpsiV2, errJpsiV2));
     //latexTitle -> DrawLatex(0.28, 0.77, "#chi^{2}/NDF = 1.1");
 
     canvasMassFlow -> cd();

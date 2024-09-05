@@ -65,7 +65,7 @@ void plot_results() {
     latexTitle -> SetTextSize(0.050);
     latexTitle -> SetNDC();
     latexTitle -> SetTextFont(42);
-    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary, Pb#minusPb #sqrt{#it{s}_{NN}} = 5.36 TeV");
+    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary, Pb#minusPb, #sqrt{#it{s}_{NN}} = 5.36 TeV");
     latexTitle -> DrawLatex(0.18, 0.77, "J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 < y < 4, 10#minus50\%");
 
 
