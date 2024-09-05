@@ -4,9 +4,11 @@ void SetLegend(TLegend *);
 void plot_v2_fit(double minPtBin = 2, double maxPtBin = 3) {
     LoadStyle();
     gStyle -> SetOptStat(0);
+    // For 2-3 --> v2_fit_2.3_4.7_CB2_VWG_data_Pol2_v2bkg
+    // For 5-6 --> v2_fit_2.3_4.7_CB2_VWG_MC_Pol2_v2bkg
 
     TFile *fIn = new TFile(Form("/Users/lucamicheletti/GITHUB/jpsi_flow_run3/macros/systematics_mix_fit/fitResults_Pt_%2.1f_%2.1f.root", minPtBin, maxPtBin));
-    TCanvas *canvasFit = (TCanvas*) fIn -> Get("v2_fit_2.3_4.7_CB2_VWG_data_Pol2_v2bkg");
+    TCanvas *canvasFit = (TCanvas*) fIn -> Get("v2_fit_2.3_4.7_CB2_VWG_MC_Pol2_v2bkg");
 
     TPad *padMassFit = (TPad*) canvasFit -> GetPrimitive("pad1");
     TH1D *histMassSEPM = (TH1D*) padMassFit -> GetPrimitive(Form("histMassSEPM_%1.0f_%1.0f__10_50", minPtBin, maxPtBin));
@@ -66,9 +68,16 @@ void plot_v2_fit(double minPtBin = 2, double maxPtBin = 3) {
 
     histMassSEPM -> SetTitle("");
     double minMassBin, maxMassBin;
-    if (minPtBin < 4) {
+
+    if (minPtBin == 0) {
+        minMassBin = 0.001 * histMassSEPM -> GetBinContent(histMassSEPM -> FindBin(2.5));
+        maxMassBin = 1.01 * histMassSEPM -> GetBinContent(histMassSEPM -> FindBin(2.5));
+    } else if (minPtBin < 4) {
         minMassBin = 0.01 * histMassSEPM -> GetBinContent(histMassSEPM -> FindBin(2.5));
         maxMassBin = 1.10 * histMassSEPM -> GetBinContent(histMassSEPM -> FindBin(2.5));
+    } else if (minPtBin >= 5) {
+        minMassBin = 0.01 * histMassSEPM -> GetBinContent(histMassSEPM -> FindBin(2.5));
+        maxMassBin = 1.60 * histMassSEPM -> GetBinContent(histMassSEPM -> FindBin(2.5));
     } else {
         minMassBin = 0.01 * histMassSEPM -> GetBinContent(histMassSEPM -> FindBin(2.5));
         maxMassBin = 1.50 * histMassSEPM -> GetBinContent(histMassSEPM -> FindBin(2.5));
@@ -117,8 +126,20 @@ void plot_v2_fit(double minPtBin = 2, double maxPtBin = 3) {
     pad2 -> SetTicks(1, 1);
 
     histFlowMEPM -> SetTitle("");
-    double minFlowBin = 0.30 * histFlowSEPM -> GetBinContent(histFlowSEPM -> FindBin(2.5));
-    double maxFlowBin = 1.30 * histFlowSEPM -> GetBinContent(histFlowSEPM -> FindBin(2.5));
+    double minFlowBin, maxFlowBin;
+    if (minPtBin == 0) {
+        minFlowBin = -0.016;
+        maxFlowBin = 0.027;
+    } else if (minPtBin < 4) {
+        minFlowBin = 0.30 * histFlowSEPM -> GetBinContent(histFlowSEPM -> FindBin(2.5));
+        maxFlowBin = 1.30 * histFlowSEPM -> GetBinContent(histFlowSEPM -> FindBin(2.5));
+    } else if (minPtBin >= 5) {
+        minFlowBin = 0.01 * histFlowSEPM -> GetBinContent(histFlowSEPM -> FindBin(2.5));
+        maxFlowBin = 2 * histFlowSEPM -> GetBinContent(histFlowSEPM -> FindBin(2.5));
+    } else {
+        minFlowBin = 0.01 * histFlowSEPM -> GetBinContent(histFlowSEPM -> FindBin(2.5));
+        maxFlowBin = 1.50 * histFlowSEPM -> GetBinContent(histFlowSEPM -> FindBin(2.5));
+    }
     histFlowMEPM -> GetXaxis() -> SetRangeUser(2.48, 4.52);
     histFlowMEPM -> GetXaxis() -> SetLabelSize(0.08);
     histFlowMEPM -> GetXaxis() -> SetTitle("");
