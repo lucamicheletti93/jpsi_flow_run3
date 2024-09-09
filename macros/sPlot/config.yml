@@ -1,0 +1,6 @@
+---
+prefilter:
+  data: /Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/data/pass3/LHC23_full/minitree/train_262043/AO2D.root
+  tree: "DF_2338657048853728/O2rtdileptmtree"
+  cuts: "(fCentFT0C >= 10. && fCentFT0C < 50. && fPt > 5. && fPt < 6. && fCos2DeltaPhi > -1. && fCos2DeltaPhi < 1.)"
+  suffix: _Centr_10_50__Pt_5_6
