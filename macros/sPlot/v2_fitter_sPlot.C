@@ -41,7 +41,7 @@ void MakePlotsAndTree(RooWorkspace*, string, string, bool);
 void create_toy_sample(float lumi = 1.0);
 
 //____________________________________
-void v2_fitter(bool useToy = false) {
+void v2_fitter_sPlot(bool useToy = false) {
   string fInName, treeName;
 
   if (useToy) {
