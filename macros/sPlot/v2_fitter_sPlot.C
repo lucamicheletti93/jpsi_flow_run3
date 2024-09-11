@@ -51,7 +51,7 @@ void v2_fitter_sPlot(bool useToy = false) {
   } else {
     cout << "----------- USE REAL DATA -----------" << endl;
     fInName = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/data/pass3/LHC23_full/minitree/train_262043/AO2D_Centr_10_50__Pt_5_6.root";
-    treeName = "DF_2338657048853728/O2rtdileptmtree";
+    treeName = "O2rtdileptmtree";
   }
 
   //Create a new workspace to manage the project
@@ -158,12 +158,14 @@ void AddModel(RooWorkspace* ws) {
 
   //make signal model
   RooRealVar fMass("fMass", "m_{#mu#mu}", 10.0, minMassBin, maxMassBin, "GeV");
-  RooRealVar meanJpsi("meanJpsi", "J/psi Mass", 3.096, 2.9, 3.2, "GeV");
-  RooRealVar widthJpsi("widthJpsi", "J/psi resolution", 0.08, 0.06, 0.12 , "GeV");
+  RooRealVar meanJpsi("meanJpsi", "J/psi Mass", 3.079, 2.9, 3.2, "GeV");
+  RooRealVar widthJpsi("widthJpsi", "J/psi resolution", 0.072, 0.06, 0.12 , "GeV");
   RooRealVar alphaJpsi("alphaJpsi","CB alphaJpsi", 0.82, 0.0, 2.0, "");
   RooRealVar nJpsi("nJpsi","CB n", 2.44, 1.0, 4.0, "");
   
   // Fix variables in the fit
+  meanJpsi.setConstant();
+  widthJpsi.setConstant();
   alphaJpsi.setConstant();
   nJpsi.setConstant();
   
@@ -178,8 +180,8 @@ void AddModel(RooWorkspace* ws) {
   RooChebychev modelBkg("modelBkg", "modelBkg", fMass, RooArgList(bkg0, bkg1, bkg2));
 
   //yields
-  RooRealVar yieldJpsi("yieldJpsi", "fitted J/psi yield", 60000, 100, 1000000, "");
-  RooRealVar yieldBkg("yieldBkg", "fitted bkg yield", 100000, 100, 10000000, "");
+  RooRealVar yieldJpsi("yieldJpsi", "fitted J/psi yield", 240000, 1e4, 2e6, "");
+  RooRealVar yieldBkg("yieldBkg", "fitted bkg yield", 1e7, 1e5, 1e8, "");
   
   //combined model
   RooAddPdf model("model", "J/psi+bkg", RooArgList(modelJpsi, modelBkg), RooArgList(yieldJpsi, yieldBkg));
@@ -231,7 +233,7 @@ void DoSPlot(RooWorkspace *ws){
   RooMsgService::instance().setSilentMode(true);
 
   //Now we use the SPlot class to add SWeight to our data set based on our model and our yield variables
-  RooStats::SPlot * sData = new RooStats::SPlot("sData","splot", *data, model, RooArgList(*yieldJpsi, *yieldBkg) );
+  RooStats::SPlot *sData = new RooStats::SPlot("sData", "splot", *data, model, RooArgList(*yieldJpsi, *yieldBkg) );
 
   //Check Sweight properties
   std::cout << std::endl << "Yield of J/psi is " << yieldJpsi -> getVal() << ". From sWeights it is " << sData -> GetYieldFromSWeight("yieldJpsi") << std::endl;
@@ -256,11 +258,11 @@ void MakePlotsAndTree(RooWorkspace *ws, string fInName, string treeName, bool us
   RooAbsPdf *modelBkg = ws -> pdf("modelBkg");
 
   // Get vars from WS
-  RooRealVar *fMass = ws->var("fMass");
-  RooRealVar *fCos2DeltaPhi = ws->var("fCos2DeltaPhi");
+  RooRealVar *fMass = ws -> var("fMass");
+  RooRealVar *fCos2DeltaPhi = ws -> var("fCos2DeltaPhi");
   
   // Get data from WS
-  RooDataSet* data = (RooDataSet*) ws->data("dataWithSWeights");
+  RooDataSet *data = (RooDataSet*) ws -> data("dataWithSWeights");
 
   TLatex *latexTitle = new TLatex();
   latexTitle -> SetTextSize(0.07);

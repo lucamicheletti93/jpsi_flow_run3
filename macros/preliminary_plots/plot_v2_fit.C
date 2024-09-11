@@ -1,47 +1,67 @@
 void LoadStyle();
 void SetLegend(TLegend *);
 
-void plot_v2_fit(double minPtBin = 2, double maxPtBin = 3) {
+void plot_v2_fit(double minPtBin = 2, double maxPtBin = 3, bool mixing = true) {
     LoadStyle();
     gStyle -> SetOptStat(0);
     // For 2-3 --> v2_fit_2.3_4.7_CB2_VWG_data_Pol2_v2bkg
     // For 5-6 --> v2_fit_2.3_4.7_CB2_VWG_MC_Pol2_v2bkg
 
-    TFile *fIn = new TFile(Form("/Users/lucamicheletti/GITHUB/jpsi_flow_run3/macros/systematics_mix_fit/fitResults_Pt_%2.1f_%2.1f.root", minPtBin, maxPtBin));
+    string dirName;
+    if (mixing) {
+        dirName = "/Users/lucamicheletti/GITHUB/jpsi_flow_run3/macros/systematics_mix_fit";
+    } else {
+        dirName = "/Users/lucamicheletti/GITHUB/jpsi_flow_run3/macros/systematics_std_fit";
+    }
+     
+
+    TFile *fIn = new TFile(Form("%s/fitResults_Pt_%2.1f_%2.1f.root", dirName.c_str(), minPtBin, maxPtBin));
+    TH1D *histChi2Ndf = (TH1D*) fIn -> Get("histChi2Ndf");
     TCanvas *canvasFit = (TCanvas*) fIn -> Get("v2_fit_2.3_4.7_CB2_VWG_MC_Pol2_v2bkg");
 
     TPad *padMassFit = (TPad*) canvasFit -> GetPrimitive("pad1");
     TH1D *histMassSEPM = (TH1D*) padMassFit -> GetPrimitive(Form("histMassSEPM_%1.0f_%1.0f__10_50", minPtBin, maxPtBin));
-    TH1D *histMassMEPM = (TH1D*) padMassFit -> GetPrimitive(Form("histMassMEPM_%1.0f_%1.0f__10_50", minPtBin, maxPtBin));
+    TH1D *histMassMEPM;
+    if (mixing) {
+        histMassMEPM = (TH1D*) padMassFit -> GetPrimitive(Form("histMassMEPM_%1.0f_%1.0f__10_50", minPtBin, maxPtBin));
+    }
 
     TF1 *funcMassSigBkg = (TF1*) padMassFit -> GetPrimitive("funcMassSigBkg");
     TF1 *funcMassSig = (TF1*) padMassFit -> GetPrimitive("funcMassSig");
     TF1 *funcMassBkg = (TF1*) padMassFit -> GetPrimitive("funcMassBkg");
 
     TPad *padFlowFit = (TPad*) canvasFit -> GetPrimitive("pad2");
-    TF1 *funcFlowBkg = (TF1*) padFlowFit -> GetPrimitive("bck2");
+    TF1 *funcFlowBkg;
 
     // The histogram has no names -> necessary to retrieve with primitives
     TList* primitives = padFlowFit -> GetListOfPrimitives();
+    TF1 *funcFlowSigBkg = (TF1*) padFlowFit -> GetPrimitive("funcFlowSigBkg");
+
     TIter next(primitives);
     TObject* obj = nullptr;
     TH1D *histFlowSEPM;
     TH1D *histFlowMEPM;
 
-    int counter = 0;
-    while ((obj = next())) {
-        if (obj->InheritsFrom(TH1::Class())) {
-            TH1* hist = (TH1*) obj;
-            if (strcmp(hist -> GetName(), "") == 0) {
-                if (counter == 0) {
-                    histFlowSEPM = (TH1D*) hist;
+    if (mixing) {
+        funcFlowBkg = (TF1*) padFlowFit -> GetPrimitive("bck2");
+        int counter = 0;
+        while ((obj = next())) {
+            std::cout << obj -> GetName() << std::endl;
+            if (obj->InheritsFrom(TH1::Class())) {
+                TH1* hist = (TH1*) obj;
+                if (strcmp(hist -> GetName(), "") == 0) {
+                    if (counter == 0) {
+                        histFlowSEPM = (TH1D*) hist;
+                    }
+                    if (counter == 1) {
+                        histFlowMEPM = (TH1D*) hist;
+                    }
+                    counter++;
                 }
-                if (counter == 1) {
-                    histFlowMEPM = (TH1D*) hist;
-                }
-                counter++;
             }
         }
+    } else {
+        histFlowSEPM = (TH1D*) padFlowFit -> GetPrimitive(Form("histV2SEPM_%1.0f_%1.0f__10_50", minPtBin, maxPtBin));
     }
 
     // Retrieve the fit result
@@ -85,7 +105,11 @@ void plot_v2_fit(double minPtBin = 2, double maxPtBin = 3) {
     histMassSEPM -> GetXaxis() -> SetRangeUser(2.48, 4.52);
     histMassSEPM -> GetYaxis() -> SetRangeUser(minMassBin, maxMassBin);
     histMassSEPM -> GetYaxis() -> SetLabelSize(0.07);
-    histMassSEPM -> GetYaxis() -> SetTitleOffset(0.90);
+    if (mixing) {
+        histMassSEPM -> GetYaxis() -> SetTitleOffset(0.9);
+    } else {
+        histMassSEPM -> GetYaxis() -> SetTitleOffset(1);
+    }
     histMassSEPM -> GetYaxis() -> SetTitle("d#it{N} / d#it{m}_{#mu#mu} (GeV/#it{c}^{2})^{-1}");
     histMassSEPM -> GetYaxis() -> SetTitleSize(0.08);
     histMassSEPM -> GetYaxis() -> SetMaxDigits(3);
@@ -125,7 +149,6 @@ void plot_v2_fit(double minPtBin = 2, double maxPtBin = 3) {
     pad2 -> cd();
     pad2 -> SetTicks(1, 1);
 
-    histFlowMEPM -> SetTitle("");
     double minFlowBin, maxFlowBin;
     if (minPtBin == 0) {
         minFlowBin = -0.016;
@@ -140,36 +163,79 @@ void plot_v2_fit(double minPtBin = 2, double maxPtBin = 3) {
         minFlowBin = 0.01 * histFlowSEPM -> GetBinContent(histFlowSEPM -> FindBin(2.5));
         maxFlowBin = 1.50 * histFlowSEPM -> GetBinContent(histFlowSEPM -> FindBin(2.5));
     }
-    histFlowMEPM -> GetXaxis() -> SetRangeUser(2.48, 4.52);
-    histFlowMEPM -> GetXaxis() -> SetLabelSize(0.08);
-    histFlowMEPM -> GetXaxis() -> SetTitle("");
-    histFlowMEPM -> GetXaxis() -> SetTitleSize(0.07);
-    histFlowMEPM -> GetYaxis() -> SetRangeUser(minFlowBin, maxFlowBin);
-    histFlowMEPM -> GetYaxis() -> SetLabelSize(0.07);
-    histFlowMEPM -> GetYaxis() -> CenterTitle(true);
-    histFlowMEPM -> GetYaxis() -> SetTitle("#it{v}_{2} {EP, |#Delta#eta| > 2.5}");
-    histFlowMEPM -> GetYaxis() -> SetTitleOffset(0.90);
-    histFlowMEPM -> GetYaxis() -> SetTitleSize(0.08);
-    histFlowMEPM -> SetLineColor(kBlack);
-    histFlowMEPM -> SetMarkerStyle(24);
-    histFlowMEPM -> SetMarkerSize(1);
-    histFlowMEPM -> Draw("EP");
+    
+    TH2D *histGridFlow = new TH2D("histGridFlow", "", 100, 2.48, 4.52, 100, -0.1, 0.1);
+    histGridFlow -> SetTitle("");
+    histGridFlow -> GetXaxis() -> SetRangeUser(2.48, 4.52);
+    histGridFlow -> GetXaxis() -> SetLabelSize(0.08);
+    histGridFlow -> GetXaxis() -> SetTitle("");
+    histGridFlow -> GetXaxis() -> SetTitleSize(0.07);
+    histGridFlow -> GetYaxis() -> SetRangeUser(minFlowBin, maxFlowBin);
+    histGridFlow -> GetYaxis() -> SetLabelSize(0.07);
+    histGridFlow -> GetYaxis() -> CenterTitle(true);
+    histGridFlow -> GetYaxis() -> SetTitle("#it{v}_{2} {EP, |#Delta#eta| > 2.5}");
+    if (mixing) {
+        histGridFlow -> GetYaxis() -> SetTitleOffset(0.9);
+    } else {
+        histGridFlow -> GetYaxis() -> SetTitleOffset(1);
+    }
+    histGridFlow -> GetYaxis() -> SetTitleSize(0.08);
+    histGridFlow -> Draw();
+
+    if (mixing) {
+        histFlowMEPM -> SetLineColor(kBlack);
+        histFlowMEPM -> SetMarkerStyle(24);
+        histFlowMEPM -> SetMarkerSize(1);
+        histFlowMEPM -> Draw("EP SAME");
+    } else {
+        funcFlowBkg = new TF1("funcFlowBkg", "[0] + [1]*x + [2]*x*x", 2.48, 4.52);
+
+        // Getting the parameter values from the stat panel in the canvas
+        TPaveStats* stats = (TPaveStats*) histFlowSEPM -> FindObject("stats");
+
+        TList* listOfLines = stats -> GetListOfLines();
+        TIter next(listOfLines);
+        TObject* obj;
+
+        std::regex regexPatter0(R"(v_\{2\} BG0 = (-?[\d.]+) #pm ([\d.]+))");
+        std::regex regexPatter1(R"(v_\{2\} BG1 = (-?[\d.]+) #pm ([\d.]+))");
+        std::regex regexPatter2(R"(v_\{2\} BG2 = (-?[\d.]+) #pm ([\d.]+))");
+
+        while ((obj = next())) {
+            std::string line = obj -> GetTitle();
+            std::smatch match;
+            if (std::regex_search(line, match, regexPatter0)) {
+                funcFlowBkg -> SetParameter(0, std::stod(match[1]));
+            }
+            if (std::regex_search(line, match, regexPatter1)) {
+                funcFlowBkg -> SetParameter(1, std::stod(match[1]));
+            }
+            if (std::regex_search(line, match, regexPatter2)) {
+                funcFlowBkg -> SetParameter(2, std::stod(match[1]));
+            }
+        }
+    }
 
     funcFlowBkg -> SetLineColor(kGray+1);
+    funcFlowBkg -> SetLineStyle(kDashed);
     funcFlowBkg -> Draw("SAME");
 
+    histFlowSEPM -> SetStats(0);
     histFlowSEPM -> SetMarkerSize(1);
     histFlowSEPM -> SetLineColor(kBlack);
     histFlowSEPM -> Draw("EP SAME");
 
-    TLegend *legendFlowFit = new TLegend(0.65, 0.85, 0.88, 0.97, " ", "brNDC");
-    SetLegend(legendFlowFit);
-    legendFlowFit -> SetTextSize(0.07);
-    legendFlowFit -> AddEntry(histFlowMEPM, "Mixed event", "PL");
-    legendFlowFit -> Draw();
+    if (mixing) {
+        TLegend *legendFlowFit = new TLegend(0.65, 0.85, 0.88, 0.97, " ", "brNDC");
+        SetLegend(legendFlowFit);
+        legendFlowFit -> SetTextSize(0.07);
+        legendFlowFit -> AddEntry(histFlowMEPM, "Mixed event", "PL");
+        legendFlowFit -> Draw();
+    }
 
     latexTitle -> DrawLatex(0.18, 0.87, Form("v_{2}^{Sig}(J/#psi) = %4.3f#kern[0.5]{#pm} %4.3f", jpsiV2, errJpsiV2));
-    //latexTitle -> DrawLatex(0.28, 0.77, "#chi^{2}/NDF = 1.1");
+    // For the moment the X2/NDF is not added
+    //latexTitle -> DrawLatex(0.65, 0.87, Form("#chi^{2}/NDF = %3.2f", histChi2Ndf -> GetBinContent(histChi2Ndf -> GetXaxis() -> FindBin("CB2 + VWG + MC tails, 2.3 - 4.7, Pol2[v2 bkg]"))));
 
     canvasMassFlow -> cd();
     TLatex *latexAxis = new TLatex();
@@ -179,7 +245,11 @@ void plot_v2_fit(double minPtBin = 2, double maxPtBin = 3) {
     latexAxis -> DrawLatex(0.70, 0.030, "#it{m}_{#mu#mu} (GeV/#it{c}^{2})");
 
     canvasMassFlow -> Update();
-    canvasMassFlow -> SaveAs(Form("fitFlowVsMassPt_%1.0f_%1.0f_MixedEvent.pdf", minPtBin, maxPtBin));
+    if (mixing) {
+        canvasMassFlow -> SaveAs(Form("fitFlowVsMassPt_%1.0f_%1.0f_MixedEvent.pdf", minPtBin, maxPtBin));
+    } else {
+        canvasMassFlow -> SaveAs(Form("fitFlowVsMassPt_%1.0f_%1.0f.pdf", minPtBin, maxPtBin));
+    }
 }
 ////////////////////////////////////////////////////////////////////////////////
 void LoadStyle(){
