@@ -155,25 +155,23 @@ void plot_v2_fit(double minPtBin = 2, double maxPtBin = 3, bool mixing = true) {
         maxFlowBin = 0.027;
     } else if (minPtBin < 4) {
         minFlowBin = 0.30 * histFlowSEPM -> GetBinContent(histFlowSEPM -> FindBin(2.5));
-        maxFlowBin = 1.30 * histFlowSEPM -> GetBinContent(histFlowSEPM -> FindBin(2.5));
+        maxFlowBin = 1.36 * histFlowSEPM -> GetBinContent(histFlowSEPM -> FindBin(2.5));
     } else if (minPtBin >= 5) {
-        minFlowBin = 0.01 * histFlowSEPM -> GetBinContent(histFlowSEPM -> FindBin(2.5));
-        maxFlowBin = 2 * histFlowSEPM -> GetBinContent(histFlowSEPM -> FindBin(2.5));
+        minFlowBin = 0.04 * histFlowSEPM -> GetBinContent(histFlowSEPM -> FindBin(2.5));
+        maxFlowBin = 2.3 * histFlowSEPM -> GetBinContent(histFlowSEPM -> FindBin(2.5));
     } else {
         minFlowBin = 0.01 * histFlowSEPM -> GetBinContent(histFlowSEPM -> FindBin(2.5));
         maxFlowBin = 1.50 * histFlowSEPM -> GetBinContent(histFlowSEPM -> FindBin(2.5));
     }
     
-    TH2D *histGridFlow = new TH2D("histGridFlow", "", 100, 2.48, 4.52, 100, -0.1, 0.1);
+    TH2D *histGridFlow = new TH2D("histGridFlow", "", 100, 2.48, 4.52, 100, minFlowBin, maxFlowBin);
     histGridFlow -> SetTitle("");
-    histGridFlow -> GetXaxis() -> SetRangeUser(2.48, 4.52);
     histGridFlow -> GetXaxis() -> SetLabelSize(0.08);
     histGridFlow -> GetXaxis() -> SetTitle("");
     histGridFlow -> GetXaxis() -> SetTitleSize(0.07);
-    histGridFlow -> GetYaxis() -> SetRangeUser(minFlowBin, maxFlowBin);
     histGridFlow -> GetYaxis() -> SetLabelSize(0.07);
     histGridFlow -> GetYaxis() -> CenterTitle(true);
-    histGridFlow -> GetYaxis() -> SetTitle("#it{v}_{2} {EP, |#Delta#eta| > 2.5}");
+    histGridFlow -> GetYaxis() -> SetTitle("#it{v}_{2} {EP, |#Delta#eta| > 1.7}");
     if (mixing) {
         histGridFlow -> GetYaxis() -> SetTitleOffset(0.9);
     } else {
