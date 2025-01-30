@@ -65,15 +65,37 @@ string parNames_CB2_Pol4Exp[] = {"bkg","aa","bb","cc","dd","ee","ff","sig_Jpsi",
 string parNames_NA60_VWG[] = {"bkg","aa","bb","cc","sig_Jpsi","mean_Jpsi","width_Jpsi","b_Jpsi","c_Jpsi","d_Jpsi","f_Jpsi","g_Jpsi","h_Jpsi","a_Jpsi","e_Jpsi"};
 string parNames_NA60_Pol4Exp[] = {"bkg","aa","bb","cc","dd","ee","ff","sig_Jpsi","mean_Jpsi","width_Jpsi","b_Jpsi","c_Jpsi","d_Jpsi","f_Jpsi","g_Jpsi","h_Jpsi","a_Jpsi","e_Jpsi"};
 
-double minCentrBins[] = {10};
-double maxCentrBins[] = {50};
+double minCentrBins[] = {50};
+double maxCentrBins[] = {80};
 
-const int nPtBins = 10;
-double minPtBins[] = {0, 1, 2, 3, 4, 5, 6, 8, 10, 12};
-double maxPtBins[] = {1, 2, 3, 4, 5, 6, 8, 10, 12, 15};
-double ptBins[] = {0, 1, 2, 3, 4, 5, 6, 8, 10, 12, 15};
-//double minPtBins[] = {2};
-//double maxPtBins[] = {3};
+// 10-30%
+/*double resolution = 1.14851; // 1.2782435627 10-30%
+const int nPtBins = 14;
+double minPtBins[] = {0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0};
+double maxPtBins[] = {0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0, 15.0};
+double ptBins[] = {0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0, 15.0};*/
+/*double resolution = 1.14851; // 1.2782435627 10-30%
+const int nPtBins = 13;
+double minPtBins[] = {0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0};
+double maxPtBins[] = {0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0, 15.0};
+double ptBins[] = {0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0, 15.0};*/
+// 30-50%
+/*double resolution = 1.15675; // 1.2782435627 30-50%
+const int nPtBins = 13;
+double minPtBins[] = {0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0};
+double maxPtBins[] = {0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0, 15.0};
+double ptBins[] = {0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0, 15.0};*/
+// 50-80%
+double resolution = 1.60671; // 50-80%
+const int nPtBins = 8;
+double minPtBins[] = {0.0, 2.0, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0};
+double maxPtBins[] = {2.0, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 15.0};
+double ptBins[] = {0.0, 2.0, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 15.0};
+// Single Fit
+//const int nPtBins = 1;
+//double minPtBins[] = {3.5};
+//double maxPtBins[] = {4.0};
+//double ptBins[] = {3.5, 4.0};
 
 const int nFitRanges = 3;
 double minFitRanges[] = {2.3, 2.4, 2.5};
@@ -81,14 +103,15 @@ double maxFitRanges[] = {4.7, 4.6, 4.5};
 
 int nTrials = 0;
 
-double resolution = 1.28004;
-string dirPath = "/Users/dhananjaya/Desktop/ALICE_PbPb_Analysis/jpsi_flow_run3/Signal_Systematic/Small_pT_Bins";
+string dirInPath = Form("/Users/lucamicheletti/GITHUB/dq_fitter/analysis/LHC23_pass4_full/centrality_%1.0f_%1.0f/pt_dependence_narrow_bins", minCentrBins[0], maxCentrBins[0]);
+string fInName = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/data/pass4/LHC23_full/Histograms_Fullpass4PbPbQualitymatchedMchMid_centr_Mixing_10_50.root";
+string dirOutPath = "systematics_pass4_mix_fit";
 
 void v2_fitter_mixing() {
-  if (!gSystem -> AccessPathName(dirPath.c_str())) {
+  if (!gSystem -> AccessPathName(dirInPath.c_str())) {
     std::cout << "The output directory already exists! " << std::endl;
   } else {
-    int status = gSystem -> MakeDirectory(dirPath.c_str());
+    int status = gSystem -> MakeDirectory(dirInPath.c_str());
     if (status == 0) {
       std::cout << "Output directory created!" << std::endl;
     } else {
@@ -98,7 +121,7 @@ void v2_fitter_mixing() {
   }
 
   // Histograms for plotting the results
-  TH1D *histStatJpsiV2 = new TH1D("histStatJpsiV2", "", 10, ptBins);
+  TH1D *histStatJpsiV2 = new TH1D("histStatJpsiV2", "", nPtBins, ptBins);
   histStatJpsiV2 -> GetXaxis() -> SetTitle("#it{p}_{T} (GeV/#it{c})");
   histStatJpsiV2 -> GetYaxis() -> SetRangeUser(-0.05, 0.4);
   histStatJpsiV2 -> GetYaxis() -> SetTitle("#it{v}_{2}");
@@ -106,7 +129,7 @@ void v2_fitter_mixing() {
   histStatJpsiV2 -> SetMarkerColor(kRed+1);
   histStatJpsiV2 -> SetLineColor(kRed+1);
 
-  TH1D *histSystJpsiV2 = new TH1D("histSystJpsiV2", "", 10, ptBins);
+  TH1D *histSystJpsiV2 = new TH1D("histSystJpsiV2", "", nPtBins, ptBins);
   histSystJpsiV2 -> SetMarkerStyle(20);
   histSystJpsiV2 -> SetMarkerColor(kRed+1);
   histSystJpsiV2 -> SetLineColor(kRed+1);
@@ -122,8 +145,8 @@ void v2_fitter_mixing() {
     double maxPtBin = maxPtBins[iPt];
     nTrials = 0;
 
-     TFile *fIn = new TFile("Histograms_Fullpass3matchedMchMid_centr_Mixing10_50.root");
-     TFile *fOut = new TFile(Form("systematics3/fitResults_Pt_%2.1f_%2.1f.root", minPtBin, maxPtBin), "RECREATE");
+    TFile *fIn = new TFile(fInName.c_str(), "READ");
+    TFile *fOut = new TFile(Form("%s/centrality_%1.0f_%1.0f/fitResults_Pt_%2.1f_%2.1f.root", dirOutPath.c_str(), minCentrBins[0], maxCentrBins[0], minPtBin, maxPtBin), "RECREATE");
 
     for (int iSigFunc = 0;iSigFunc < nSigFuncs;iSigFunc++) { // loop on mass signal funcs
       for (int iBkgFunc = 0;iBkgFunc < nBkgFuncs;iBkgFunc++) { // loop on mass background funcs
@@ -136,16 +159,16 @@ void v2_fitter_mixing() {
             continue;
           }
 
-          TFile *fInMassFit = new TFile(Form("mass_fit_results/Pt_%2.1f_%2.1f/multi_trial_%s_%s_%s_tails.root", minPtBin, maxPtBin, sigFunc.c_str(), bkgFunc.c_str(), tailSet.c_str()));
+          TFile *fInMassFit = new TFile(Form("%s/Pt_%2.1f_%2.1f/multi_trial_%s_%s_%s_tails.root", dirInPath.c_str(), minPtBin, maxPtBin, sigFunc.c_str(), bkgFunc.c_str(), tailSet.c_str()));
 
           for (int iFitRange = 0;iFitRange < nFitRanges;iFitRange++) {
             double minFitRange = minFitRanges[iFitRange];
             double maxFitRange = maxFitRanges[iFitRange];
 
-            TH1D *histMassFitPars = (TH1D*) fInMassFit -> Get(Form("fit_results_%s_%s__%2.1f_%2.1f_histMassSEPM_%1.0f_%1.0f__10_50", sigFunc.c_str(), bkgFunc.c_str(), minFitRange, maxFitRange, minPtBin, maxPtBin));
-            TH1D *histMass = (TH1D*) fIn -> Get(Form("histMassSEPM_%1.0f_%1.0f__10_50", minPtBin, maxPtBin));
-            TProfile *profV2 = (TProfile*) fIn -> Get(Form("histV2SEPM_%1.0f_%1.0f__10_50", minPtBin, maxPtBin));
-            TProfile *profV2Mix = (TProfile*) fIn->Get(Form("histV2MEPM_%1.0f_%1.0f__10_50", minPtBin, maxPtBin));
+            TH1D *histMassFitPars = (TH1D*) fInMassFit -> Get(Form("fit_results_%s_%s__%2.1f_%2.1f_histMassSEPM_%2.1f_%2.1f__%1.0f_%1.0f", sigFunc.c_str(), bkgFunc.c_str(), minFitRange, maxFitRange, minPtBin, maxPtBin, minCentrBins[0], maxCentrBins[0]));
+            TH1D *histMass = (TH1D*) fIn -> Get(Form("histMassSEPM_%2.1f_%2.1f__%1.0f_%1.0f", minPtBin, maxPtBin, minCentrBins[0], maxCentrBins[0]));
+            TProfile *profV2 = (TProfile*) fIn -> Get(Form("histV2SEPM_%2.1f_%2.1f__%1.0f_%1.0f", minPtBin, maxPtBin, minCentrBins[0], maxCentrBins[0]));
+            TProfile *profV2Mix = (TProfile*) fIn->Get(Form("histV2MEPM_%2.1f_%2.1f__%1.0f_%1.0f", minPtBin, maxPtBin, minCentrBins[0], maxCentrBins[0]));
 	    
             // Plot options
             histMass -> GetXaxis() -> SetRangeUser(minFitRange, maxFitRange);
@@ -167,9 +190,9 @@ void v2_fitter_mixing() {
               string bkgV2Func = bkgV2Funcs[iBkgV2Func];
               double *results; 
               if (iSigFunc == 0 && iBkgFunc == 0 && iTailSet == 0 && iFitRange == 0 && iBkgV2Func == 0) {
-                results = DoFlowFit(histMassFitPars, histMass, profV2,profV2Mix,minPtBin, maxPtBin, minFitRange, maxFitRange, kTRUE, Form("%s_%s_%s_%s_v2bkg", sigFunc.c_str(), bkgFunc.c_str(), tailSet.c_str(), bkgV2Func.c_str()), fOut);
+                results = DoFlowFit(histMassFitPars, histMass, profV2, profV2Mix, minPtBin, maxPtBin, minFitRange, maxFitRange, kTRUE, Form("%s_%s_%s_%s_v2bkg", sigFunc.c_str(), bkgFunc.c_str(), tailSet.c_str(), bkgV2Func.c_str()), fOut);
               } else {
-                results = DoFlowFit(histMassFitPars, histMass, profV2,profV2Mix,minPtBin, maxPtBin, minFitRange, maxFitRange, kFALSE, Form("%s_%s_%s_%s_v2bkg", sigFunc.c_str(), bkgFunc.c_str(), tailSet.c_str(), bkgV2Func.c_str()), fOut);
+                results = DoFlowFit(histMassFitPars, histMass, profV2, profV2Mix, minPtBin, maxPtBin, minFitRange, maxFitRange, kFALSE, Form("%s_%s_%s_%s_v2bkg", sigFunc.c_str(), bkgFunc.c_str(), tailSet.c_str(), bkgV2Func.c_str()), fOut);
               }
               
               // WARNING! v2 from the fit is scaled by the RESOLUTION
@@ -202,6 +225,7 @@ void v2_fitter_mixing() {
     histSyst -> GetYaxis() -> SetRangeUser(0, 0.2);
     int nv2_ex =0;
     for (int iBin = 0;iBin < nTrials;iBin++) {
+      if (jpsiV2s[iBin] < -1. || jpsiV2s[iBin] > 1.) continue;
       //cout << iBin << ") " << jpsiV2s[iBin] << " +/- " << errJpsiV2s[iBin] << " -> " << trialSetNames[iBin].c_str() << endl;
       histSyst -> SetBinContent(iBin+1, jpsiV2s[iBin]);
       histSyst -> SetBinError(iBin+1, errJpsiV2s[iBin]);
@@ -220,6 +244,7 @@ void v2_fitter_mixing() {
     double sumSyst = 0;
     int nsys_ex =0;
     for (int iBin = 0;iBin < nTrials;iBin++) {
+      if (jpsiV2s[iBin] < -1. || jpsiV2s[iBin] > 1.) continue;
       if(chi2Ndfs[iBin] >4) nsys_ex ++;
       if(chi2Ndfs[iBin] >4) continue;
       double dev = (jpsiV2s[iBin] - meanJpsiV2);
@@ -292,7 +317,7 @@ void v2_fitter_mixing() {
 
     canvasSyst -> Write();
     histChi2Ndf -> Write();
-    canvasSyst -> SaveAs(Form("%s/systematic_plot_Pt_%1.0f_%1.0f.pdf", dirPath.c_str(), minPtBin, maxPtBin));
+    canvasSyst -> SaveAs(Form("%s/systematic_plot_Pt_%1.0f_%1.0f.pdf", dirInPath.c_str(), minPtBin, maxPtBin));
 
     fOut -> Close();
   }
@@ -326,10 +351,10 @@ double* DoFlowFit(TH1D *histMassFitPars, TH1D *histMass, TProfile *profV2,TProfi
   fitPars.clear();
   double* results = new double[3];
 
-  TF1 *funcMassBkg;
-  TF1 *funcMassSig;
-  TF1 *funcMassSigBkg;
-  TF1 *funcFlowSigBkg;
+  TF1 *funcMassBkg = nullptr;
+  TF1 *funcMassSig = nullptr;
+  TF1 *funcMassSigBkg = nullptr;
+  TF1 *funcFlowSigBkg = nullptr;
   
 
   double SEv2 =histoV2->Integral(histoV2->GetXaxis()->FindBin(1.0),histoV2->GetXaxis()->FindBin(2.5)) + histoV2->Integral(histoV2->GetXaxis()->FindBin(3.92),histoV2->GetXaxis()->FindBin(5.0));
@@ -819,7 +844,7 @@ double* DoFlowFit(TH1D *histMassFitPars, TH1D *histMass, TProfile *profV2,TProfi
   canvasFit -> Write(Form("v2_fit_%2.1f_%2.1f_%s", minFitRange, maxFitRange, fitFuncs.c_str()));
 
   if (debug) {
-    canvasFit -> SaveAs(Form("%s/v2_fit_%2.1f_%2.1f_%s_Pt_%1.0f_%1.0f.pdf", dirPath.c_str(), minFitRange, maxFitRange, fitFuncs.c_str(), minPtBin, maxPtBin));
+    canvasFit -> SaveAs(Form("%s/v2_fit_%2.1f_%2.1f_%s_Pt_%1.0f_%1.0f.pdf", dirInPath.c_str(), minFitRange, maxFitRange, fitFuncs.c_str(), minPtBin, maxPtBin));
   }
   return results;
 }
@@ -831,7 +856,7 @@ std::vector<TH1*> Uncertainities(std::vector<TH1*> histlist, vector<double> para
     std::vector<TH1*> histograms;
     int ncombination = parameter.size() / nPtBins;
     int nbin = 0;
-    for (int i = 0; i < parameter.size(); i++) {
+    for (int i = 0; i < static_cast<int>(parameter.size()); i++) {
         if ((i) % ncombination != 0) {
             continue;
         }
