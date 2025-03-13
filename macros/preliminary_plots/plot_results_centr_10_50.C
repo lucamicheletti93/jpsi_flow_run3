@@ -1,7 +1,7 @@
 void LoadStyle();
 void SetLegend(TLegend *);
 
-void plot_results() {
+void plot_results_centr_10_50() {
     LoadStyle();
 
     const int nPtBins = 10;
