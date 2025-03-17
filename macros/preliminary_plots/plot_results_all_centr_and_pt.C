@@ -179,16 +179,16 @@ void plot_results_all_centr_and_pt() {
     double systV2JpsiVsPtCentr1030Run2[] = {0.0038391, 0.0036633, 0.004898, 0.0035068, 0.0037855, 0.0029726, 0.0036802, 0.0075789, 0.0093488, 0.0091828};
 
     TGraphErrors *graStatV2JpsiVsPtCentr1030Run2 = new TGraphErrors(nPtBinsRun2, ptCentrRun2, v2JpsiVsPtCentr1030Run2, ptWidthStatRun2, statV2JpsiVsPtCentr1030Run2);
-    graStatV2JpsiVsPtCentr1030Run2 -> SetLineColor(kOrange+1);
+    graStatV2JpsiVsPtCentr1030Run2 -> SetLineColor(kGray+2);
     graStatV2JpsiVsPtCentr1030Run2 -> SetLineWidth(2);
     graStatV2JpsiVsPtCentr1030Run2 -> SetMarkerStyle(20);
-    graStatV2JpsiVsPtCentr1030Run2 -> SetMarkerColor(kOrange+1);
+    graStatV2JpsiVsPtCentr1030Run2 -> SetMarkerColor(kGray+2);
 
     TGraphErrors *graSystV2JpsiVsPtCentr1030Run2 = new TGraphErrors(nPtBinsRun2, ptCentrRun2, v2JpsiVsPtCentr1030Run2, ptWidthSystRun2, systV2JpsiVsPtCentr1030Run2);
-    graSystV2JpsiVsPtCentr1030Run2 -> SetLineColor(kOrange+1);
+    graSystV2JpsiVsPtCentr1030Run2 -> SetLineColor(kGray+2);
     graSystV2JpsiVsPtCentr1030Run2 -> SetLineWidth(2);
     graSystV2JpsiVsPtCentr1030Run2 -> SetMarkerStyle(20);
-    graSystV2JpsiVsPtCentr1030Run2 -> SetMarkerColor(kOrange+1);
+    graSystV2JpsiVsPtCentr1030Run2 -> SetMarkerColor(kGray+2);
     graSystV2JpsiVsPtCentr1030Run2 -> SetFillStyle(0);
 
 
@@ -197,16 +197,16 @@ void plot_results_all_centr_and_pt() {
     double systV2JpsiVsPt3050Run2[] = {0.0032389, 0.0032904, 0.003359, 0.0043267, 0.0065719, 0.0066256, 0.0065651, 0.0067724, 0.0075293, 0.0093145};
 
     TGraphErrors *graStatV2JpsiVsPt3050Run2 = new TGraphErrors(nPtBinsRun2, ptCentrRun2, v2JpsiVsPt3050Run2, ptWidthStatRun2, statV2JpsiVsPt3050Run2);
-    graStatV2JpsiVsPt3050Run2 -> SetLineColor(kOrange+1);
+    graStatV2JpsiVsPt3050Run2 -> SetLineColor(kGray+2);
     graStatV2JpsiVsPt3050Run2 -> SetLineWidth(2);
     graStatV2JpsiVsPt3050Run2 -> SetMarkerStyle(20);
-    graStatV2JpsiVsPt3050Run2 -> SetMarkerColor(kOrange+1);
+    graStatV2JpsiVsPt3050Run2 -> SetMarkerColor(kGray+2);
 
     TGraphErrors *graSystV2JpsiVsPt3050Run2 = new TGraphErrors(nPtBinsRun2, ptCentrRun2, v2JpsiVsPt3050Run2, ptWidthSystRun2, systV2JpsiVsPt3050Run2);
-    graSystV2JpsiVsPt3050Run2 -> SetLineColor(kOrange+1);
+    graSystV2JpsiVsPt3050Run2 -> SetLineColor(kGray+2);
     graSystV2JpsiVsPt3050Run2 -> SetLineWidth(2);
     graSystV2JpsiVsPt3050Run2 -> SetMarkerStyle(20);
-    graSystV2JpsiVsPt3050Run2 -> SetMarkerColor(kOrange+1);
+    graSystV2JpsiVsPt3050Run2 -> SetMarkerColor(kGray+2);
     graSystV2JpsiVsPt3050Run2 -> SetFillStyle(0);
 
     TCanvas *canvasV2JpsiVsPtCentr1030Run2VsRun3 = new TCanvas("canvasV2JpsiVsPtCentr1030Run2VsRun3", "", 800, 600);
