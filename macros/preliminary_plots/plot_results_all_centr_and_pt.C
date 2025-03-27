@@ -323,7 +323,7 @@ void plot_results_all_centr_and_pt() {
     double statV2JpsiVsPt1030Run3LargeBins[] = {0.0041272, 0.00555273, 0.007468, 0.0109966, 0.0148175, 0.0136262, 0.0274283, 0.0333535};
     double systV2JpsiVsPt1030Run3LargeBins[] = {0.00251499, 0.00225653, 0.00333794, 0.00928915, 0.00494801, 0.0152623, 0.0156752, 0.0113642};
 
-    for (int iPt = 0;iPt < nPtBins1030Run3;iPt++) {
+    for (int iPt = 0;iPt < nPtBins5080Run3;iPt++) {
         double systReso = v2JpsiVsPt1030Run3LargeBins[iPt] * systResoVsPt1030Run3;
         systV2JpsiVsPt1030Run3LargeBins[iPt] = TMath::Sqrt(systV2JpsiVsPt1030Run3LargeBins[iPt]*systV2JpsiVsPt1030Run3LargeBins[iPt] + systReso*systReso);
     }
@@ -336,7 +336,7 @@ void plot_results_all_centr_and_pt() {
     double statV2JpsiVsPt3050Run3LargeBins[] = {0.005412, 0.0072238, 0.00925043, 0.0122683, 0.0152096, 0.015853, 0.0266407, 0.0368849};
     double systV2JpsiVsPt3050Run3LargeBins[] = {0.00221957, 0.00378637, 0.00191604, 0.00280911, 0.00546688, 0.00801671, 0.0107334, 0.0203881};
 
-    for (int iPt = 0;iPt < nPtBins3050Run3;iPt++) {
+    for (int iPt = 0;iPt < nPtBins5080Run3;iPt++) {
         double systReso = v2JpsiVsPt3050Run3LargeBins[iPt] * systResoVsPt3050Run3;
         systV2JpsiVsPt3050Run3LargeBins[iPt] = TMath::Sqrt(systV2JpsiVsPt3050Run3LargeBins[iPt]*systV2JpsiVsPt3050Run3LargeBins[iPt] + systReso*systReso);
     }
