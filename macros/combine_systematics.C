@@ -1,47 +1,50 @@
 void combine_systematics() {
-    /*string dirInPathStd = "/Users/lucamicheletti/GITHUB/jpsi_flow_run3/macros/systematics_pass4_std_fit/centrality_30_50";
+    string dirInPathStd = "/Users/lucamicheletti/GITHUB/jpsi_flow_run3/macros/systematics_pass4_std_fit/centrality_30_50";
     string dirInPathMix = "/Users/lucamicheletti/GITHUB/jpsi_flow_run3/macros/systematics_pass4_mix_fit/centrality_30_50";
-    string dirOutPath = "combined_systematics_pass4/centrality_30_50";*/
+    string dirOutPath = "combined_systematics_pass4/centrality_30_50";
 
-    string dirInPathStd = "/Users/lucamicheletti/GITHUB/jpsi_flow_run3/macros/systematics_pass4_std_fit/pt_0_5";
-    string dirInPathMix = "/Users/lucamicheletti/GITHUB/jpsi_flow_run3/macros/systematics_pass4_mix_fit/pt_0_5";
-    string dirOutPath = "combined_systematics_pass4/pt_0_5";
+    /*string dirInPathStd = "/Users/lucamicheletti/GITHUB/jpsi_flow_run3/macros/systematics_pass4_std_fit/pt_5_15";
+    string dirInPathMix = "/Users/lucamicheletti/GITHUB/jpsi_flow_run3/macros/systematics_pass4_mix_fit/pt_5_15";
+    string dirOutPath = "combined_systematics_pass4/pt_5_15";*/
 
     const int nTrials = 72;
 
     // Pt dependence
-    /*string varAxisTitle = "#it{p}_{T} (GeV/#it{c})";
+    string varAxisTitle = "#it{p}_{T} (GeV/#it{c})";
     string varName = "Pt";
     string varFixName = "centrality";
     
     double minFixVarBins[] = {30};
-    double maxFixVarBins[] = {50};*/
+    double maxFixVarBins[] = {50};
 
-    // 10-30% & 30-50%
+    // 10-30% & 30-50% & 20-40%
     /*const int nVarBins = 13;
     double minVarBins[] = {0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0};
     double maxVarBins[] = {0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0, 15.0};
     double varBins[] = {0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0, 15.0};*/
     // 50-80%
-    /*const int nVarBins = 8;
+    const int nVarBins = 8;
     double minVarBins[] = {0.0, 2.0, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0};
     double maxVarBins[] = {2.0, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 15.0};
-    double varBins[] = {0.0, 2.0, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 15.0};*/
+    double varBins[] = {0.0, 2.0, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 15.0};
     //double minVarBins[] = {2};
     //double maxVarBins[] = {3};
 
     // Centrality dependence
-    string varAxisTitle = "Centrality (%)";
+    /*string varAxisTitle = "Centrality (%)";
     string varName = "Centr";
     string varFixName = "pt";
 
-    double minFixVarBins[] = {0};
-    double maxFixVarBins[] = {5};
+    double minFixVarBins[] = {5};
+    double maxFixVarBins[] = {15};
 
     const int nVarBins = 8;
     double minVarBins[] = {0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0};
     double maxVarBins[] = {10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0};
-    double varBins[] = {0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0};
+    double varBins[] = {0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0};*/
+
+    TCanvas *canvasChi2Ndf = new TCanvas("canvasChi2Ndf", "", 3000, 1800);
+    canvasChi2Ndf -> Divide(5, 3);
 
     TH1D *histStatJpsiV2 = new TH1D("histStatJpsiV2", "", nVarBins, varBins);
     histStatJpsiV2 -> GetXaxis() -> SetTitle(varAxisTitle.c_str());
@@ -77,10 +80,12 @@ void combine_systematics() {
         histCombinedSysts -> SetMarkerColor(kBlack);
         histCombinedSysts -> SetLineColor(kBlack);
 
+        TH1D *histChi2NdfAll = new TH1D("histChi2NdfAll", Form("%2.1f < #it{p}_{T} < %2.1f GeV/#it{c} ; #chi^{2} / NDF", minVarBins[iVar], maxVarBins[iVar]), 100, 0, 5);
         int nTrueTrials = 0;
         for (int iTrial = 0;iTrial < nTrials;iTrial++) {
             if (iTrial < nTrials/2) {
                 double chi2Ndf = histChi2NdfStdFit -> GetBinContent(iTrial+1);
+                histChi2NdfAll -> Fill(chi2Ndf);
                 double v2Jpsi = histStdFit -> GetBinContent(iTrial+1);
                 if (chi2Ndf > 4 || chi2Ndf == 0 || v2Jpsi < -0.15 || v2Jpsi > 0.3) {
                     continue;
@@ -94,6 +99,7 @@ void combine_systematics() {
                 histCombinedSysts -> GetXaxis() -> SetBinLabel(iTrial+1, histStdFit -> GetXaxis() -> GetBinLabel(iTrial+1));
             } else {
                 double chi2Ndf = histChi2NdfMixFit -> GetBinContent(iTrial+1-(nTrials/2));
+                histChi2NdfAll -> Fill(chi2Ndf);
                 double v2Jpsi = histMixFit -> GetBinContent(iTrial+1-(nTrials/2));
                 if (chi2Ndf > 4 || chi2Ndf == 0 || v2Jpsi < -0.15 || v2Jpsi > 0.3) {
                     continue;
@@ -197,8 +203,13 @@ void combine_systematics() {
             canvasCombinedSysts -> SaveAs(Form("%s/v2_sys_pt_%1.0f_%1.0f_cent_%1.0f_%1.0f.pdf", dirOutPath.c_str(), minVarBins[iVar], maxVarBins[iVar], minFixVarBins[0], maxFixVarBins[0]));
         }
 
+        canvasChi2Ndf -> cd(iVar+1);
+        histChi2NdfAll -> Draw("HIST");
+
         delete canvasCombinedSysts;
     }
+
+    canvasChi2Ndf -> SaveAs(Form("%s/Chi2Summary.pdf", dirOutPath.c_str()));
 
     TCanvas *canvasJpsiV2 = new TCanvas("canvasJpsiV2", "", 800, 600);
     histStatJpsiV2 -> Draw("EP");
@@ -209,5 +220,12 @@ void combine_systematics() {
     for (int iVar = 0;iVar < nVarBins;iVar++) {
         Printf("%3.2f %3.2f %6.5f %6.5f %6.5f ", minVarBins[iVar], maxVarBins[iVar], histStatJpsiV2 -> GetBinContent(iVar+1), histStatJpsiV2 -> GetBinError(iVar+1), histSystJpsiV2 -> GetBinError(iVar+1));
     }
+    cout << "-------------------------" << endl;
+    for (int iVar = 0;iVar < nVarBins;iVar++) {std::cout << histStatJpsiV2 -> GetBinContent(iVar+1) << ", ";}
+    std::cout << std::endl;
+    for (int iVar = 0;iVar < nVarBins;iVar++) {std::cout << histStatJpsiV2 -> GetBinError(iVar+1) << ", ";}
+    std::cout << std::endl;
+    for (int iVar = 0;iVar < nVarBins;iVar++) {std::cout << histSystJpsiV2 -> GetBinError(iVar+1) << ", ";}
+    std::cout << std::endl;
 
 }
