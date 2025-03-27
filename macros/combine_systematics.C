@@ -1,52 +1,73 @@
-void combine_systematics() {
-    string dirInPathStd = "/Users/lucamicheletti/GITHUB/jpsi_flow_run3/macros/systematics_pass4_std_fit/centrality_30_50";
-    string dirInPathMix = "/Users/lucamicheletti/GITHUB/jpsi_flow_run3/macros/systematics_pass4_mix_fit/centrality_30_50";
-    string dirOutPath = "combined_systematics_pass4/centrality_30_50";
-
-    /*string dirInPathStd = "/Users/lucamicheletti/GITHUB/jpsi_flow_run3/macros/systematics_pass4_std_fit/pt_5_15";
-    string dirInPathMix = "/Users/lucamicheletti/GITHUB/jpsi_flow_run3/macros/systematics_pass4_mix_fit/pt_5_15";
-    string dirOutPath = "combined_systematics_pass4/pt_5_15";*/
+void combine_systematics(string fixVar = "centrality", double minFixVar = 10, double maxFixVar = 30, string binning = "narrow") {
+    string dirInPathStd = Form("/Users/lucamicheletti/GITHUB/jpsi_flow_run3/macros/systematics_pass4_std_fit/%s_%1.0f_%1.0f", fixVar.c_str(), minFixVar, maxFixVar);
+    string dirInPathMix = Form("/Users/lucamicheletti/GITHUB/jpsi_flow_run3/macros/systematics_pass4_mix_fit/%s_%1.0f_%1.0f", fixVar.c_str(), minFixVar, maxFixVar);
+    string dirOutPath = Form("combined_systematics_pass4/%s_%1.0f_%1.0f", fixVar.c_str(), minFixVar, maxFixVar);
 
     const int nTrials = 72;
+    string varAxisTitle, varName, varFixName;
+    int nVarBins = -999;
+    vector <double> vecMinVarBins, vecMaxVarBins, vecVarBins;
 
-    // Pt dependence
-    string varAxisTitle = "#it{p}_{T} (GeV/#it{c})";
-    string varName = "Pt";
-    string varFixName = "centrality";
-    
-    double minFixVarBins[] = {30};
-    double maxFixVarBins[] = {50};
+    //WARNING! 1% systematic applied to all centrality for pT integrated results
+    std::map<std::pair<double, double>, double> mapResoRelErr = {{{10, 30}, 0.01}, {{30, 50}, 0.01}, {{50, 80}, 0.017}, {{0, 5}, 0.01}, {{5, 15}, 0.01}};
 
-    // 10-30% & 30-50% & 20-40%
-    /*const int nVarBins = 13;
-    double minVarBins[] = {0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0};
-    double maxVarBins[] = {0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0, 15.0};
-    double varBins[] = {0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0, 15.0};*/
-    // 50-80%
-    const int nVarBins = 8;
-    double minVarBins[] = {0.0, 2.0, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0};
-    double maxVarBins[] = {2.0, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 15.0};
-    double varBins[] = {0.0, 2.0, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 15.0};
-    //double minVarBins[] = {2};
-    //double maxVarBins[] = {3};
+    if (fixVar == "centrality") {
+        // Pt dependence
+        varAxisTitle = "#it{p}_{T} (GeV/#it{c})";
+        varName = "Pt";
+        varFixName = "centrality";
 
-    // Centrality dependence
-    /*string varAxisTitle = "Centrality (%)";
-    string varName = "Centr";
-    string varFixName = "pt";
+        if (binning == "narrow") {
+            nVarBins = 13;
+            double minVarBins[] = {0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0};
+            double maxVarBins[] = {0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0, 15.0};
+            double varBins[] = {0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0, 15.0};
 
-    double minFixVarBins[] = {5};
-    double maxFixVarBins[] = {15};
+            for (int iPt = 0;iPt < nVarBins+1;iPt++) {
+                if (iPt < nVarBins) {
+                    vecMinVarBins.push_back(minVarBins[iPt]);
+                    vecMaxVarBins.push_back(maxVarBins[iPt]);
+                }
+                vecVarBins.push_back(varBins[iPt]);
+            }
+        } else {
+            nVarBins = 8;
+            double minVarBins[] = {0.0, 2.0, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0};
+            double maxVarBins[] = {2.0, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 15.0};
+            double varBins[] = {0.0, 2.0, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 15.0};
 
-    const int nVarBins = 8;
-    double minVarBins[] = {0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0};
-    double maxVarBins[] = {10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0};
-    double varBins[] = {0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0};*/
+            for (int iPt = 0;iPt < nVarBins+1;iPt++) {
+                if (iPt < nVarBins) {
+                    vecMinVarBins.push_back(minVarBins[iPt]);
+                    vecMaxVarBins.push_back(maxVarBins[iPt]);
+                }
+                vecVarBins.push_back(varBins[iPt]);
+            }
+        }
+    } else {
+        // Centrality dependence
+        varAxisTitle = "Centrality (%)";
+        varName = "Centr";
+        varFixName = "pt";
+
+        nVarBins = 8;
+        double minVarBins[] = {0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0};
+        double maxVarBins[] = {10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0};
+        double varBins[] = {0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0};
+
+        for (int iCentr = 0;iCentr < nVarBins+1;iCentr++) {
+            if (iCentr < nVarBins) {
+                vecMinVarBins.push_back(minVarBins[iCentr]);
+                vecMaxVarBins.push_back(maxVarBins[iCentr]);
+            }
+            vecVarBins.push_back(varBins[iCentr]);
+        }
+    }
 
     TCanvas *canvasChi2Ndf = new TCanvas("canvasChi2Ndf", "", 3000, 1800);
     canvasChi2Ndf -> Divide(5, 3);
 
-    TH1D *histStatJpsiV2 = new TH1D("histStatJpsiV2", "", nVarBins, varBins);
+    TH1D *histStatJpsiV2 = new TH1D("histStatJpsiV2", "", nVarBins, &(vecVarBins[0]));
     histStatJpsiV2 -> GetXaxis() -> SetTitle(varAxisTitle.c_str());
     histStatJpsiV2 -> GetYaxis() -> SetRangeUser(-0.02, 0.4);
     histStatJpsiV2 -> GetYaxis() -> SetTitle("#it{v}_{2}");
@@ -54,15 +75,15 @@ void combine_systematics() {
     histStatJpsiV2 -> SetMarkerColor(kRed+1);
     histStatJpsiV2 -> SetLineColor(kRed+1);
 
-    TH1D *histSystJpsiV2 = new TH1D("histSystJpsiV2", "", nVarBins, varBins);
+    TH1D *histSystJpsiV2 = new TH1D("histSystJpsiV2", "", nVarBins, &(vecVarBins[0]));
     histSystJpsiV2 -> SetMarkerStyle(20);
     histSystJpsiV2 -> SetMarkerColor(kRed+1);
     histSystJpsiV2 -> SetLineColor(kRed+1);
     histSystJpsiV2 -> SetFillStyle(0);
 
     for (int iVar = 0;iVar < nVarBins;iVar++) {
-        TFile *fInStdFit = new TFile(Form("%s/fitResults_%s_%2.1f_%2.1f.root", dirInPathStd.c_str(), varName.c_str(), minVarBins[iVar], maxVarBins[iVar]));
-        TFile *fInMixFit = new TFile(Form("%s/fitResults_%s_%2.1f_%2.1f.root", dirInPathMix.c_str(), varName.c_str(), minVarBins[iVar], maxVarBins[iVar]));
+        TFile *fInStdFit = new TFile(Form("%s/fitResults_%s_%2.1f_%2.1f.root", dirInPathStd.c_str(), varName.c_str(), vecMinVarBins[iVar], vecMaxVarBins[iVar]));
+        TFile *fInMixFit = new TFile(Form("%s/fitResults_%s_%2.1f_%2.1f.root", dirInPathMix.c_str(), varName.c_str(), vecMinVarBins[iVar], vecMaxVarBins[iVar]));
 
         TCanvas *canvasStdFit = (TCanvas*) fInStdFit -> Get("canvasSyst");
         TH1D *histStdFit = (TH1D*) canvasStdFit -> GetPrimitive("histSyst");
@@ -80,7 +101,7 @@ void combine_systematics() {
         histCombinedSysts -> SetMarkerColor(kBlack);
         histCombinedSysts -> SetLineColor(kBlack);
 
-        TH1D *histChi2NdfAll = new TH1D("histChi2NdfAll", Form("%2.1f < #it{p}_{T} < %2.1f GeV/#it{c} ; #chi^{2} / NDF", minVarBins[iVar], maxVarBins[iVar]), 100, 0, 5);
+        TH1D *histChi2NdfAll = new TH1D("histChi2NdfAll", Form("%2.1f < #it{p}_{T} < %2.1f GeV/#it{c} ; #chi^{2} / NDF", vecMinVarBins[iVar], vecMaxVarBins[iVar]), 100, 0, 5);
         int nTrueTrials = 0;
         for (int iTrial = 0;iTrial < nTrials;iTrial++) {
             if (iTrial < nTrials/2) {
@@ -174,7 +195,7 @@ void combine_systematics() {
             histCombinedSysts -> GetYaxis() -> SetRangeUser(-0.05, 0.05);
         }
         
-        if (minVarBins[iVar] >= 10) {
+        if (vecMinVarBins[iVar] >= 10) {
             //histCombinedSysts -> GetYaxis() -> SetRangeUser(-0.05, 0.2);
             histCombinedSysts -> GetYaxis() -> SetRangeUser(meanJpsiV2 -  (2*meanJpsiV2), meanJpsiV2 + (2*meanJpsiV2));
         }
@@ -193,14 +214,14 @@ void combine_systematics() {
         display1 -> SetBorderSize(0);
         display1 -> SetFillColor(0);
 
-        TText *text1 = display1 -> AddText(Form(" v_{2}^{J/#psi} [%1.0f < #it{p}_{T} < %1.0f GeV/#it{c}] = %5.4f #pm %5.4f #pm %5.4f", minVarBins[iVar], maxVarBins[iVar], meanJpsiV2, meanStatErrJpsiV2, meanSystErrJpsiV2));
+        TText *text1 = display1 -> AddText(Form(" v_{2}^{J/#psi} [%1.0f < #it{p}_{T} < %1.0f GeV/#it{c}] = %5.4f #pm %5.4f #pm %5.4f", vecMinVarBins[iVar], vecMaxVarBins[iVar], meanJpsiV2, meanStatErrJpsiV2, meanSystErrJpsiV2));
         display1 -> Draw("same");
 
         if (varName == "Centr") {
-            canvasCombinedSysts -> SaveAs(Form("%s/v2_sys_cent_%1.0f_%1.0f_pt_%1.0f_%1.0f.pdf", dirOutPath.c_str(), minVarBins[iVar], maxVarBins[iVar], minFixVarBins[0], maxFixVarBins[0]));
+            canvasCombinedSysts -> SaveAs(Form("%s/v2_sys_cent_%1.0f_%1.0f_pt_%1.0f_%1.0f.pdf", dirOutPath.c_str(), vecMinVarBins[iVar], vecMaxVarBins[iVar], minFixVar, maxFixVar));
         }
         if (varName == "Pt") {
-            canvasCombinedSysts -> SaveAs(Form("%s/v2_sys_pt_%1.0f_%1.0f_cent_%1.0f_%1.0f.pdf", dirOutPath.c_str(), minVarBins[iVar], maxVarBins[iVar], minFixVarBins[0], maxFixVarBins[0]));
+            canvasCombinedSysts -> SaveAs(Form("%s/v2_sys_pt_%1.0f_%1.0f_cent_%1.0f_%1.0f.pdf", dirOutPath.c_str(), vecMinVarBins[iVar], vecMaxVarBins[iVar], minFixVar, maxFixVar));
         }
 
         canvasChi2Ndf -> cd(iVar+1);
@@ -215,17 +236,38 @@ void combine_systematics() {
     histStatJpsiV2 -> Draw("EP");
     histSystJpsiV2 -> Draw("E2P SAME");
 
-    cout << "-------------------------" << endl;
+    cout << "----------------------------------------------------------------------------------" << endl;
+    std::pair<int, int> key = {minFixVar, maxFixVar};
+    double resoRelErr;
+    auto tmpResoRelErr = mapResoRelErr.find(key);
+    if (tmpResoRelErr != mapResoRelErr.end()) {
+        resoRelErr = tmpResoRelErr -> second;
+    }
+
+    cout << Form("******** Adding in quadrature the syst. on resolution (%f) *******", resoRelErr) << endl;
     cout << "x_min x_max val stat syst " << endl;
     for (int iVar = 0;iVar < nVarBins;iVar++) {
-        Printf("%3.2f %3.2f %6.5f %6.5f %6.5f ", minVarBins[iVar], maxVarBins[iVar], histStatJpsiV2 -> GetBinContent(iVar+1), histStatJpsiV2 -> GetBinError(iVar+1), histSystJpsiV2 -> GetBinError(iVar+1));
+        double systSigExtr = histSystJpsiV2 -> GetBinError(iVar+1);
+        double systReso = histStatJpsiV2 -> GetBinContent(iVar+1) * resoRelErr;
+        double systAll = TMath::Sqrt(systSigExtr*systSigExtr + systReso*systReso);
+        //Printf("%3.2f %3.2f %6.5f %6.5f %6.5f ", vecMinVarBins[iVar], vecMaxVarBins[iVar], histStatJpsiV2 -> GetBinContent(iVar+1), histStatJpsiV2 -> GetBinError(iVar+1), histSystJpsiV2 -> GetBinError(iVar+1));
+        Printf("%3.2f %3.2f %6.5f %6.5f %6.5f ", vecMinVarBins[iVar], vecMaxVarBins[iVar], histStatJpsiV2 -> GetBinContent(iVar+1), histStatJpsiV2 -> GetBinError(iVar+1), systAll);
     }
-    cout << "-------------------------" << endl;
-    for (int iVar = 0;iVar < nVarBins;iVar++) {std::cout << histStatJpsiV2 -> GetBinContent(iVar+1) << ", ";}
+    cout << "----------------------------------------------------------------------------------" << endl;
+    for (int iVar = 0;iVar < nVarBins;iVar++) {
+        std::cout << histStatJpsiV2 -> GetBinContent(iVar+1) << ", ";
+    }
     std::cout << std::endl;
-    for (int iVar = 0;iVar < nVarBins;iVar++) {std::cout << histStatJpsiV2 -> GetBinError(iVar+1) << ", ";}
+    for (int iVar = 0;iVar < nVarBins;iVar++) {
+        std::cout << histStatJpsiV2 -> GetBinError(iVar+1) << ", ";
+    }
     std::cout << std::endl;
-    for (int iVar = 0;iVar < nVarBins;iVar++) {std::cout << histSystJpsiV2 -> GetBinError(iVar+1) << ", ";}
+    for (int iVar = 0;iVar < nVarBins;iVar++) {
+        double systSigExtr = histSystJpsiV2 -> GetBinError(iVar+1);
+        double systReso = histStatJpsiV2 -> GetBinContent(iVar+1) * resoRelErr;
+        double systAll = TMath::Sqrt(systSigExtr*systSigExtr + systReso*systReso);
+        std::cout << systAll << ", ";
+    }
     std::cout << std::endl;
-
+    cout << "----------------------------------------------------------------------------------" << endl;
 }
