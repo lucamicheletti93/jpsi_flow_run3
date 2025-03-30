@@ -68,58 +68,74 @@ string parNames_NA60_Pol4Exp[] = {"bkg","aa","bb","cc","dd","ee","ff","sig_Jpsi"
 
 //--------------------------
 // v2 pT dependence
-/*double minFixVarBins[] = {50};
-double maxFixVarBins[] = {80};
+double minFixVarBins[] = {30};
+double maxFixVarBins[] = {50};
 string varAxisTitle = "#it{p}_{T} (GeV/#it{c})";
 string varName = "Pt";
-string varFixName = "centrality";*/
+string varFixName = "centrality";
 // 10-30%
-//double resolution[] = {1.14851}; // 1.2782435627 10-30%
-//const int nVarBins = 13;
-//double minVarBins[] = {0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0};
-//double maxVarBins[] = {0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0, 15.0};
-//double varBins[] = {0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0, 15.0};
+/*double resolution[] = {1.16148}; // 1.2782435627 10-30%
+const int nVarBins = 13;
+double minVarBins[] = {0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0};
+double maxVarBins[] = {0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0, 15.0};
+double varBins[] = {0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0, 15.0};*/
+// 20-40%
+/*double resolution[] = {1.13508}; // 1.2782435627 20-40%
+const int nVarBins = 13;
+double minVarBins[] = {0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0};
+double maxVarBins[] = {0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0, 15.0};
+double varBins[] = {0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0, 15.0};*/
 // 30-50%
-/*double resolution[] = {1.15675}; // 1.2782435627 30-50%
+/*double resolution[] = {1.15516}; // 1.2782435627 30-50%
 const int nVarBins = 13;
 double minVarBins[] = {0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0};
 double maxVarBins[] = {0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0, 15.0};
 double varBins[] = {0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0, 15.0};*/
 // 50-80%
-/*double resolution[] = {1.60671}; // 50-80%
+/*double resolution[] = {1.43847}; // 50-80%
 const int nVarBins = 8;
 double minVarBins[] = {0.0, 2.0, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0};
 double maxVarBins[] = {2.0, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 15.0};
-double varBins[] = {0.0, 2.0, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 15.0};
+double varBins[] = {0.0, 2.0, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 15.0};*/
 
-string dirInPath = Form("/Users/lucamicheletti/GITHUB/dq_fitter/analysis/LHC23_pass4_full/centrality_%1.0f_%1.0f/pt_dependence_narrow_bins", minFixVarBins[0], maxFixVarBins[0]);
-string fInName = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/data/pass4/LHC23_full/Histograms_Fullpass4PbPbQualitymatchedMchMid_centr_Mixing_10_50.root";
-string dirOutPath = "systematics_pass4_std_fit";*/
+// Single Fit
+double resolution[] = {1.15516};
+const int nVarBins = 1;
+double minVarBins[] = {10.0};
+double maxVarBins[] = {15.0};
+double varBins[] = {10.0, 15.0};
+
+//string dirInPath = Form("/Users/lucamicheletti/GITHUB/dq_fitter/analysis/LHC23_pass4_full/centrality_%1.0f_%1.0f/pt_dependence_narrow_bins", minFixVarBins[0], maxFixVarBins[0]);
+string dirInPath = Form("/Users/lucamicheletti/GITHUB/dq_fitter/analysis/LHC23_pass4_full/centrality_%1.0f_%1.0f/pt_dependence_large_bins", minFixVarBins[0], maxFixVarBins[0]);
+//string fInName = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/data/pass4/LHC23_full/Histograms_Fullpass4PbPbQualitymatchedMchMid_centr_Mixing_10_50.root";
+//string fInName = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/data/pass4/LHC23_full/Histograms_Fullpass4PbPbQualitymatchedMchMid_CentBins_MchMid__20_40.root";
+string fInName = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/data/pass4/LHC23_full/Histograms_Fullpass4PbPbQualitymatchedMchMid_CentBins_MchMid__widerpTbins10_80.root";
+string dirOutPath = "systematics_pass4_std_fit";
 
 //--------------------------
 // v2 centrality dependence
-double minFixVarBins[] = {0};
-double maxFixVarBins[] = {5};
+/*double minFixVarBins[] = {5};
+double maxFixVarBins[] = {15};
 string varAxisTitle = "Centrality (%)";
 string varName = "Centr";
-string varFixName = "pt";
+string varFixName = "pt";*/
 
-double resolution[] = {1.46605, 1.16905, 1.12797, 1.14218, 1.20011, 1.33024, 1.61749, 2.27902};
+/*double resolution[] = {1.56041, 1.17495, 1.1283, 1.14024, 1.1949, 1.31888, 1.5944, 2.25324};
 const int nVarBins = 8;
 double minVarBins[] = {0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0};
 double maxVarBins[] = {10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0};
-double varBins[] = {0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0};
+double varBins[] = {0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0};*/
 
 // Single Fit
-/*double resolution[] = {1.14218};
+/*double resolution[] = {1.5944};
 const int nVarBins = 1;
-double minVarBins[] = {30.0};
-double maxVarBins[] = {40.0};
-double varBins[] = {30.0, 40.0};*/
+double minVarBins[] = {60.0};
+double maxVarBins[] = {70.0};
+double varBins[] = {60.0, 70.0};
 
 string dirInPath = Form("/Users/lucamicheletti/GITHUB/dq_fitter/analysis/LHC23_pass4_full/pt_%1.0f_%1.0f/centrality_dependence", minFixVarBins[0], maxFixVarBins[0]);
 string fInName = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/data/pass4/LHC23_full/Histograms_Fullpass4PbPbQualitymatchedMchMid_mergedpT_Mixing_0_80.root";
-string dirOutPath = "systematics_pass4_std_fit";
+string dirOutPath = "systematics_pass4_std_fit";*/
 
 const int nFitRanges = 3;
 double minFitRanges[] = {2.3, 2.4, 2.5};
@@ -486,8 +502,8 @@ double* DoFlowFit(TH1D *histMassFitPars, TH1D *histMass, TProfile *profV2, doubl
         funcMassSigBkg -> SetParameter(0, 1e5); // Bkg normalization
         funcMassSigBkg -> SetParameter(7, 100000); // Jpsi normalization
       } else {
-        funcMassSigBkg -> SetParLimits(0, 0.01, 1e7);
-        funcMassSigBkg -> SetParLimits(7, 0.01, 1e7);
+        funcMassSigBkg -> SetParLimits(0, 0.0001, 1e7);
+        funcMassSigBkg -> SetParLimits(7, 0.0001, 1e7);
         funcMassSigBkg -> SetParameter(0, funcMassSigBkg -> GetParameter(0)); // Bkg normalization
         funcMassSigBkg -> SetParameter(7, funcMassSigBkg -> GetParameter(7)); // Jpsi normalization
       }
@@ -674,8 +690,8 @@ double* DoFlowFit(TH1D *histMassFitPars, TH1D *histMass, TProfile *profV2, doubl
           funcMassSigBkg -> SetParLimits(0, 0, 1e6);
           funcMassSigBkg -> SetParLimits(7, 0, 1e6);
         } else {
-          funcMassSigBkg -> SetParLimits(0, 10, 1e7);
-          funcMassSigBkg -> SetParLimits(7, 10, 1e7);
+          funcMassSigBkg -> SetParLimits(0, 0.0001, 1e6);
+          funcMassSigBkg -> SetParLimits(7, 0.0001, 1e6);
         }
         funcMassSigBkg -> SetParameter(0, funcMassSigBkg -> GetParameter(0)); // Bkg normalization
         funcMassSigBkg -> SetParameter(7, funcMassSigBkg -> GetParameter(7)); // Jpsi normalization

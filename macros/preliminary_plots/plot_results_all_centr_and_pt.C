@@ -283,123 +283,125 @@ void plot_results_all_centr_and_pt() {
     TCanvas *canvasV2JpsiSpVsPt010 = new TCanvas("canvasV2JpsiSpVsPt010", "", 800, 600);
     canvasV2JpsiSpVsPt010 -> SetTicks(1, 1);
 
-    TH2D *histGridV2JpsiSpVsPt010 = new TH2D("histGridV2JpsiSpVsPt010", "", 100, -0.5, 15.5, 100, -0.05, 0.3);
+    TH2D *histGridV2JpsiSpVsPt010 = new TH2D("histGridV2JpsiSpVsPt010", "", 100, -0.5, 15.5, 100, -0.07, 0.3);
     histGridV2JpsiSpVsPt010 -> GetXaxis() -> SetTitle("#it{p}_{T} (GeV/#it{c})");
-    histGridV2JpsiSpVsPt010 -> GetYaxis() -> SetTitle("#font[12]{v}_{2} {SP, |#Delta#eta| > 1.7}");
+    histGridV2JpsiSpVsPt010 -> GetYaxis() -> SetTitle("#it{v}_{2} {SP, |#Delta#eta| > 1.7}");
     histGridV2JpsiSpVsPt010 -> Draw();
     lineZeroV2Pt -> Draw();
     graStatV2JpsiSpVsPt010Run3 -> Draw("EP SAME");
     graSystV2JpsiSpVsPt010Run3 -> Draw("E2 SAME");
 
-    TLegend *legendV2JpsiVsPt010 = new TLegend(0.65, 0.60, 0.85, 0.80, " ", "brNDC");
+    TLegend *legendV2JpsiVsPt010 = new TLegend(0.65, 0.62, 0.85, 0.82, " ", "brNDC");
     SetLegend(legendV2JpsiVsPt010);
-    legendV2JpsiVsPt010 -> SetTextSize(0.05);
-    legendV2JpsiVsPt010 -> AddEntry(graStatV2JpsiSpVsPt010Run3, "Stat. Uncert.", "PL");
+    legendV2JpsiVsPt010 -> AddEntry(graStatV2JpsiSpVsPt010Run3, "Stat. Uncert.", "EP");
     legendV2JpsiVsPt010 -> AddEntry(graSystV2JpsiSpVsPt010Run3, "Syst. Uncert.", "F");
     legendV2JpsiVsPt010 -> Draw();
 
-    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary, Pb#minusPb, #sqrt{#it{s}_{NN}} = 5.36 TeV");
-    latexTitle -> DrawLatex(0.18, 0.77, "J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 < y < 4, 0#minus10\%");
+    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary");
+    latexTitle -> DrawLatex(0.18, 0.80, "Pb#minusPb,#kern[0.3]{#sqrt{#it{s}_{NN}}} = 5.36 TeV, 0#minus10\%");
+    latexTitle -> DrawLatex(0.18, 0.73, "J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 <#kern[0.7]{#it{y}} < 4");
 
     // 10-30% 
     // EP
     TCanvas *canvasV2JpsiEpVsPt1030 = new TCanvas("canvasV2JpsiEpVsPt1030", "", 800, 600);
     canvasV2JpsiEpVsPt1030 -> SetTicks(1, 1);
 
-    TH2D *histGridV2JpsiEpVsPt1030 = new TH2D("histGridV2JpsiEpVsPt1030", "", 100, -0.5, 15.5, 100, -0.05, 0.3);
+    TH2D *histGridV2JpsiEpVsPt1030 = new TH2D("histGridV2JpsiEpVsPt1030", "", 100, -0.5, 15.5, 100, -0.07, 0.3);
     histGridV2JpsiEpVsPt1030 -> GetXaxis() -> SetTitle("#it{p}_{T} (GeV/#it{c})");
-    histGridV2JpsiEpVsPt1030 -> GetYaxis() -> SetTitle("#font[12]{v}_{2} {EP, |#Delta#eta| > 1.7}");
+    histGridV2JpsiEpVsPt1030 -> GetYaxis() -> SetTitle("#it{v}_{2} {EP, |#Delta#eta| > 1.7}");
     histGridV2JpsiEpVsPt1030 -> Draw();
     lineZeroV2Pt -> Draw();
     graStatV2JpsiEpVsPt1030Run3 -> Draw("EP SAME");
     graSystV2JpsiEpVsPt1030Run3 -> Draw("E2 SAME");
 
-    TLegend *legendV2JpsiVsPt1030 = new TLegend(0.65, 0.60, 0.85, 0.80, " ", "brNDC");
+    TLegend *legendV2JpsiVsPt1030 = new TLegend(0.65, 0.62, 0.85, 0.82, " ", "brNDC");
     SetLegend(legendV2JpsiVsPt1030);
-    legendV2JpsiVsPt1030 -> SetTextSize(0.05);
-    legendV2JpsiVsPt1030 -> AddEntry(graStatV2JpsiEpVsPt1030Run3, "Stat. Uncert.", "PL");
+    legendV2JpsiVsPt1030 -> AddEntry(graStatV2JpsiEpVsPt1030Run3, "Stat. Uncert.", "EP");
     legendV2JpsiVsPt1030 -> AddEntry(graSystV2JpsiEpVsPt1030Run3, "Syst. Uncert.", "F");
     legendV2JpsiVsPt1030 -> Draw();
 
-    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary, Pb#minusPb, #sqrt{#it{s}_{NN}} = 5.36 TeV");
-    latexTitle -> DrawLatex(0.18, 0.77, "J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 < y < 4, 10#minus30\%");
+    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary");
+    latexTitle -> DrawLatex(0.18, 0.80, "Pb#minusPb,#kern[0.3]{#sqrt{#it{s}_{NN}}} = 5.36 TeV, 10#minus30\%");
+    latexTitle -> DrawLatex(0.18, 0.73, "J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 <#kern[0.7]{#it{y}} < 4");
 
     // SP
     TCanvas *canvasV2JpsiSpVsPt1030 = new TCanvas("canvasV2JpsiSpVsPt1030", "", 800, 600);
     canvasV2JpsiSpVsPt1030 -> SetTicks(1, 1);
 
-    TH2D *histGridV2JpsiSpVsPt1030 = new TH2D("histGridV2JpsiSpVsPt1030", "", 100, -0.5, 15.5, 100, -0.05, 0.3);
+    TH2D *histGridV2JpsiSpVsPt1030 = new TH2D("histGridV2JpsiSpVsPt1030", "", 100, -0.5, 15.5, 100, -0.07, 0.3);
     histGridV2JpsiSpVsPt1030 -> GetXaxis() -> SetTitle("#it{p}_{T} (GeV/#it{c})");
-    histGridV2JpsiSpVsPt1030 -> GetYaxis() -> SetTitle("#font[12]{v}_{2} {SP, |#Delta#eta| > 1.7}");
+    histGridV2JpsiSpVsPt1030 -> GetYaxis() -> SetTitle("#it{v}_{2} {SP, |#Delta#eta| > 1.7}");
     histGridV2JpsiSpVsPt1030 -> Draw();
     lineZeroV2Pt -> Draw();
     graStatV2JpsiSpVsPt1030Run3 -> Draw("EP SAME");
     graSystV2JpsiSpVsPt1030Run3 -> Draw("E2 SAME");
     legendV2JpsiVsPt1030 -> Draw();
 
-    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary, Pb#minusPb, #sqrt{#it{s}_{NN}} = 5.36 TeV");
-    latexTitle -> DrawLatex(0.18, 0.77, "J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 < y < 4, 10#minus30\%");
+    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary");
+    latexTitle -> DrawLatex(0.18, 0.80, "Pb#minusPb,#kern[0.3]{#sqrt{#it{s}_{NN}}} = 5.36 TeV, 10#minus30\%");
+    latexTitle -> DrawLatex(0.18, 0.73, "J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 <#kern[0.7]{#it{y}} < 4");
 
     // 30-50%
     // EP
     TCanvas *canvasV2JpsiEpVsPt3050 = new TCanvas("canvasV2JpsiEpVsPt3050", "", 800, 600);
     canvasV2JpsiEpVsPt3050 -> SetTicks(1, 1);
 
-    TH2D *histGridV2JpsiEpVsPt3050 = new TH2D("histGridV2JpsiEpVsPt3050", "", 100, -0.5, 15.5, 100, -0.05, 0.3);
+    TH2D *histGridV2JpsiEpVsPt3050 = new TH2D("histGridV2JpsiEpVsPt3050", "", 100, -0.5, 15.5, 100, -0.07, 0.3);
     histGridV2JpsiEpVsPt3050 -> GetXaxis() -> SetTitle("#it{p}_{T} (GeV/#it{c})");
-    histGridV2JpsiEpVsPt3050 -> GetYaxis() -> SetTitle("#font[12]{v}_{2} {EP, |#Delta#eta| > 1.7}");
+    histGridV2JpsiEpVsPt3050 -> GetYaxis() -> SetTitle("#it{v}_{2} {EP, |#Delta#eta| > 1.7}");
     histGridV2JpsiEpVsPt3050 -> Draw();
     lineZeroV2Pt -> Draw();
     graStatV2JpsiEpVsPt3050Run3 -> Draw("EP SAME");
     graSystV2JpsiEpVsPt3050Run3 -> Draw("E2 SAME");
 
-    TLegend *legendV2JpsiVsPt3050 = new TLegend(0.65, 0.60, 0.85, 0.80, " ", "brNDC");
+    TLegend *legendV2JpsiVsPt3050 = new TLegend(0.65, 0.62, 0.85, 0.82, " ", "brNDC");
     SetLegend(legendV2JpsiVsPt3050);
-    legendV2JpsiVsPt3050 -> SetTextSize(0.05);
-    legendV2JpsiVsPt3050 -> AddEntry(graStatV2JpsiEpVsPt3050Run3, "Stat. Uncert.", "PL");
+    legendV2JpsiVsPt3050 -> AddEntry(graStatV2JpsiEpVsPt3050Run3, "Stat. Uncert.", "EP");
     legendV2JpsiVsPt3050 -> AddEntry(graSystV2JpsiEpVsPt3050Run3, "Syst. Uncert.", "F");
     legendV2JpsiVsPt3050 -> Draw();
 
-    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary, Pb#minusPb, #sqrt{#it{s}_{NN}} = 5.36 TeV");
-    latexTitle -> DrawLatex(0.18, 0.77, "J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 < y < 4, 30#minus50\%");
+    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary");
+    latexTitle -> DrawLatex(0.18, 0.80, "Pb#minusPb,#kern[0.3]{#sqrt{#it{s}_{NN}}} = 5.36 TeV, 30#minus50\%");
+    latexTitle -> DrawLatex(0.18, 0.73, "J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 <#kern[0.7]{#it{y}} < 4");
 
     // SP
     TCanvas *canvasV2JpsiSpVsPt3050 = new TCanvas("canvasV2JpsiSpVsPt3050", "", 800, 600);
     canvasV2JpsiSpVsPt3050 -> SetTicks(1, 1);
 
-    TH2D *histGridV2JpsiSpVsPt3050 = new TH2D("histGridV2JpsiSpVsPt3050", "", 100, -0.5, 15.5, 100, -0.05, 0.3);
+    TH2D *histGridV2JpsiSpVsPt3050 = new TH2D("histGridV2JpsiSpVsPt3050", "", 100, -0.5, 15.5, 100, -0.07, 0.3);
     histGridV2JpsiSpVsPt3050 -> GetXaxis() -> SetTitle("#it{p}_{T} (GeV/#it{c})");
-    histGridV2JpsiSpVsPt3050 -> GetYaxis() -> SetTitle("#font[12]{v}_{2} {SP, |#Delta#eta| > 1.7}");
+    histGridV2JpsiSpVsPt3050 -> GetYaxis() -> SetTitle("#it{v}_{2} {SP, |#Delta#eta| > 1.7}");
     histGridV2JpsiSpVsPt3050 -> Draw();
     lineZeroV2Pt -> Draw();
     graStatV2JpsiSpVsPt3050Run3 -> Draw("EP SAME");
     graSystV2JpsiSpVsPt3050Run3 -> Draw("E2 SAME");
     legendV2JpsiVsPt3050 -> Draw();
 
-    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary, Pb#minusPb, #sqrt{#it{s}_{NN}} = 5.36 TeV");
-    latexTitle -> DrawLatex(0.18, 0.77, "J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 < y < 4, 30#minus50\%");
+    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary");
+    latexTitle -> DrawLatex(0.18, 0.80, "Pb#minusPb,#kern[0.3]{#sqrt{#it{s}_{NN}}} = 5.36 TeV, 30#minus50\%");
+    latexTitle -> DrawLatex(0.18, 0.73, "J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 <#kern[0.7]{#it{y}} < 4");
 
     // 50-80%
     TCanvas *canvasV2JpsiEpVsPt5080 = new TCanvas("canvasV2JpsiEpVsPt5080", "", 800, 600);
     canvasV2JpsiEpVsPt5080 -> SetTicks(1, 1);
 
-    TH2D *histGridV2JpsiVsPt5080 = new TH2D("histGridV2JpsiVsPt5080", "", 100, -0.5, 15.5, 100, -0.05, 0.3);
+    TH2D *histGridV2JpsiVsPt5080 = new TH2D("histGridV2JpsiVsPt5080", "", 100, -0.5, 15.5, 100, -0.07, 0.3);
     histGridV2JpsiVsPt5080 -> GetXaxis() -> SetTitle("#it{p}_{T} (GeV/#it{c})");
-    histGridV2JpsiVsPt5080 -> GetYaxis() -> SetTitle("#font[12]{v}_{2} {EP, |#Delta#eta| > 1.7}");
+    histGridV2JpsiVsPt5080 -> GetYaxis() -> SetTitle("#it{v}_{2} {EP, |#Delta#eta| > 1.7}");
     histGridV2JpsiVsPt5080 -> Draw();
     lineZeroV2Pt -> Draw();
     graStatV2JpsiEpVsPt5080Run3 -> Draw("EP SAME");
     graSystV2JpsiEpVsPt5080Run3 -> Draw("E2 SAME");
 
-    TLegend *legendV2JpsiVsPt5080 = new TLegend(0.65, 0.60, 0.85, 0.80, " ", "brNDC");
+    TLegend *legendV2JpsiVsPt5080 = new TLegend(0.65, 0.62, 0.85, 0.82, " ", "brNDC");
     SetLegend(legendV2JpsiVsPt5080);
-    legendV2JpsiVsPt5080 -> SetTextSize(0.05);
-    legendV2JpsiVsPt5080 -> AddEntry(graStatV2JpsiEpVsPt5080Run3, "Stat. Uncert.", "PL");
+    legendV2JpsiVsPt5080 -> AddEntry(graStatV2JpsiEpVsPt5080Run3, "Stat. Uncert.", "EP");
     legendV2JpsiVsPt5080 -> AddEntry(graSystV2JpsiEpVsPt5080Run3, "Syst. Uncert.", "F");
     legendV2JpsiVsPt5080 -> Draw();
 
-    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary, Pb#minusPb, #sqrt{#it{s}_{NN}} = 5.36 TeV");
-    latexTitle -> DrawLatex(0.18, 0.77, "J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 < y < 4, 50#minus80\%");
+    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary");
+    latexTitle -> DrawLatex(0.18, 0.80, "Pb#minusPb,#kern[0.3]{#sqrt{#it{s}_{NN}}} = 5.36 TeV, 50#minus80\%");
+    latexTitle -> DrawLatex(0.18, 0.73, "J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 <#kern[0.7]{#it{y}} < 4");
 
     //******************************************************************************************//
     // J/psi v2 vs centrality
@@ -409,9 +411,9 @@ void plot_results_all_centr_and_pt() {
     TCanvas *canvasV2JpsiEpVsCentr05 = new TCanvas("canvasV2JpsiEpVsCentr05", "", 800, 600);
     canvasV2JpsiEpVsCentr05 -> SetTicks(1, 1);
 
-    TH2D *histGridV2JpsiEpVsCentr05 = new TH2D("histGridV2JpsiEpVsCentr05", "", 100, -0.5, 90.5, 100, -0.05, 0.3);
+    TH2D *histGridV2JpsiEpVsCentr05 = new TH2D("histGridV2JpsiEpVsCentr05", "", 100, -0.5, 90.5, 100, -0.05, 0.20);
     histGridV2JpsiEpVsCentr05 -> GetXaxis() -> SetTitle("Centrality (%)");
-    histGridV2JpsiEpVsCentr05 -> GetYaxis() -> SetTitle("#font[12]{v}_{2} {EP, |#Delta#eta| > 1.7}");
+    histGridV2JpsiEpVsCentr05 -> GetYaxis() -> SetTitle("#it{v}_{2} {EP, |#Delta#eta| > 1.7}");
     histGridV2JpsiEpVsCentr05 -> Draw();
     lineZeroV2Centr -> Draw();
     graStatV2JpsiEpVsCentr05Run3 -> Draw("EP SAME");
@@ -419,37 +421,36 @@ void plot_results_all_centr_and_pt() {
 
     TLegend *legendV2JpsiVsCentr05 = new TLegend(0.20, 0.60, 0.45, 0.80, " ", "brNDC");
     SetLegend(legendV2JpsiVsCentr05);
-    legendV2JpsiVsCentr05 -> SetTextSize(0.05);
-    legendV2JpsiVsCentr05 -> AddEntry(graStatV2JpsiEpVsCentr05Run3, "Stat. Uncert.", "PL");
+    legendV2JpsiVsCentr05 -> AddEntry(graStatV2JpsiEpVsCentr05Run3, "Stat. Uncert.", "EP");
     legendV2JpsiVsCentr05 -> AddEntry(graSystV2JpsiEpVsCentr05Run3, "Syst. Uncert.", "F");
     legendV2JpsiVsCentr05 -> Draw();
 
-    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary");
-    latexTitle -> DrawLatex(0.18, 0.80, "Pb#minusPb, J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 < y < 4, #it{p}_{T} < 5 GeV/#it{c}");
+    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary, Pb#minusPb");
+    latexTitle -> DrawLatex(0.18, 0.80, "J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 <#kern[0.7]{#it{y}} < 4, #it{p}_{T} < 5 GeV/#it{c}");
 
     // SP
     TCanvas *canvasV2JpsiSpVsCentr05 = new TCanvas("canvasV2JpsiSpVsCentr05", "", 800, 600);
     canvasV2JpsiSpVsCentr05 -> SetTicks(1, 1);
 
-    TH2D *histGridV2JpsiSpVsCentr05 = new TH2D("histGridV2JpsiSpVsCentr05", "", 100, -0.5, 90.5, 100, -0.05, 0.3);
+    TH2D *histGridV2JpsiSpVsCentr05 = new TH2D("histGridV2JpsiSpVsCentr05", "", 100, -0.5, 90.5, 100, -0.05, 0.20);
     histGridV2JpsiSpVsCentr05 -> GetXaxis() -> SetTitle("Centrality (%)");
-    histGridV2JpsiSpVsCentr05 -> GetYaxis() -> SetTitle("#font[12]{v}_{2} {SP, |#Delta#eta| > 1.7}");
+    histGridV2JpsiSpVsCentr05 -> GetYaxis() -> SetTitle("#it{v}_{2} {SP, |#Delta#eta| > 1.7}");
     histGridV2JpsiSpVsCentr05 -> Draw();
     lineZeroV2Centr -> Draw();
     graStatV2JpsiSpVsCentr05Run3 -> Draw("EP SAME");
     graSystV2JpsiSpVsCentr05Run3 -> Draw("E2 SAME");
     legendV2JpsiVsCentr05 -> Draw();
 
-    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary");
-    latexTitle -> DrawLatex(0.18, 0.80, "Pb#minusPb, J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 < y < 4, #it{p}_{T} < 5 GeV/#it{c}");
+    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary, Pb#minusPb");
+    latexTitle -> DrawLatex(0.18, 0.80, "J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 <#kern[0.7]{#it{y}} < 4, #it{p}_{T} < 5 GeV/#it{c}");
 
     // 5 < pT < 15 GeV/c, EP
     TCanvas *canvasV2JpsiEpVsCentr515 = new TCanvas("canvasV2JpsiEpVsCentr515", "", 800, 600);
     canvasV2JpsiEpVsCentr515 -> SetTicks(1, 1);
 
-    TH2D *histGridV2JpsiEpVsCentr515 = new TH2D("histGridV2JpsiEpVsCentr515", "", 100, -0.5, 90.5, 100, -0.05, 0.3);
+    TH2D *histGridV2JpsiEpVsCentr515 = new TH2D("histGridV2JpsiEpVsCentr515", "", 100, -0.5, 90.5, 100, -0.05, 0.30);
     histGridV2JpsiEpVsCentr515 -> GetXaxis() -> SetTitle("Centrality (%)");
-    histGridV2JpsiEpVsCentr515 -> GetYaxis() -> SetTitle("#font[12]{v}_{2} {EP, |#Delta#eta| > 1.7}");
+    histGridV2JpsiEpVsCentr515 -> GetYaxis() -> SetTitle("#it{v}_{2} {EP, |#Delta#eta| > 1.7}");
     histGridV2JpsiEpVsCentr515 -> Draw();
     lineZeroV2Centr -> Draw();
     graStatV2JpsiEpVsCentr515Run3 -> Draw("EP SAME");
@@ -457,35 +458,33 @@ void plot_results_all_centr_and_pt() {
 
     TLegend *legendV2JpsiVsCentr515 = new TLegend(0.20, 0.60, 0.45, 0.80, " ", "brNDC");
     SetLegend(legendV2JpsiVsCentr515);
-    legendV2JpsiVsCentr515 -> SetTextSize(0.05);
-    legendV2JpsiVsCentr515 -> AddEntry(graStatV2JpsiEpVsCentr515Run3, "Stat. Uncert.", "PL");
+    legendV2JpsiVsCentr515 -> AddEntry(graStatV2JpsiEpVsCentr515Run3, "Stat. Uncert.", "EP");
     legendV2JpsiVsCentr515 -> AddEntry(graSystV2JpsiEpVsCentr515Run3, "Syst. Uncert.", "F");
     legendV2JpsiVsCentr515 -> Draw();
 
-    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary");
-    latexTitle -> DrawLatex(0.18, 0.80, "Pb#minusPb, J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 < y < 4, 5 < #it{p}_{T} < 15 GeV/#it{c}");
+    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary, Pb#minusPb");
+    latexTitle -> DrawLatex(0.18, 0.80, "J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 <#kern[0.7]{#it{y}} < 4, 5 < #it{p}_{T} < 15 GeV/#it{c}");
 
     // 5 < pT < 20 GeV/c, SP
     TCanvas *canvasV2JpsiSpVsCentr520 = new TCanvas("canvasV2JpsiSpVsCentr520", "", 800, 600);
     canvasV2JpsiSpVsCentr520 -> SetTicks(1, 1);
 
-    TH2D *histGridV2JpsiSpVsCentr520 = new TH2D("histGridV2JpsiSpVsCentr520", "", 100, -0.5, 90.5, 100, -0.05, 0.3);
+    TH2D *histGridV2JpsiSpVsCentr520 = new TH2D("histGridV2JpsiSpVsCentr520", "", 100, -0.5, 90.5, 100, -0.05, 0.30);
     histGridV2JpsiSpVsCentr520 -> GetXaxis() -> SetTitle("Centrality (%)");
-    histGridV2JpsiSpVsCentr520 -> GetYaxis() -> SetTitle("#font[12]{v}_{2} {SP, |#Delta#eta| > 1.7}");
+    histGridV2JpsiSpVsCentr520 -> GetYaxis() -> SetTitle("#it{v}_{2} {SP, |#Delta#eta| > 1.7}");
     histGridV2JpsiSpVsCentr520 -> Draw();
     lineZeroV2Centr -> Draw();
-    graStatV2JpsiEpVsCentr515Run3 -> Draw("EP SAME");
-    graSystV2JpsiEpVsCentr515Run3 -> Draw("E2 SAME");
+    graStatV2JpsiSpVsCentr520Run3 -> Draw("EP SAME");
+    graSystV2JpsiSpVsCentr520Run3 -> Draw("E2 SAME");
 
     TLegend *legendV2JpsiVsCentr520 = new TLegend(0.20, 0.60, 0.45, 0.80, " ", "brNDC");
     SetLegend(legendV2JpsiVsCentr520);
-    legendV2JpsiVsCentr520 -> SetTextSize(0.05);
-    legendV2JpsiVsCentr520 -> AddEntry(graStatV2JpsiEpVsCentr515Run3, "Stat. Uncert.", "PL");
-    legendV2JpsiVsCentr520 -> AddEntry(graSystV2JpsiEpVsCentr515Run3, "Syst. Uncert.", "F");
+    legendV2JpsiVsCentr520 -> AddEntry(graStatV2JpsiSpVsCentr520Run3, "Stat. Uncert.", "EP");
+    legendV2JpsiVsCentr520 -> AddEntry(graSystV2JpsiSpVsCentr520Run3, "Syst. Uncert.", "F");
     legendV2JpsiVsCentr520 -> Draw();
 
-    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary");
-    latexTitle -> DrawLatex(0.18, 0.80, "Pb#minusPb, J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 < y < 4, 5 < #it{p}_{T} < 20 GeV/#it{c}");
+    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary, Pb#minusPb");
+    latexTitle -> DrawLatex(0.18, 0.80, "J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 <#kern[0.7]{#it{y}} < 4, 5 < #it{p}_{T} < 20 GeV/#it{c}");
 
     //******************************************************************************************//
     // J/psi v2 vs pT vs Run 2
@@ -504,13 +503,12 @@ void plot_results_all_centr_and_pt() {
     TLegend *legendV2JpsiVsPt010Run2VsSpRun3 = new TLegend(0.20, 0.70, 0.85, 0.85, " ", "brNDC");
     SetLegend(legendV2JpsiVsPt010Run2VsSpRun3);
     legendV2JpsiVsPt010Run2VsSpRun3 -> SetNColumns(2);
-    legendV2JpsiVsPt010Run2VsSpRun3 -> SetTextSize(0.05);
     legendV2JpsiVsPt010Run2VsSpRun3 -> AddEntry(graSystV2JpsiVsPt010Run2, "#sqrt{#it{s}_{NN}} = 5.02 TeV", "PF");
     legendV2JpsiVsPt010Run2VsSpRun3 -> AddEntry(graSystV2JpsiSpVsPt010Run3, "#sqrt{#it{s}_{NN}} = 5.36 TeV", "PF"); 
     legendV2JpsiVsPt010Run2VsSpRun3 -> Draw();
 
-    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary");
-    latexTitle -> DrawLatex(0.18, 0.80, "Pb#minusPb, J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 < y < 4, 0#minus10\%");
+    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary, Pb#minusPb");
+    latexTitle -> DrawLatex(0.18, 0.80, "J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 <#kern[0.7]{#it{y}} < 4, 0#minus10\%");
 
     // 10-30% 
     // EP
@@ -527,13 +525,12 @@ void plot_results_all_centr_and_pt() {
     TLegend *legendV2JpsiVsPt1030Run2VsEpRun3 = new TLegend(0.20, 0.70, 0.85, 0.85, " ", "brNDC");
     SetLegend(legendV2JpsiVsPt1030Run2VsEpRun3);
     legendV2JpsiVsPt1030Run2VsEpRun3 -> SetNColumns(2);
-    legendV2JpsiVsPt1030Run2VsEpRun3 -> SetTextSize(0.05);
     legendV2JpsiVsPt1030Run2VsEpRun3 -> AddEntry(graSystV2JpsiVsPt1030Run2, "#sqrt{#it{s}_{NN}} = 5.02 TeV", "PF");
     legendV2JpsiVsPt1030Run2VsEpRun3 -> AddEntry(graSystV2JpsiEpVsPt1030Run3, "#sqrt{#it{s}_{NN}} = 5.36 TeV", "PF"); 
     legendV2JpsiVsPt1030Run2VsEpRun3 -> Draw();
 
-    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary");
-    latexTitle -> DrawLatex(0.18, 0.80, "Pb#minusPb, J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 < y < 4, 10#minus30\%");
+    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary, Pb#minusPb");
+    latexTitle -> DrawLatex(0.18, 0.80, "J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 <#kern[0.7]{#it{y}} < 4, 10#minus30\%");
 
     // SP
     TCanvas *canvasV2JpsiSpVsPt1030Run2VsRun3 = new TCanvas("canvasV2JpsiSpVsPt1030Run2VsRun3", "", 800, 600);
@@ -549,13 +546,12 @@ void plot_results_all_centr_and_pt() {
     TLegend *legendV2JpsiVsPt1030Run2VsSpRun3 = new TLegend(0.20, 0.70, 0.85, 0.85, " ", "brNDC");
     SetLegend(legendV2JpsiVsPt1030Run2VsSpRun3);
     legendV2JpsiVsPt1030Run2VsSpRun3 -> SetNColumns(2);
-    legendV2JpsiVsPt1030Run2VsSpRun3 -> SetTextSize(0.05);
     legendV2JpsiVsPt1030Run2VsSpRun3 -> AddEntry(graSystV2JpsiVsPt1030Run2, "#sqrt{#it{s}_{NN}} = 5.02 TeV", "PF");
     legendV2JpsiVsPt1030Run2VsSpRun3 -> AddEntry(graSystV2JpsiSpVsPt1030Run3, "#sqrt{#it{s}_{NN}} = 5.36 TeV", "PF"); 
     legendV2JpsiVsPt1030Run2VsSpRun3 -> Draw();
 
-    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary");
-    latexTitle -> DrawLatex(0.18, 0.80, "Pb#minusPb, J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 < y < 4, 10#minus30\%");
+    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary, Pb#minusPb");
+    latexTitle -> DrawLatex(0.18, 0.80, "J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 <#kern[0.7]{#it{y}} < 4, 10#minus30\%");
 
     // 30-50% 
     // EP
@@ -572,13 +568,12 @@ void plot_results_all_centr_and_pt() {
     TLegend *legendV2JpsiVsPt3050Run2VsEpRun3 = new TLegend(0.20, 0.70, 0.85, 0.85, " ", "brNDC");
     SetLegend(legendV2JpsiVsPt3050Run2VsEpRun3);
     legendV2JpsiVsPt3050Run2VsEpRun3 -> SetNColumns(2);
-    legendV2JpsiVsPt3050Run2VsEpRun3 -> SetTextSize(0.05);
     legendV2JpsiVsPt3050Run2VsEpRun3 -> AddEntry(graSystV2JpsiVsPt3050Run2, "#sqrt{#it{s}_{NN}} = 5.02 TeV", "PF");
     legendV2JpsiVsPt3050Run2VsEpRun3 -> AddEntry(graSystV2JpsiEpVsPt3050Run3, "#sqrt{#it{s}_{NN}} = 5.36 TeV", "PF"); 
     legendV2JpsiVsPt3050Run2VsEpRun3 -> Draw();
 
-    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary");
-    latexTitle -> DrawLatex(0.18, 0.80, "Pb#minusPb, J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 < y < 4, 30#minus50\%");
+    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary, Pb#minusPb");
+    latexTitle -> DrawLatex(0.18, 0.80, "J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 <#kern[0.7]{#it{y}} < 4, 30#minus50\%");
 
     // SP
     TCanvas *canvasV2JpsiSpVsPt3050Run2VsRun3 = new TCanvas("canvasV2JpsiSpVsPt3050Run2VsRun3", "", 800, 600);
@@ -594,13 +589,12 @@ void plot_results_all_centr_and_pt() {
     TLegend *legendV2JpsiVsPt3050Run2VsSpRun3 = new TLegend(0.20, 0.70, 0.85, 0.85, " ", "brNDC");
     SetLegend(legendV2JpsiVsPt3050Run2VsSpRun3);
     legendV2JpsiVsPt3050Run2VsSpRun3 -> SetNColumns(2);
-    legendV2JpsiVsPt3050Run2VsSpRun3 -> SetTextSize(0.05);
     legendV2JpsiVsPt3050Run2VsSpRun3 -> AddEntry(graSystV2JpsiVsPt3050Run2, "#sqrt{#it{s}_{NN}} = 5.02 TeV", "PF");
     legendV2JpsiVsPt3050Run2VsSpRun3 -> AddEntry(graSystV2JpsiSpVsPt3050Run3, "#sqrt{#it{s}_{NN}} = 5.36 TeV", "PF"); 
     legendV2JpsiVsPt3050Run2VsSpRun3 -> Draw();
 
-    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary");
-    latexTitle -> DrawLatex(0.18, 0.80, "Pb#minusPb, J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 < y < 4, 30#minus50\%");
+    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary, Pb#minusPb");
+    latexTitle -> DrawLatex(0.18, 0.80, "J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 <#kern[0.7]{#it{y}} < 4, 30#minus50\%");
     
     //******************************************************************************************//
     // J/psi v2 vs pT collection plot
@@ -611,7 +605,7 @@ void plot_results_all_centr_and_pt() {
 
     TH2D *histGridV2JpsiEpVsPtCollPlot = new TH2D("histGridV2JpsiEpVsPtCollPlot", "", 100, -0.5, 15.5, 100, -0.07, 0.3);
     histGridV2JpsiEpVsPtCollPlot -> GetXaxis() -> SetTitle("#it{p}_{T} (GeV/#it{c})");
-    histGridV2JpsiEpVsPtCollPlot -> GetYaxis() -> SetTitle("#font[12]{v}_{2} {EP, |#Delta#eta| > 1.7}");
+    histGridV2JpsiEpVsPtCollPlot -> GetYaxis() -> SetTitle("#it{v}_{2} {EP, |#Delta#eta| > 1.7}");
     histGridV2JpsiEpVsPtCollPlot -> Draw();
 
     lineZeroV2Pt -> Draw();
@@ -622,16 +616,16 @@ void plot_results_all_centr_and_pt() {
     graStatV2JpsiEpVsPt5080Run3CollPlot -> Draw("EP SAME");
     graSystV2JpsiEpVsPt5080Run3CollPlot -> Draw("E2 SAME");
 
-    TLegend *legendV2JpsiEpVsPtColl = new TLegend(0.20, 0.60, 0.45, 0.80, " ", "brNDC");
+    TLegend *legendV2JpsiEpVsPtColl = new TLegend(0.20, 0.70, 0.85, 0.85, " ", "brNDC");
     SetLegend(legendV2JpsiEpVsPtColl);
-    legendV2JpsiEpVsPtColl -> SetTextSize(0.05);
+    legendV2JpsiEpVsPtColl -> SetNColumns(3);
     legendV2JpsiEpVsPtColl -> AddEntry(graSystV2JpsiEpVsPt1030Run3LargeBinsCollPlot, "10#minus30\%", "PF");
     legendV2JpsiEpVsPtColl -> AddEntry(graSystV2JpsiEpVsPt3050Run3LargeBinsCollPlot, "30#minus50\%", "PF");
     legendV2JpsiEpVsPtColl -> AddEntry(graSystV2JpsiEpVsPt5080Run3CollPlot, "50#minus80\%", "PF");
     legendV2JpsiEpVsPtColl -> Draw();
 
-    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary, #sqrt{#it{s}_{NN}} = 5.36 TeV");
-    latexTitle -> DrawLatex(0.18, 0.80, "Pb#minusPb, J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 < y < 4");
+    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary, Pb#minusPb,#kern[0.3]{#sqrt{#it{s}_{NN}}} = 5.36 TeV");
+    latexTitle -> DrawLatex(0.18, 0.80, "J/#psi#rightarrow#mu^{#plus}#mu^{#minus}, 2.5 <#kern[0.7]{#it{y}} < 4");
 
     // SP
     TCanvas *canvasV2JpsiSpVsPtCollPlot = new TCanvas("canvasV2JpsiSpVsPtCollPlot", "", 800, 600);
@@ -639,7 +633,7 @@ void plot_results_all_centr_and_pt() {
 
     TH2D *histGridV2JpsiSpVsPtCollPlot = new TH2D("histGridV2JpsiSpVsPtCollPlot", "", 100, -0.5, 15.5, 100, -0.07, 0.3);
     histGridV2JpsiSpVsPtCollPlot -> GetXaxis() -> SetTitle("#it{p}_{T} (GeV/#it{c})");
-    histGridV2JpsiSpVsPtCollPlot -> GetYaxis() -> SetTitle("#font[12]{v}_{2} {SP, |#Delta#eta| > 1.7}");
+    histGridV2JpsiSpVsPtCollPlot -> GetYaxis() -> SetTitle("#it{v}_{2} {SP, |#Delta#eta| > 1.7}");
     histGridV2JpsiSpVsPtCollPlot -> Draw();
 
     lineZeroV2Pt -> Draw();
@@ -650,16 +644,16 @@ void plot_results_all_centr_and_pt() {
     graStatV2JpsiSpVsPt3050Run3CollPlot -> Draw("EP SAME");
     graSystV2JpsiSpVsPt3050Run3CollPlot -> Draw("E2 SAME");
 
-    TLegend *legendV2JpsiSpVsPtColl = new TLegend(0.20, 0.60, 0.45, 0.80, " ", "brNDC");
+    TLegend *legendV2JpsiSpVsPtColl = new TLegend(0.20, 0.70, 0.85, 0.85, " ", "brNDC");
     SetLegend(legendV2JpsiSpVsPtColl);
-    legendV2JpsiSpVsPtColl -> SetTextSize(0.05);
+    legendV2JpsiSpVsPtColl -> SetNColumns(3);
     legendV2JpsiSpVsPtColl -> AddEntry(graSystV2JpsiSpVsPt010Run3CollPlot, "0#minus10\%", "PF");
     legendV2JpsiSpVsPtColl -> AddEntry(graSystV2JpsiSpVsPt1030Run3CollPlot, "10#minus30\%", "PF");
     legendV2JpsiSpVsPtColl -> AddEntry(graSystV2JpsiSpVsPt3050Run3CollPlot, "30#minus50\%", "PF");
     legendV2JpsiSpVsPtColl -> Draw();
 
-    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary, #sqrt{#it{s}_{NN}} = 5.36 TeV");
-    latexTitle -> DrawLatex(0.18, 0.80, "Pb#minusPb, J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 < y < 4");
+    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary, Pb#minusPb,#kern[0.3]{#sqrt{#it{s}_{NN}}} = 5.36 TeV");
+    latexTitle -> DrawLatex(0.18, 0.80, "J/#psi#rightarrow#mu^{#plus}#mu^{#minus}, 2.5 <#kern[0.7]{#it{y}} < 4");
 
     //******************************************************************************************//
     // J/psi v2 vs centrality vs Run 2
@@ -679,13 +673,12 @@ void plot_results_all_centr_and_pt() {
     TLegend *legendV2JpsiVsCentr05Run2VsRun3 = new TLegend(0.20, 0.70, 0.85, 0.85, " ", "brNDC");
     SetLegend(legendV2JpsiVsCentr05Run2VsRun3);
     legendV2JpsiVsCentr05Run2VsRun3 -> SetNColumns(2);
-    legendV2JpsiVsCentr05Run2VsRun3 -> SetTextSize(0.05);
     legendV2JpsiVsCentr05Run2VsRun3 -> AddEntry(graSystV2JpsiVsCentr05Run2, "#sqrt{#it{s}_{NN}} = 5.02 TeV", "PF");
     legendV2JpsiVsCentr05Run2VsRun3 -> AddEntry(graSystV2JpsiEpVsCentr05Run3, "#sqrt{#it{s}_{NN}} = 5.36 TeV", "PF"); 
     legendV2JpsiVsCentr05Run2VsRun3 -> Draw();
 
-    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary");
-    latexTitle -> DrawLatex(0.18, 0.80, "Pb#minusPb, J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 < y < 4, #it{p}_{T} < 5 GeV/#it{c}");
+    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary, Pb#minusPb");
+    latexTitle -> DrawLatex(0.18, 0.80, "J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 <#kern[0.7]{#it{y}} < 4, #it{p}_{T} < 5 GeV/#it{c}");
 
     // SP
     TCanvas *canvasV2JpsiSpVsCentr05Run2VsRun3 = new TCanvas("canvasV2JpsiSpVsCentr05Run2VsRun3", "", 800, 600);
@@ -699,8 +692,8 @@ void plot_results_all_centr_and_pt() {
     graSystV2JpsiSpVsCentr05Run3 -> Draw("E2 SAME");
     legendV2JpsiVsCentr05Run2VsRun3 -> Draw();
 
-    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary");
-    latexTitle -> DrawLatex(0.18, 0.80, "Pb#minusPb, J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 < y < 4, #it{p}_{T} < 5 GeV/#it{c}");
+    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary, Pb#minusPb");
+    latexTitle -> DrawLatex(0.18, 0.80, "J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 <#kern[0.7]{#it{y}} < 4, #it{p}_{T} < 5 GeV/#it{c}");
 
 
     // 5 < pT < 15 GeV/c, EP
@@ -717,13 +710,12 @@ void plot_results_all_centr_and_pt() {
     TLegend *legendV2JpsiVsCentr515Run2VsRun3 = new TLegend(0.20, 0.70, 0.85, 0.85, " ", "brNDC");
     SetLegend(legendV2JpsiVsCentr515Run2VsRun3);
     legendV2JpsiVsCentr515Run2VsRun3 -> SetNColumns(2);
-    legendV2JpsiVsCentr515Run2VsRun3 -> SetTextSize(0.05);
     legendV2JpsiVsCentr515Run2VsRun3 -> AddEntry(graSystV2JpsiVsCentr515Run2, "#sqrt{#it{s}_{NN}} = 5.02 TeV", "PF");
     legendV2JpsiVsCentr515Run2VsRun3 -> AddEntry(graSystV2JpsiEpVsCentr515Run3, "#sqrt{#it{s}_{NN}} = 5.36 TeV", "PF"); 
     legendV2JpsiVsCentr515Run2VsRun3 -> Draw();
 
-    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary");
-    latexTitle -> DrawLatex(0.18, 0.80, "Pb#minusPb, J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 < y < 4, 5 < #it{p}_{T} < 15 GeV/#it{c}");
+    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary, Pb#minusPb");
+    latexTitle -> DrawLatex(0.18, 0.80, "J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 <#kern[0.7]{#it{y}} < 4, 5 < #it{p}_{T} < 15 GeV/#it{c}");
 
     // 5 < pT < 20 GeV/c, SP
     TCanvas *canvasV2JpsiSpVsCentr520Run2VsRun3 = new TCanvas("canvasV2JpsiSpVsCentr520Run2VsRun3", "", 800, 600);
@@ -737,15 +729,15 @@ void plot_results_all_centr_and_pt() {
     graSystV2JpsiSpVsCentr520Run3 -> Draw("E2 SAME");
     legendV2JpsiVsCentr515Run2VsRun3 -> Draw();
 
-    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary");
-    latexTitle -> DrawLatex(0.18, 0.80, "Pb#minusPb, J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 < y < 4, 5 < #it{p}_{T} < 20 GeV/#it{c}");
+    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary, Pb#minusPb");
+    latexTitle -> DrawLatex(0.18, 0.80, "J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 <#kern[0.7]{#it{y}} < 4, 5 < #it{p}_{T} < 20 GeV/#it{c}");
 
     TCanvas *canvasV2JpsiVsCentr515Run2VsRun3 = new TCanvas("canvasV2JpsiVsCentr515Run2VsRun3", "", 800, 600);
     canvasV2JpsiVsCentr515Run2VsRun3 -> SetTicks(1, 1);
 
-    TH2D *histGridV2JpsiVsCentr515Run2VsRun3 = new TH2D("histGridV2JpsiVsCentr515Run2VsRun3", "", 100, -0.5, 90.5, 100, -0.05, 0.3);
+    TH2D *histGridV2JpsiVsCentr515Run2VsRun3 = new TH2D("histGridV2JpsiVsCentr515Run2VsRun3", "", 100, -0.5, 90.5, 100, -0.07, 0.3);
     histGridV2JpsiVsCentr515Run2VsRun3 -> GetXaxis() -> SetTitle("Centrality (%)");
-    histGridV2JpsiVsCentr515Run2VsRun3 -> GetYaxis() -> SetTitle("#font[12]{v}_{2} {EP, |#Delta#eta| > 1.7}");
+    histGridV2JpsiVsCentr515Run2VsRun3 -> GetYaxis() -> SetTitle("#it{v}_{2} {EP, |#Delta#eta| > 1.7}");
     histGridV2JpsiVsCentr515Run2VsRun3 -> Draw();
     lineZeroV2Centr -> Draw();
     graStatV2JpsiVsCentr515Run2 -> Draw("EP SAME");
@@ -755,8 +747,8 @@ void plot_results_all_centr_and_pt() {
 
     legendV2JpsiVsCentr515Run2VsRun3 -> Draw();
 
-    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary");
-    latexTitle -> DrawLatex(0.18, 0.80, "Pb#minusPb, J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 < y < 4, 5 < #it{p}_{T} < 15 GeV/#it{c}");
+    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary, Pb#minusPb");
+    latexTitle -> DrawLatex(0.18, 0.80, "J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 <#kern[0.7]{#it{y}} < 4, 5 < #it{p}_{T} < 15 GeV/#it{c}");
 
     // EP
     canvasV2JpsiEpVsPt1030 -> SaveAs("QM2025_preliminary/v2JpsiEpVsPt1030.pdf");
@@ -840,5 +832,5 @@ void SetLegend(TLegend *legend){
     legend -> SetLineStyle(0);
     legend -> SetLineColor(0);
     legend -> SetTextFont(42);
-    legend -> SetTextSize(0.04);
+    legend -> SetTextSize(0.045);
 }

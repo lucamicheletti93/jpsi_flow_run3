@@ -60,6 +60,15 @@ string bkgV2Funcs[] = {"Pol2", "Cheb"};
 const int nTailSets = 2;
 string tailSets[] = {"data", "MC"};
 
+/*const int nSigFuncs = 1;
+string sigFuncs[] = {"CB2"};
+const int nBkgFuncs = 1;
+string bkgFuncs[] = {"VWG"};
+const int nBkgV2Funcs = 2;
+string bkgV2Funcs[] = {"Pol2", "Cheb"};
+const int nTailSets = 1;
+string tailSets[] = {"MC"};*/
+
 string parNames_CB2_VWG[] = {"bkg","aa","bb","cc","sig_Jpsi","mean_Jpsi","width_Jpsi","a_Jpsi","b_Jpsi","c_Jpsi","d_Jpsi"};
 string parNames_CB2_Pol4Exp[] = {"bkg","aa","bb","cc","dd","ee","ff","sig_Jpsi","mean_Jpsi","width_Jpsi","a_Jpsi","b_Jpsi","c_Jpsi","d_Jpsi"};
 string parNames_NA60_VWG[] = {"bkg","aa","bb","cc","sig_Jpsi","mean_Jpsi","width_Jpsi","b_Jpsi","c_Jpsi","d_Jpsi","f_Jpsi","g_Jpsi","h_Jpsi","a_Jpsi","e_Jpsi"};
@@ -67,58 +76,84 @@ string parNames_NA60_Pol4Exp[] = {"bkg","aa","bb","cc","dd","ee","ff","sig_Jpsi"
 
 //--------------------------
 // v2 pT dependence
-/*double minFixVarBins[] = {50};
-double maxFixVarBins[] = {80};
+double minFixVarBins[] = {30};
+double maxFixVarBins[] = {50};
 string varAxisTitle = "#it{p}_{T} (GeV/#it{c})";
 string varName = "Pt";
-string varFixName = "centrality";*/
+string varFixName = "centrality";
 // 10-30%
-//double resolution[] = {1.14851}; // 1.2782435627 10-30%
-//const int nVarBins = 13;
-//double minVarBins[] = {0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0};
-//double maxVarBins[] = {0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0, 15.0};
-//double varBins[] = {0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0, 15.0};
+/*double resolution[] = {1.16148};// 1.2782435627 10-30%
+const int nVarBins = 13;
+double minVarBins[] = {0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0};
+double maxVarBins[] = {0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0, 15.0};
+double varBins[] = {0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0, 15.0};*/
+// 20-40%
+/*double resolution[] = {1.13508}; // 1.2782435627 20-40%
+const int nVarBins = 13;
+double minVarBins[] = {0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0};
+double maxVarBins[] = {0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0, 15.0};
+double varBins[] = {0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0, 15.0};*/
 // 30-50%
-/*double resolution[] = {1.15675}; // 1.2782435627 30-50%
+/*double resolution[] = {1.15516}; // 1.2782435627 30-50%
 const int nVarBins = 13;
 double minVarBins[] = {0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0};
 double maxVarBins[] = {0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0, 15.0};
 double varBins[] = {0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0, 15.0};*/
 // 50-80%
-/*double resolution[] = {1.60671}; // 50-80%
+/*double resolution[] = {1.43847}; // 50-80%
 const int nVarBins = 8;
 double minVarBins[] = {0.0, 2.0, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0};
 double maxVarBins[] = {2.0, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 15.0};
-double varBins[] = {0.0, 2.0, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 15.0};
+double varBins[] = {0.0, 2.0, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 15.0};*/
 
-string dirInPath = Form("/Users/lucamicheletti/GITHUB/dq_fitter/analysis/LHC23_pass4_full/centrality_%1.0f_%1.0f/pt_dependence_narrow_bins", minFixVarBins[0], maxFixVarBins[0]);
-string fInName = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/data/pass4/LHC23_full/Histograms_Fullpass4PbPbQualitymatchedMchMid_centr_Mixing_10_50.root";
-string dirOutPath = "systematics_pass4_mix_fit";*/
+// Single Fit
+double resolution[] = {1.15516};
+const int nVarBins = 1;
+double minVarBins[] = {10.0};
+double maxVarBins[] = {15.0};
+double varBins[] = {10.0, 15.0};
+
+std::map<std::pair<double, double>, double> inputV2VsPtCentr3050 = {{{0.0, 0.5}, 0.00674}, {{0.5, 1.0}, 0.01865}, {{1.0, 1.5}, 0.03371}, {{1.5, 2.0}, 0.03932}, {{2.0, 2.5}, 0.07062}, 
+                                                                   {{2.5, 3.0}, 0.06541}, {{3.0, 4.0}, 0.09357}, {{4.0, 5.0}, 0.08581}, {{5.0, 6.0}, 0.07073}, {{6.0, 8.0}, 0.06867}, 
+                                                                   {{8.0, 10.0}, 0.07321}, {{10.0, 12.0}, 0.07151}, {{12.0, 15.0}, 0.08718}};
+//string dirInPath = Form("/Users/lucamicheletti/GITHUB/dq_fitter/analysis/LHC23_pass4_full/centrality_%1.0f_%1.0f/pt_dependence_narrow_bins", minFixVarBins[0], maxFixVarBins[0]);
+string dirInPath = Form("/Users/lucamicheletti/GITHUB/dq_fitter/analysis/LHC23_pass4_full/centrality_%1.0f_%1.0f/pt_dependence_large_bins", minFixVarBins[0], maxFixVarBins[0]);
+//string fInName = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/data/pass4/LHC23_full/Histograms_Fullpass4PbPbQualitymatchedMchMid_centr_Mixing_10_50.root"; // default
+//string fInName = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/data/pass4/LHC23_full/Histograms_Fullpass4PbPbQualitymatchedMchMid_CentBins_MchMid__20_40.root"; // For cross check with SP
+string fInName = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/data/pass4/LHC23_full/Histograms_Fullpass4PbPbQualitymatchedMchMid_CentBins_MchMid__widerpTbins10_80.root"; // For plot with wider pT bins
+string dirOutPath = "systematics_pass4_mix_fit";
 
 //--------------------------
 // v2 centrality dependence
-double minFixVarBins[] = {0};
-double maxFixVarBins[] = {5};
+/*double minFixVarBins[] = {5};
+double maxFixVarBins[] = {15};
 string varAxisTitle = "Centrality (%)";
 string varName = "Centr";
-string varFixName = "pt";
+string varFixName = "pt";*/
 
-double resolution[] = {1.46605, 1.16905, 1.12797, 1.14218, 1.20011, 1.33024, 1.61749, 2.27902};
+/*double resolution[] = {1.56041, 1.17495, 1.1283, 1.14024, 1.1949, 1.31888, 1.5944, 2.25324};
 const int nVarBins = 8;
 double minVarBins[] = {0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0};
 double maxVarBins[] = {10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0};
-double varBins[] = {0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0};
+double varBins[] = {0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0};*/
 
 // Single Fit
-/*double resolution[] = {1.14218};
+/*double resolution[] = {1.31888};
 const int nVarBins = 1;
-double minVarBins[] = {30.0};
-double maxVarBins[] = {40.0};
-double varBins[] = {30.0, 40.0};*/
+double minVarBins[] = {50.0};
+double maxVarBins[] = {60.0};
+double varBins[] = {50.0, 60.0};*/
+
+// pt < 5 GeV/c
+/*std::map<std::pair<double, double>, double> inputV2VsPtCentr3050 = {{{0.0, 10.0}, 0.0002}, {{10.0, 20.0}, 0.0807206}, {{20.0, 30.0}, 0.047}, {{30.0, 40.0}, 0.0502}, {{40.0, 50.0}, 0.07062}, 
+                                                                   {{50.0, 60.0}, 0.0469286}, {{60.0, 70.0}, 0.0469286}, {{70.0, 80.0}, 0.0469286}};*/
+// 5 < pt < 15 GeV/c
+/*std::map<std::pair<double, double>, double> inputV2VsPtCentr3050 = {{{0.0, 10.0}, 0.0002}, {{10.0, 20.0}, 0.01199}, {{20.0, 30.0}, 0.047}, {{30.0, 40.0}, 0.0502}, {{40.0, 50.0}, 0.0260}, 
+                                                                   {{50.0, 60.0}, 0.0469286}, {{60.0, 70.0}, 0.0469286}, {{70.0, 80.0}, 0.0469286}};
 
 string dirInPath = Form("/Users/lucamicheletti/GITHUB/dq_fitter/analysis/LHC23_pass4_full/pt_%1.0f_%1.0f/centrality_dependence", minFixVarBins[0], maxFixVarBins[0]);
 string fInName = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/data/pass4/LHC23_full/Histograms_Fullpass4PbPbQualitymatchedMchMid_mergedpT_Mixing_0_80.root";
-string dirOutPath = "systematics_pass4_mix_fit";
+string dirOutPath = "systematics_pass4_mix_fit";*/
 
 const int nFitRanges = 3;
 double minFitRanges[] = {2.3, 2.4, 2.5};
@@ -198,10 +233,13 @@ void v2_fitter_mixing() {
               profV2MixName = Form("histV2MEPM_%2.1f_%2.1f__%1.0f_%1.0f", minFixVarBins[0], maxFixVarBins[0], minVarBin, maxVarBin);
             }
 
+            //std::cout << Form("%s/%s_%2.1f_%2.1f/multi_trial_%s_%s_%s_tails.root", dirInPath.c_str(), varName.c_str(), minVarBin, maxVarBin, sigFunc.c_str(), bkgFunc.c_str(), tailSet.c_str()) << std::endl;
+            //return;
+
             TH1D *histMassFitPars = (TH1D*) fInMassFit -> Get(histMassFitParsName.c_str());
             TH1D *histMass = (TH1D*) fIn -> Get(histMassName.c_str());
             TProfile *profV2 = (TProfile*) fIn -> Get(profV2Name.c_str());
-            TProfile *profV2Mix = (TProfile*) fIn -> Get(profV2Name.c_str());
+            TProfile *profV2Mix = (TProfile*) fIn -> Get(profV2MixName.c_str());
 	    
             // Plot options
             histMass -> GetXaxis() -> SetRangeUser(minFitRange, maxFitRange);
@@ -373,6 +411,12 @@ void v2_fitter_mixing() {
 }
 ////////////////////////////////////////////////////////////
 double* DoFlowFit(TH1D *histMassFitPars, TH1D *histMass, TProfile *profV2,TProfile *profV2Mix, double minVarBin, double maxVarBin, double minFitRange, double maxFitRange, bool debug, string fitFuncs, TFile *fOut) {
+  std::pair<int, int> key = {minVarBin, maxVarBin};
+  double inputV2 = 0.0;
+  auto it = inputV2VsPtCentr3050.find(key);
+  if (it != inputV2VsPtCentr3050.end()) {
+    inputV2 = it -> second;
+  }
 
   TH1D *histoV2 = profV2->ProjectionX("", "e");
   TH1D *histoV2Mix = profV2Mix->ProjectionX("", "e");
@@ -497,7 +541,9 @@ double* DoFlowFit(TH1D *histMassFitPars, TH1D *histMass, TProfile *profV2,TProfi
     }
     funcFlowSigBkg -> FixParameter(11, 0);
     if (fitFuncs.find("Pol2_v2bkg") != std::string::npos) {
-      funcFlowSigBkg -> SetParameter(12, 0.072);
+      //funcFlowSigBkg -> SetParameter(12, 0.01262);
+      funcFlowSigBkg -> SetParameter(12, inputV2);
+      //funcFlowSigBkg -> SetParLimits(12, 0.00001, 0.1);
       //funcFlowSigBkg -> SetParameter(13, 0.09);
       //funcFlowSigBkg -> SetParameter(14, -0.0252894);
       //funcFlowSigBkg -> SetParameter(15, 0.0022179);
@@ -507,14 +553,15 @@ double* DoFlowFit(TH1D *histMassFitPars, TH1D *histMass, TProfile *profV2,TProfi
       funcFlowSigBkg -> FixParameter(16, 999); // Extra parameter for 3 degree cheby
       funcFlowSigBkg -> FixParameter(17, 0); // v2 bkg is a Pol2
     } else {
-      funcFlowSigBkg -> SetParameter(12, 0.072);
+      funcFlowSigBkg -> SetParameter(12, inputV2);
+      //funcFlowSigBkg -> SetParLimits(12, 0.0001, 0.1);
       funcFlowSigBkg -> FixParameter(13, bck2->GetParameter(0));
       funcFlowSigBkg -> FixParameter(14, bck2->GetParameter(1));
       funcFlowSigBkg -> FixParameter(15, bck2->GetParameter(2));
       funcFlowSigBkg -> FixParameter(16, bck2->GetParameter(3)); // Extra parameter for 3 degree cheby
       funcFlowSigBkg -> FixParameter(17, 1); // v2 bkg is a Cheby
     }
-    histoV2 -> Fit (funcFlowSigBkg, "RI"); // Get the normalization from the fit
+    histoV2 -> Fit (funcFlowSigBkg, "RI0"); // Get the normalization from the fit
 
     results[0] = funcFlowSigBkg -> GetParameter(12);
     results[1] = funcFlowSigBkg -> GetParError(12);
@@ -544,8 +591,8 @@ double* DoFlowFit(TH1D *histMassFitPars, TH1D *histMass, TProfile *profV2,TProfi
         funcMassSigBkg -> SetParameter(0, 1e5); // Bkg normalization
         funcMassSigBkg -> SetParameter(7, 100000); // Jpsi normalization
       } else {
-        funcMassSigBkg -> SetParLimits(0, 0.1, 1e6);
-        funcMassSigBkg -> SetParLimits(7, 0.1, 1e6);
+        funcMassSigBkg -> SetParLimits(0, 0.00000001, 1e6);
+        funcMassSigBkg -> SetParLimits(7, 1, 1e6);
         funcMassSigBkg -> SetParameter(0, funcMassSigBkg -> GetParameter(0)); // Bkg normalization
         funcMassSigBkg -> SetParameter(7, funcMassSigBkg -> GetParameter(7)); // Jpsi normalization
       }
@@ -593,26 +640,28 @@ double* DoFlowFit(TH1D *histMassFitPars, TH1D *histMass, TProfile *profV2,TProfi
     }
     if (fitFuncs.find("Pol2_v2bkg") != std::string::npos) {
       funcFlowSigBkg -> FixParameter(14, 0);
-      funcFlowSigBkg -> SetParameter(15, 0.072);
+      funcFlowSigBkg -> SetParameter(15, inputV2);
+      //funcFlowSigBkg -> SetParLimits(15, 0.0001, 0.2);
       //funcFlowSigBkg -> SetParameter(16, 0.09);
       //funcFlowSigBkg -> SetParameter(17, -0.0252894);
       //funcFlowSigBkg -> SetParameter(18, 0.0022179);
-      funcFlowSigBkg -> FixParameter(16,  bck2->GetParameter(0));
-      funcFlowSigBkg -> FixParameter(17,  bck2->GetParameter(1));
-      funcFlowSigBkg -> FixParameter(18,  bck2->GetParameter(2));
+      funcFlowSigBkg -> FixParameter(16, bck2->GetParameter(0));
+      funcFlowSigBkg -> FixParameter(17, bck2->GetParameter(1));
+      funcFlowSigBkg -> FixParameter(18, bck2->GetParameter(2));
 	
       funcFlowSigBkg -> FixParameter(19, 999); // Extra parameter for 3 degree cheby
       funcFlowSigBkg -> FixParameter(20, 0); // v2 bkg is a Pol2
     } else {
       funcFlowSigBkg -> FixParameter(14, 0);
-      funcFlowSigBkg -> SetParameter(15, 0.072);
+      funcFlowSigBkg -> SetParameter(15, inputV2);
+      //funcFlowSigBkg -> SetParLimits(15, 0.001, 0.2);
       funcFlowSigBkg -> FixParameter(16, bck2->GetParameter(0));
       funcFlowSigBkg -> FixParameter(17, bck2->GetParameter(1));
       funcFlowSigBkg -> FixParameter(18, bck2->GetParameter(2));
       funcFlowSigBkg -> FixParameter(19, bck2->GetParameter(3)); // Extra parameter for 3 degree cheby
       funcFlowSigBkg -> FixParameter(20, 1); // v2 bkg is a Cheby
     }
-    histoV2 -> Fit (funcFlowSigBkg, "RI"); // Get the normalization from the fit
+    histoV2 -> Fit (funcFlowSigBkg, "RI0"); // Get the normalization from the fit
 
     results[0] = funcFlowSigBkg -> GetParameter(15);
     results[1] = funcFlowSigBkg -> GetParError(15);
@@ -692,27 +741,29 @@ double* DoFlowFit(TH1D *histMassFitPars, TH1D *histMass, TProfile *profV2,TProfi
     }
     if (fitFuncs.find("Pol2_v2bkg") != std::string::npos) {
       funcFlowSigBkg -> FixParameter(15, 0);
-      funcFlowSigBkg -> SetParameter(16, 0.072);
+      funcFlowSigBkg -> SetParameter(16, inputV2);
+      //funcFlowSigBkg -> SetParLimits(16, 0.000001, 0.4);
 
       //funcFlowSigBkg -> SetParameter(17, 0.09);
       //funcFlowSigBkg -> SetParameter(18, -0.0252894);
       //funcFlowSigBkg -> SetParameter(19, 0.0022179);
       funcFlowSigBkg -> FixParameter(17, bck2->GetParameter(0));
-      funcFlowSigBkg -> FixParameter(18,  bck2->GetParameter(1));
-      funcFlowSigBkg -> FixParameter(19,  bck2->GetParameter(2));
+      funcFlowSigBkg -> FixParameter(18, bck2->GetParameter(1));
+      funcFlowSigBkg -> FixParameter(19, bck2->GetParameter(2));
 
       funcFlowSigBkg -> FixParameter(20, 999); // Extra parameter for 3 degree cheby
       funcFlowSigBkg -> FixParameter(21, 0); // v2 bkg is a Pol2
     } else {
       funcFlowSigBkg -> FixParameter(15, 0);
-      funcFlowSigBkg -> SetParameter(16, 0.072);
+      funcFlowSigBkg -> SetParameter(16, inputV2);
+      //funcFlowSigBkg -> SetParLimits(16, 0.0001, 0.2);
       funcFlowSigBkg -> FixParameter(17, bck2->GetParameter(0));
       funcFlowSigBkg -> FixParameter(18, bck2->GetParameter(1));
       funcFlowSigBkg -> FixParameter(19, bck2->GetParameter(2));
       funcFlowSigBkg -> FixParameter(20, bck2->GetParameter(3)); // Extra parameter for 3 degree cheby
       funcFlowSigBkg -> FixParameter(21, 1); // v2 bkg is a Cheby
     }
-    histoV2 -> Fit (funcFlowSigBkg, "RI"); // Get the normalization from the fit
+    histoV2 -> Fit (funcFlowSigBkg, "RI0"); // Get the normalization from the fit
 
     results[0] = funcFlowSigBkg -> GetParameter(16);
     results[1] = funcFlowSigBkg -> GetParError(16);
@@ -799,7 +850,7 @@ double* DoFlowFit(TH1D *histMassFitPars, TH1D *histMass, TProfile *profV2,TProfi
     }
     if (fitFuncs.find("Pol2_v2bkg") != std::string::npos) {
       funcFlowSigBkg -> FixParameter(18, 0);
-      funcFlowSigBkg -> SetParameter(19, 0.072);
+      funcFlowSigBkg -> SetParameter(19, inputV2);
       //funcFlowSigBkg -> SetParameter(20, 0.09);
       //funcFlowSigBkg -> SetParameter(21, -0.0252894);
       //funcFlowSigBkg -> SetParameter(22, 0.0022179);
@@ -811,14 +862,14 @@ double* DoFlowFit(TH1D *histMassFitPars, TH1D *histMass, TProfile *profV2,TProfi
       funcFlowSigBkg -> FixParameter(24, 0); // v2 bkg is a Pol2
     } else {
       funcFlowSigBkg -> FixParameter(18, 0);
-      funcFlowSigBkg -> SetParameter(19, 0.072);
+      funcFlowSigBkg -> SetParameter(19, inputV2);
       funcFlowSigBkg -> FixParameter(20, bck2->GetParameter(0));
       funcFlowSigBkg -> FixParameter(21, bck2->GetParameter(1));
       funcFlowSigBkg -> FixParameter(22, bck2->GetParameter(2));
       funcFlowSigBkg -> FixParameter(23, bck2->GetParameter(3)); // Extra parameter for 3 degree cheby
       funcFlowSigBkg -> FixParameter(24, 1); // v2 bkg is a Cheby
     }
-    histoV2 -> Fit (funcFlowSigBkg, "RI"); // Get the normalization from the fit
+    histoV2 -> Fit (funcFlowSigBkg, "RI0"); // Get the normalization from the fit
 
     results[0] = funcFlowSigBkg -> GetParameter(19);
     results[1] = funcFlowSigBkg -> GetParError(19);
@@ -869,10 +920,11 @@ double* DoFlowFit(TH1D *histMassFitPars, TH1D *histMass, TProfile *profV2,TProfi
   gStyle -> SetOptStat(0);
   gStyle -> SetOptFit(1111);
   histoV2 -> Draw();
-  histoV2Mix->Draw("psame");
+  histoV2Mix->Draw("EP SAME");
   bck2->Draw("same");
   funcFlowSigBkg -> Draw("SAME");
   legend2->Draw();
+  canvasFit -> Update();
 
 
   fOut -> cd();
