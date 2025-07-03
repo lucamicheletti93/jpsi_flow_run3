@@ -964,7 +964,7 @@ void plot_results_all_centr_and_pt() {
     legendV2Hf6VsPtCollPlot -> Draw();
 
     latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary, Pb#minusPb,#kern[0.3]{#sqrt{#it{s}_{NN}}} = 5.36 TeV");
-    latexTitle -> DrawLatex(0.18, 0.80, "J/#psi,#varUpsilon(1S)#rightarrow#mu^{+}#mu^{-}, 2.5 <#kern[0.7]{#it{y}} < 4");
+    latexTitle -> DrawLatex(0.18, 0.80, "J/#psi,#kern[0.1]{#varUpsilon(1S)}#kern[0.1]{#rightarrow}#kern[0.1]{#mu^{+}#mu^{-}}, 2.5 <#kern[0.7]{#it{y}} < 4");
 
     //******************************************************************************************//
     // J/psi v2 vs centrality vs Run 2
@@ -1144,10 +1144,10 @@ void plot_results_all_centr_and_pt() {
     canvasV2Hf2VsPtCollPlot -> SaveAs("QM2025_preliminary/v2Hf2VsPtCollPlot.pdf");
     canvasV2Hf3VsPtCollPlot -> SaveAs("QM2025_preliminary/v2Hf3VsPtCollPlot.pdf");
     canvasV2Hf4VsPtCollPlot -> SaveAs("QM2025_preliminary/v2Hf4VsPtCollPlot.pdf");
-    canvasV2Hf5VsPtCollPlot -> SaveAs("QM2025_preliminary/v2Hf5VsPtCollPlot.pdf");*/
+    canvasV2Hf5VsPtCollPlot -> SaveAs("QM2025_preliminary/v2Hf5VsPtCollPlot.pdf");
     canvasV2Hf6VsPtCollPlot -> SaveAs("QM2025_preliminary/v2Hf6VsPtCollPlot.pdf");
 
-    /*canvasV2JpsiSpVsCentr05 -> SaveAs("QM2025_preliminary/v2JpsiSpVsCentr05.pdf");
+    canvasV2JpsiSpVsCentr05 -> SaveAs("QM2025_preliminary/v2JpsiSpVsCentr05.pdf");
     canvasV2JpsiSpVsCentr520 -> SaveAs("QM2025_preliminary/v2JpsiSpVsCentr520.pdf");
     canvasV2JpsiSpVsCentr05Run2VsRun3 -> SaveAs("QM2025_preliminary/v2JpsiSpVsCentr05Run2VsRun3.pdf");
     canvasV2JpsiSpVsCentr520Run2VsRun3 -> SaveAs("QM2025_preliminary/v2JpsiSpVsCentr520Run2VsRun3.pdf");
