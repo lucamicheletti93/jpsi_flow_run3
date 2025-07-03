@@ -76,35 +76,91 @@ void plot_results_all_centr_and_pt() {
     lineZeroV2Pt -> SetLineWidth(2);
     lineZeroV2Pt -> SetLineColor(kGray+1);
 
+    TLine *lineZeroV2HighPt = new TLine(-0.5, 0, 25.5, 0);
+    lineZeroV2HighPt -> SetLineStyle(kDashed);
+    lineZeroV2HighPt -> SetLineWidth(2);
+    lineZeroV2HighPt -> SetLineColor(kGray+1);
+
     TLine *lineZeroV2Centr = new TLine(-0.5, 0, 90.5, 0);
     lineZeroV2Centr -> SetLineStyle(kDashed);
     lineZeroV2Centr -> SetLineWidth(2);
     lineZeroV2Centr -> SetLineColor(kGray+1);
 
     //////////////////////////////////////////
+    // D0 v2 vs pT in Run 3                 //
+    //////////////////////////////////////////
+    TFile *fInPromptD0 = new TFile("../../results/QM2025/v2_prompt_wsyst_D0_3050.root", "READ");
+    TGraphAsymmErrors *graStatV2PromptD0VsPt3050Run3 = (TGraphAsymmErrors*) fInPromptD0 -> Get("gvn_prompt_stat");
+    graStatV2PromptD0VsPt3050Run3 -> SetMarkerSize(1);
+    SetGraph(graStatV2PromptD0VsPt3050Run3, kOrange+7, 20, kOrange+7, 2, 0, 0.7);
+    TGraphAsymmErrors *graSystV2PromptD0VsPt3050Run3 = (TGraphAsymmErrors*) fInPromptD0 -> Get("tot_syst");
+    graSystV2PromptD0VsPt3050Run3 -> SetMarkerSize(1);
+    SetGraph(graSystV2PromptD0VsPt3050Run3, kOrange+7, 20, kOrange+7, 2, 0, 0.7);
+
+    TFile *fInNonPromptD0 = new TFile("../../results/QM2025/v2_np_wsyst_npD0_3050_wider.root", "READ");
+    TGraphAsymmErrors *graStatV2NonPromptD0VsPt3050Run3 = (TGraphAsymmErrors*) fInNonPromptD0 -> Get("gvn_np_stat");
+    graStatV2NonPromptD0VsPt3050Run3 -> SetMarkerSize(1);
+    SetGraph(graStatV2NonPromptD0VsPt3050Run3, kGreen+2, 20, kGreen+2, 2, 0, 0.7);
+    TGraphAsymmErrors *graSystV2NonPromptD0VsPt3050Run3 = (TGraphAsymmErrors*) fInNonPromptD0 -> Get("tot_syst");
+    graSystV2NonPromptD0VsPt3050Run3 -> SetMarkerSize(1);
+    SetGraph(graSystV2NonPromptD0VsPt3050Run3, kGreen+2, 20, kGreen+2, 2, 0, 0.7);
+
+    //////////////////////////////////////////
     // J/psi v2 vs pT / centrality vs Run 2 //
     //////////////////////////////////////////
+    /*const int nPtBinsD0 = 10;
+    double ptCentrD0[] = {0.64, 1.49, 2.47, 3.46, 4.45, 5.45, 6.819, 8.835, 10.84, 14.25};
+    double ptWidthStatD0[] = {0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25};
+    double ptWidthSystD0[] = {0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15};
+
+    double v2D0VsPt010Run3[] = {0.0008, 0.039, 0.077, 0.12, 0.15, 0.20, 0.18, 0.15, 0.12, 0.05};
+    double statV2D0VsPt010Run3[] = {0.011, 0.0091, 0.0089, 0.0095, 0.011, 0.013, 0.023, 0.022, 0.037, 0.039};
+    double systV2D0VsPt010Run3[] = {0.0032389, 0.0032904, 0.003359, 0.0043267, 0.0065719, 0.0066256, 0.0065651, 0.0067724, 0.0075293, 0.0093145};
+
+    TGraphErrors *graStatV2PromptD0VsPt3050Run3 = new TGraphErrors(nPtBinsD0, ptCentrD0, v2D0VsPt010Run3, ptWidthStatD0, statV2D0VsPt010Run3);
+    SetGraph(graStatV2PromptD0VsPt3050Run3, kOrange+7, 20, kOrange+7, 2, 0, 0.8);
+    TGraphErrors *graSystV2PromptD0VsPt3050Run3 = new TGraphErrors(nPtBinsD0, ptCentrD0, v2D0VsPt010Run3, ptWidthSystD0, systV2D0VsPt010Run3);
+    SetGraph(graSystV2PromptD0VsPt3050Run3, kOrange+7, 20, kOrange+7, 2, 0, 0.8);*/
+
+    const int nPtBinsUps1s = 3;
+    //double ptCentrUps1s[] = {1.5, 4.5, 10.5};
+    double ptCentrUps1s[] = {1.89, 4.42, 8.86};
+    double ptWidthStatLowUps1s[] = {1.89, 4.42-3, 8.86-6};
+    double ptWidthStatHighUps1s[] = {3-1.89, 6-4.42, 15-8.86};
+    double ptWidthStatUps1s[] = {1.5, 1.5, 4.5};
+    double ptWidthSystUps1s[] = {0.15, 0.15, 0.15};
+    	
+    double v2Ups1sVsPt560Run3[] = {-0.007,0.070,-0.005}; 
+    double statV2Ups1sVsPt560Run3[] = {0.047,0.053,0.080};
+    double systV2Ups1sVsPt560Run3[] = {0.028,0.030,0.035};
+
+    TGraphAsymmErrors *graStatV2Ups1sVsPt560Run3 = new TGraphAsymmErrors(nPtBinsUps1s, ptCentrUps1s, v2Ups1sVsPt560Run3, ptWidthStatLowUps1s, ptWidthStatHighUps1s, statV2Ups1sVsPt560Run3, statV2Ups1sVsPt560Run3);
+    SetGraph(graStatV2Ups1sVsPt560Run3, kAzure+4, 20, kAzure+4, 2, 0, 1);
+    TGraphErrors *graSystV2Ups1sVsPt560Run3 = new TGraphErrors(nPtBinsUps1s, ptCentrUps1s, v2Ups1sVsPt560Run3, ptWidthSystUps1s, systV2Ups1sVsPt560Run3);
+    SetGraph(graSystV2Ups1sVsPt560Run3, kAzure+4, 20, kAzure+4, 2, 0, 1);
+
+
     const int nPtBinsRun2 = 10;
     double ptCentrRun2[] = {0.64, 1.49, 2.47, 3.46, 4.45, 5.45, 6.819, 8.835, 10.84, 14.25};
     double ptWidthStatRun2[] = {0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25};
     double ptWidthSystRun2[] = {0.30, 0.30, 0.30, 0.30, 0.30, 0.30, 0.30, 0.30, 0.30, 0.30};
 
-    double v2JpsiVsPtCentr010Run2[] = {0.03,0.034, 0.022, 0.053, 0.043, 0.05, 0.045, 0.0006, 0.068, 0.002};
-    double statV2JpsiVsPtCentr010Run2[] = {0.013, 0.01, 0.011, 0.013, 0.016, 0.019, 0.019, 0.028, 0.046, 0.059};
-    double systV2JpsiVsPtCentr010Run2[] = {0.0041243, 0.0031563, 0.0040117, 0.0030156, 0.0017944, 0.0025338, 0.0033808, 0.0051196, 0.0059211, 0.0051197};
+    double v2JpsiVsPt010Run2[] = {0.03,0.034, 0.022, 0.053, 0.043, 0.05, 0.045, 0.0006, 0.068, 0.002};
+    double statV2JpsiVsPt010Run2[] = {0.013, 0.01, 0.011, 0.013, 0.016, 0.019, 0.019, 0.028, 0.046, 0.059};
+    double systV2JpsiVsPt010Run2[] = {0.0041243, 0.0031563, 0.0040117, 0.0030156, 0.0017944, 0.0025338, 0.0033808, 0.0051196, 0.0059211, 0.0051197};
 
-    TGraphErrors *graStatV2JpsiVsPt010Run2 = new TGraphErrors(nPtBinsRun2, ptCentrRun2, v2JpsiVsPtCentr010Run2, ptWidthStatRun2, statV2JpsiVsPtCentr010Run2);
+    TGraphErrors *graStatV2JpsiVsPt010Run2 = new TGraphErrors(nPtBinsRun2, ptCentrRun2, v2JpsiVsPt010Run2, ptWidthStatRun2, statV2JpsiVsPt010Run2);
     SetGraph(graStatV2JpsiVsPt010Run2, kGray+2, 20, kGray+2, 2, 0, 0.7);
-    TGraphErrors *graSystV2JpsiVsPt010Run2 = new TGraphErrors(nPtBinsRun2, ptCentrRun2, v2JpsiVsPtCentr010Run2, ptWidthSystRun2, systV2JpsiVsPtCentr010Run2);
+    TGraphErrors *graSystV2JpsiVsPt010Run2 = new TGraphErrors(nPtBinsRun2, ptCentrRun2, v2JpsiVsPt010Run2, ptWidthSystRun2, systV2JpsiVsPt010Run2);
     SetGraph(graSystV2JpsiVsPt010Run2, kGray+2, 20, kGray+2, 2, 0, 0.7);
 
-    double v2JpsiVsPtCentr1030Run2[] = {0.011, 0.043, 0.074, 0.088, 0.085, 0.103, 0.083, 0.100, 0.049, 0.022};
-    double statV2JpsiVsPtCentr1030Run2[] = {0.0085, 0.0069, 0.0069, 0.0077, 0.009, 0.011, 0.011, 0.018, 0.028, 0.032};
-    double systV2JpsiVsPtCentr1030Run2[] = {0.0038391, 0.0036633, 0.004898, 0.0035068, 0.0037855, 0.0029726, 0.0036802, 0.0075789, 0.0093488, 0.0091828};
+    double v2JpsiVsPt1030Run2[] = {0.011, 0.043, 0.074, 0.088, 0.085, 0.103, 0.083, 0.100, 0.049, 0.022};
+    double statV2JpsiVsPt1030Run2[] = {0.0085, 0.0069, 0.0069, 0.0077, 0.009, 0.011, 0.011, 0.018, 0.028, 0.032};
+    double systV2JpsiVsPt1030Run2[] = {0.0038391, 0.0036633, 0.004898, 0.0035068, 0.0037855, 0.0029726, 0.0036802, 0.0075789, 0.0093488, 0.0091828};
 
-    TGraphErrors *graStatV2JpsiVsPt1030Run2 = new TGraphErrors(nPtBinsRun2, ptCentrRun2, v2JpsiVsPtCentr1030Run2, ptWidthStatRun2, statV2JpsiVsPtCentr1030Run2);
+    TGraphErrors *graStatV2JpsiVsPt1030Run2 = new TGraphErrors(nPtBinsRun2, ptCentrRun2, v2JpsiVsPt1030Run2, ptWidthStatRun2, statV2JpsiVsPt1030Run2);
     SetGraph(graStatV2JpsiVsPt1030Run2, kGray+2, 20, kGray+2, 2, 0, 0.7);
-    TGraphErrors *graSystV2JpsiVsPt1030Run2 = new TGraphErrors(nPtBinsRun2, ptCentrRun2, v2JpsiVsPtCentr1030Run2, ptWidthSystRun2, systV2JpsiVsPtCentr1030Run2);
+    TGraphErrors *graSystV2JpsiVsPt1030Run2 = new TGraphErrors(nPtBinsRun2, ptCentrRun2, v2JpsiVsPt1030Run2, ptWidthSystRun2, systV2JpsiVsPt1030Run2);
     SetGraph(graSystV2JpsiVsPt1030Run2, kGray+2, 20, kGray+2, 2, 0, 0.7);
 
     double v2JpsiVsPt3050Run2[] = {0.0008, 0.029, 0.067, 0.099, 0.098, 0.101, 0.098, 0.092, 0.055, 0.026};
@@ -229,6 +285,11 @@ void plot_results_all_centr_and_pt() {
     TGraphErrors *graSystV2JpsiSpVsPt3050Run3CollPlot = new TGraphErrors(ptCentr3050SpRun3.size(), &(ptCentr3050SpRun3[0]), &(v2JpsiVsPt3050SpRun3[0]), &(ptWidthSyst3050SpRun3[0]), &(systV2JpsiVsPt3050SpRun3[0]));
     SetGraph(graSystV2JpsiSpVsPt3050Run3CollPlot, kAzure+4, 20, kAzure+4, 2, 0);
 
+    TGraphErrors *graStatV2JpsiSpVsPt3050Run3CollPlotHf = new TGraphErrors(ptCentr3050SpRun3.size(), &(ptCentr3050SpRun3[0]), &(v2JpsiVsPt3050SpRun3[0]), &(ptWidthStat3050SpRun3[0]), &(statV2JpsiVsPt3050SpRun3[0]));
+    SetGraph(graStatV2JpsiSpVsPt3050Run3CollPlotHf, kRed+1, 20, kRed+1, 2, 0);
+    TGraphErrors *graSystV2JpsiSpVsPt3050Run3CollPlotHf = new TGraphErrors(ptCentr3050SpRun3.size(), &(ptCentr3050SpRun3[0]), &(v2JpsiVsPt3050SpRun3[0]), &(ptWidthSyst3050SpRun3[0]), &(systV2JpsiVsPt3050SpRun3[0]));
+    SetGraph(graSystV2JpsiSpVsPt3050Run3CollPlotHf, kRed+1, 20, kRed+1, 2, 0);
+
     // 50-80% 
     // narrow / large binning
     std::vector<double> ptCentr5080EpRun3, ptWidthStat5080EpRun3, ptWidthSyst5080EpRun3, v2JpsiVsPt5080EpRun3, statV2JpsiVsPt5080EpRun3, systV2JpsiVsPt5080EpRun3;
@@ -252,6 +313,13 @@ void plot_results_all_centr_and_pt() {
     TGraphErrors *graSystV2JpsiEpVsCentr05Run3 = new TGraphErrors(centrCenCentr05EpRun3.size(), &(centrCenCentr05EpRun3[0]), &(v2JpsiVsCentr05EpRun3[0]), &(ptWidthSyCentr05EpRun3[0]), &(systV2JpsiVsCentr05EpRun3[0]));
     SetGraph(graSystV2JpsiEpVsCentr05Run3, kRed+1, 20, kRed+1, 2, 0);
 
+    std::vector<double> centrCenCentr05EpRun3CollPlot, ptWidthStCentr05EpRun3CollPlot, ptWidthSyCentr05EpRun3CollPlot, v2JpsiVsCentr05EpRun3CollPlot, statV2JpsiVsCentr05EpRun3CollPlot, systV2JpsiVsCentr05EpRun3CollPlot;
+    GetDataFromTxt(pathEpCentr05.c_str(), centrCenCentr05EpRun3CollPlot, ptWidthStCentr05EpRun3CollPlot, ptWidthSyCentr05EpRun3CollPlot, v2JpsiVsCentr05EpRun3CollPlot, statV2JpsiVsCentr05EpRun3CollPlot, systV2JpsiVsCentr05EpRun3CollPlot, 1.5);
+    TGraphErrors *graStatV2JpsiEpVsCentr05Run3CollPlot = new TGraphErrors(centrCenCentr05EpRun3CollPlot.size(), &(centrCenCentr05EpRun3CollPlot[0]), &(v2JpsiVsCentr05EpRun3CollPlot[0]), &(ptWidthStCentr05EpRun3CollPlot[0]), &(statV2JpsiVsCentr05EpRun3CollPlot[0]));
+    SetGraph(graStatV2JpsiEpVsCentr05Run3CollPlot, kAzure+4, 20, kAzure+4, 2, 0);
+    TGraphErrors *graSystV2JpsiEpVsCentr05Run3CollPlot = new TGraphErrors(centrCenCentr05EpRun3CollPlot.size(), &(centrCenCentr05EpRun3CollPlot[0]), &(v2JpsiVsCentr05EpRun3CollPlot[0]), &(ptWidthSyCentr05EpRun3CollPlot[0]), &(systV2JpsiVsCentr05EpRun3CollPlot[0]));
+    SetGraph(graSystV2JpsiEpVsCentr05Run3CollPlot, kAzure+4, 20, kAzure+4, 2, 0);
+
     // SP
     std::vector<double> centrCenCentr05SpRun3, ptWidthStCentr05SpRun3, ptWidthSyCentr05SpRun3, v2JpsiVsCentr05SpRun3, statV2JpsiVsCentr05SpRun3, systV2JpsiVsCentr05SpRun3;
     GetDataFromTxt(pathSpCentr05.c_str(), centrCenCentr05SpRun3, ptWidthStCentr05SpRun3, ptWidthSyCentr05SpRun3, v2JpsiVsCentr05SpRun3, statV2JpsiVsCentr05SpRun3, systV2JpsiVsCentr05SpRun3, 1.5);
@@ -259,6 +327,13 @@ void plot_results_all_centr_and_pt() {
     SetGraph(graStatV2JpsiSpVsCentr05Run3, kRed+1, 20, kRed+1, 2, 0);
     TGraphErrors *graSystV2JpsiSpVsCentr05Run3 = new TGraphErrors(centrCenCentr05SpRun3.size(), &(centrCenCentr05SpRun3[0]), &(v2JpsiVsCentr05SpRun3[0]), &(ptWidthSyCentr05SpRun3[0]), &(systV2JpsiVsCentr05SpRun3[0]));
     SetGraph(graSystV2JpsiSpVsCentr05Run3, kRed+1, 20, kRed+1, 2, 0);
+
+    std::vector<double> centrCenCentr05SpRun3CollPlot, ptWidthStCentr05SpRun3CollPlot, ptWidthSyCentr05SpRun3CollPlot, v2JpsiVsCentr05SpRun3CollPlot, statV2JpsiVsCentr05SpRun3CollPlot, systV2JpsiVsCentr05SpRun3CollPlot;
+    GetDataFromTxt(pathSpCentr05.c_str(), centrCenCentr05SpRun3CollPlot, ptWidthStCentr05SpRun3CollPlot, ptWidthSyCentr05SpRun3CollPlot, v2JpsiVsCentr05SpRun3CollPlot, statV2JpsiVsCentr05SpRun3CollPlot, systV2JpsiVsCentr05SpRun3CollPlot, 1.5);
+    TGraphErrors *graStatV2JpsiSpVsCentr05Run3CollPlot = new TGraphErrors(centrCenCentr05SpRun3CollPlot.size(), &(centrCenCentr05SpRun3CollPlot[0]), &(v2JpsiVsCentr05SpRun3CollPlot[0]), &(ptWidthStCentr05SpRun3CollPlot[0]), &(statV2JpsiVsCentr05SpRun3CollPlot[0]));
+    SetGraph(graStatV2JpsiSpVsCentr05Run3CollPlot, kAzure+4, 20, kAzure+4, 2, 0);
+    TGraphErrors *graSystV2JpsiSpVsCentr05Run3CollPlot = new TGraphErrors(centrCenCentr05SpRun3CollPlot.size(), &(centrCenCentr05SpRun3CollPlot[0]), &(v2JpsiVsCentr05SpRun3CollPlot[0]), &(ptWidthSyCentr05SpRun3CollPlot[0]), &(systV2JpsiVsCentr05SpRun3CollPlot[0]));
+    SetGraph(graSystV2JpsiSpVsCentr05Run3CollPlot, kAzure+4, 20, kAzure+4, 2, 0);
 
     // 5 < pT < 15 GeV/c, EP
     std::vector<double> centrCenCentr515EpRun3, ptWidthStCentr515EpRun3, ptWidthSyCentr515EpRun3, v2JpsiVsCentr515EpRun3, statV2JpsiVsCentr515EpRun3, systV2JpsiVsCentr515EpRun3;
@@ -268,6 +343,13 @@ void plot_results_all_centr_and_pt() {
     TGraphErrors *graSystV2JpsiEpVsCentr515Run3 = new TGraphErrors(centrCenCentr515EpRun3.size(), &(centrCenCentr515EpRun3[0]), &(v2JpsiVsCentr515EpRun3[0]), &(ptWidthSyCentr515EpRun3[0]), &(systV2JpsiVsCentr515EpRun3[0]));
     SetGraph(graSystV2JpsiEpVsCentr515Run3, kRed+1, 20, kRed+1, 2, 0);
 
+    std::vector<double> centrCenCentr515EpRun3CollPlot, ptWidthStCentr515EpRun3CollPlot, ptWidthSyCentr515EpRun3CollPlot, v2JpsiVsCentr515EpRun3CollPlot, statV2JpsiVsCentr515EpRun3CollPlot, systV2JpsiVsCentr515EpRun3CollPlot;
+    GetDataFromTxt(pathEpCentr515.c_str(), centrCenCentr515EpRun3CollPlot, ptWidthStCentr515EpRun3CollPlot, ptWidthSyCentr515EpRun3CollPlot, v2JpsiVsCentr515EpRun3CollPlot, statV2JpsiVsCentr515EpRun3CollPlot, systV2JpsiVsCentr515EpRun3CollPlot, 1.5);
+    TGraphErrors *graStatV2JpsiEpVsCentr515Run3CollPlot = new TGraphErrors(centrCenCentr515EpRun3CollPlot.size(), &(centrCenCentr515EpRun3CollPlot[0]), &(v2JpsiVsCentr515EpRun3CollPlot[0]), &(ptWidthStCentr515EpRun3CollPlot[0]), &(statV2JpsiVsCentr515EpRun3CollPlot[0]));
+    SetGraph(graStatV2JpsiEpVsCentr515Run3CollPlot, kRed+1, 20, kRed+1, 2, 0);
+    TGraphErrors *graSystV2JpsiEpVsCentr515Run3CollPlot = new TGraphErrors(centrCenCentr515EpRun3CollPlot.size(), &(centrCenCentr515EpRun3CollPlot[0]), &(v2JpsiVsCentr515EpRun3CollPlot[0]), &(ptWidthSyCentr515EpRun3CollPlot[0]), &(systV2JpsiVsCentr515EpRun3CollPlot[0]));
+    SetGraph(graSystV2JpsiEpVsCentr515Run3CollPlot, kRed+1, 20, kRed+1, 2, 0);
+
     // 5 < pT < 20 GeV/c, SP
     std::vector<double> centrCenCentr520SpRun3, ptWidthStCentr520SpRun3, ptWidthSyCentr520SpRun3, v2JpsiVsCentr520SpRun3, statV2JpsiVsCentr520SpRun3, systV2JpsiVsCentr520SpRun3;
     GetDataFromTxt(pathSpCentr520.c_str(), centrCenCentr520SpRun3, ptWidthStCentr520SpRun3, ptWidthSyCentr520SpRun3, v2JpsiVsCentr520SpRun3, statV2JpsiVsCentr520SpRun3, systV2JpsiVsCentr520SpRun3, 1.5);
@@ -275,6 +357,13 @@ void plot_results_all_centr_and_pt() {
     SetGraph(graStatV2JpsiSpVsCentr520Run3, kRed+1, 20, kRed+1, 2, 0);
     TGraphErrors *graSystV2JpsiSpVsCentr520Run3 = new TGraphErrors(centrCenCentr520SpRun3.size(), &(centrCenCentr520SpRun3[0]), &(v2JpsiVsCentr520SpRun3[0]), &(ptWidthSyCentr520SpRun3[0]), &(systV2JpsiVsCentr520SpRun3[0]));
     SetGraph(graSystV2JpsiSpVsCentr520Run3, kRed+1, 20, kRed+1, 2, 0);
+
+    std::vector<double> centrCenCentr520SpRun3CollPlot, ptWidthStCentr520SpRun3CollPlot, ptWidthSyCentr520SpRun3CollPlot, v2JpsiVsCentr520SpRun3CollPlot, statV2JpsiVsCentr520SpRun3CollPlot, systV2JpsiVsCentr520SpRun3CollPlot;
+    GetDataFromTxt(pathSpCentr520.c_str(), centrCenCentr520SpRun3CollPlot, ptWidthStCentr520SpRun3CollPlot, ptWidthSyCentr520SpRun3CollPlot, v2JpsiVsCentr520SpRun3CollPlot, statV2JpsiVsCentr520SpRun3CollPlot, systV2JpsiVsCentr520SpRun3CollPlot, 1.5);
+    TGraphErrors *graStatV2JpsiSpVsCentr520Run3CollPlot = new TGraphErrors(centrCenCentr520SpRun3CollPlot.size(), &(centrCenCentr520SpRun3CollPlot[0]), &(v2JpsiVsCentr520SpRun3CollPlot[0]), &(ptWidthStCentr520SpRun3CollPlot[0]), &(statV2JpsiVsCentr520SpRun3CollPlot[0]));
+    SetGraph(graStatV2JpsiSpVsCentr520Run3CollPlot, kRed+1, 20, kRed+1, 2, 0);
+    TGraphErrors *graSystV2JpsiSpVsCentr520Run3CollPlot = new TGraphErrors(centrCenCentr520SpRun3CollPlot.size(), &(centrCenCentr520SpRun3CollPlot[0]), &(v2JpsiVsCentr520SpRun3CollPlot[0]), &(ptWidthSyCentr520SpRun3CollPlot[0]), &(systV2JpsiVsCentr520SpRun3CollPlot[0]));
+    SetGraph(graSystV2JpsiSpVsCentr520Run3CollPlot, kRed+1, 20, kRed+1, 2, 0);
 
     //******************************************************************************************//
     // J/psi v2 vs pT
@@ -285,7 +374,7 @@ void plot_results_all_centr_and_pt() {
 
     TH2D *histGridV2JpsiSpVsPt010 = new TH2D("histGridV2JpsiSpVsPt010", "", 100, -0.5, 15.5, 100, -0.07, 0.3);
     histGridV2JpsiSpVsPt010 -> GetXaxis() -> SetTitle("#it{p}_{T} (GeV/#it{c})");
-    histGridV2JpsiSpVsPt010 -> GetYaxis() -> SetTitle("#it{v}_{2} {SP, |#Delta#eta| > 1.7}");
+    histGridV2JpsiSpVsPt010 -> GetYaxis() -> SetTitle("#it{v}_{2} {SP, |#Delta#it{#eta}| > 1.7}");
     histGridV2JpsiSpVsPt010 -> Draw();
     lineZeroV2Pt -> Draw();
     graStatV2JpsiSpVsPt010Run3 -> Draw("EP SAME");
@@ -301,14 +390,14 @@ void plot_results_all_centr_and_pt() {
     latexTitle -> DrawLatex(0.18, 0.80, "Pb#minusPb,#kern[0.3]{#sqrt{#it{s}_{NN}}} = 5.36 TeV, 0#minus10\%");
     latexTitle -> DrawLatex(0.18, 0.73, "J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 <#kern[0.7]{#it{y}} < 4");
 
-    // 10-30% 
-    // EP
+    // 10-30%, EP
+    // Narrow binning
     TCanvas *canvasV2JpsiEpVsPt1030 = new TCanvas("canvasV2JpsiEpVsPt1030", "", 800, 600);
     canvasV2JpsiEpVsPt1030 -> SetTicks(1, 1);
 
     TH2D *histGridV2JpsiEpVsPt1030 = new TH2D("histGridV2JpsiEpVsPt1030", "", 100, -0.5, 15.5, 100, -0.07, 0.3);
     histGridV2JpsiEpVsPt1030 -> GetXaxis() -> SetTitle("#it{p}_{T} (GeV/#it{c})");
-    histGridV2JpsiEpVsPt1030 -> GetYaxis() -> SetTitle("#it{v}_{2} {EP, |#Delta#eta| > 1.7}");
+    histGridV2JpsiEpVsPt1030 -> GetYaxis() -> SetTitle("#it{v}_{2} {EP, |#Delta#it{#eta}| > 1.7}");
     histGridV2JpsiEpVsPt1030 -> Draw();
     lineZeroV2Pt -> Draw();
     graStatV2JpsiEpVsPt1030Run3 -> Draw("EP SAME");
@@ -324,13 +413,30 @@ void plot_results_all_centr_and_pt() {
     latexTitle -> DrawLatex(0.18, 0.80, "Pb#minusPb,#kern[0.3]{#sqrt{#it{s}_{NN}}} = 5.36 TeV, 10#minus30\%");
     latexTitle -> DrawLatex(0.18, 0.73, "J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 <#kern[0.7]{#it{y}} < 4");
 
+    // Large binning
+    TCanvas *canvasV2JpsiEpVsPt1030LargeBins = new TCanvas("canvasV2JpsiEpVsPt1030LargeBins", "", 800, 600);
+    canvasV2JpsiEpVsPt1030LargeBins -> SetTicks(1, 1);
+
+    TH2D *histGridV2JpsiEpVsPt1030LargeBins = new TH2D("histGridV2JpsiEpVsPt1030LargeBins", "", 100, -0.5, 15.5, 100, -0.07, 0.3);
+    histGridV2JpsiEpVsPt1030LargeBins -> GetXaxis() -> SetTitle("#it{p}_{T} (GeV/#it{c})");
+    histGridV2JpsiEpVsPt1030LargeBins -> GetYaxis() -> SetTitle("#it{v}_{2} {EP, |#Delta#it{#eta}| > 1.7}");
+    histGridV2JpsiEpVsPt1030LargeBins -> Draw();
+    lineZeroV2Pt -> Draw();
+    graStatV2JpsiEpVsPt1030Run3LargeBins -> Draw("EP SAME");
+    graSystV2JpsiEpVsPt1030Run3LargeBins -> Draw("E2 SAME");
+    legendV2JpsiVsPt1030 -> Draw();
+
+    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary");
+    latexTitle -> DrawLatex(0.18, 0.80, "Pb#minusPb,#kern[0.3]{#sqrt{#it{s}_{NN}}} = 5.36 TeV, 10#minus30\%");
+    latexTitle -> DrawLatex(0.18, 0.73, "J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 <#kern[0.7]{#it{y}} < 4");
+
     // SP
     TCanvas *canvasV2JpsiSpVsPt1030 = new TCanvas("canvasV2JpsiSpVsPt1030", "", 800, 600);
     canvasV2JpsiSpVsPt1030 -> SetTicks(1, 1);
 
     TH2D *histGridV2JpsiSpVsPt1030 = new TH2D("histGridV2JpsiSpVsPt1030", "", 100, -0.5, 15.5, 100, -0.07, 0.3);
     histGridV2JpsiSpVsPt1030 -> GetXaxis() -> SetTitle("#it{p}_{T} (GeV/#it{c})");
-    histGridV2JpsiSpVsPt1030 -> GetYaxis() -> SetTitle("#it{v}_{2} {SP, |#Delta#eta| > 1.7}");
+    histGridV2JpsiSpVsPt1030 -> GetYaxis() -> SetTitle("#it{v}_{2} {SP, |#Delta#it{#eta}| > 1.7}");
     histGridV2JpsiSpVsPt1030 -> Draw();
     lineZeroV2Pt -> Draw();
     graStatV2JpsiSpVsPt1030Run3 -> Draw("EP SAME");
@@ -341,14 +447,14 @@ void plot_results_all_centr_and_pt() {
     latexTitle -> DrawLatex(0.18, 0.80, "Pb#minusPb,#kern[0.3]{#sqrt{#it{s}_{NN}}} = 5.36 TeV, 10#minus30\%");
     latexTitle -> DrawLatex(0.18, 0.73, "J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 <#kern[0.7]{#it{y}} < 4");
 
-    // 30-50%
-    // EP
+    // 30-50%, EP
+    // Narrow binning
     TCanvas *canvasV2JpsiEpVsPt3050 = new TCanvas("canvasV2JpsiEpVsPt3050", "", 800, 600);
     canvasV2JpsiEpVsPt3050 -> SetTicks(1, 1);
 
     TH2D *histGridV2JpsiEpVsPt3050 = new TH2D("histGridV2JpsiEpVsPt3050", "", 100, -0.5, 15.5, 100, -0.07, 0.3);
     histGridV2JpsiEpVsPt3050 -> GetXaxis() -> SetTitle("#it{p}_{T} (GeV/#it{c})");
-    histGridV2JpsiEpVsPt3050 -> GetYaxis() -> SetTitle("#it{v}_{2} {EP, |#Delta#eta| > 1.7}");
+    histGridV2JpsiEpVsPt3050 -> GetYaxis() -> SetTitle("#it{v}_{2} {EP, |#Delta#it{#eta}| > 1.7}");
     histGridV2JpsiEpVsPt3050 -> Draw();
     lineZeroV2Pt -> Draw();
     graStatV2JpsiEpVsPt3050Run3 -> Draw("EP SAME");
@@ -364,13 +470,30 @@ void plot_results_all_centr_and_pt() {
     latexTitle -> DrawLatex(0.18, 0.80, "Pb#minusPb,#kern[0.3]{#sqrt{#it{s}_{NN}}} = 5.36 TeV, 30#minus50\%");
     latexTitle -> DrawLatex(0.18, 0.73, "J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 <#kern[0.7]{#it{y}} < 4");
 
+    // Large binning
+    TCanvas *canvasV2JpsiEpVsPt3050LargeBins = new TCanvas("canvasV2JpsiEpVsPt3050LargeBins", "", 800, 600);
+    canvasV2JpsiEpVsPt3050LargeBins -> SetTicks(1, 1);
+
+    TH2D *histGridV2JpsiEpVsPt3050LargeBins = new TH2D("histGridV2JpsiEpVsPt3050LargeBins", "", 100, -0.5, 15.5, 100, -0.07, 0.3);
+    histGridV2JpsiEpVsPt3050LargeBins -> GetXaxis() -> SetTitle("#it{p}_{T} (GeV/#it{c})");
+    histGridV2JpsiEpVsPt3050LargeBins -> GetYaxis() -> SetTitle("#it{v}_{2} {EP, |#Delta#it{#eta}| > 1.7}");
+    histGridV2JpsiEpVsPt3050LargeBins -> Draw();
+    lineZeroV2Pt -> Draw();
+    graStatV2JpsiEpVsPt3050Run3LargeBins -> Draw("EP SAME");
+    graSystV2JpsiEpVsPt3050Run3LargeBins -> Draw("E2 SAME");
+    legendV2JpsiVsPt3050 -> Draw();
+
+    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary");
+    latexTitle -> DrawLatex(0.18, 0.80, "Pb#minusPb,#kern[0.3]{#sqrt{#it{s}_{NN}}} = 5.36 TeV, 10#minus30\%");
+    latexTitle -> DrawLatex(0.18, 0.73, "J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 <#kern[0.7]{#it{y}} < 4");
+
     // SP
     TCanvas *canvasV2JpsiSpVsPt3050 = new TCanvas("canvasV2JpsiSpVsPt3050", "", 800, 600);
     canvasV2JpsiSpVsPt3050 -> SetTicks(1, 1);
 
     TH2D *histGridV2JpsiSpVsPt3050 = new TH2D("histGridV2JpsiSpVsPt3050", "", 100, -0.5, 15.5, 100, -0.07, 0.3);
     histGridV2JpsiSpVsPt3050 -> GetXaxis() -> SetTitle("#it{p}_{T} (GeV/#it{c})");
-    histGridV2JpsiSpVsPt3050 -> GetYaxis() -> SetTitle("#it{v}_{2} {SP, |#Delta#eta| > 1.7}");
+    histGridV2JpsiSpVsPt3050 -> GetYaxis() -> SetTitle("#it{v}_{2} {SP, |#Delta#it{#eta}| > 1.7}");
     histGridV2JpsiSpVsPt3050 -> Draw();
     lineZeroV2Pt -> Draw();
     graStatV2JpsiSpVsPt3050Run3 -> Draw("EP SAME");
@@ -387,7 +510,7 @@ void plot_results_all_centr_and_pt() {
 
     TH2D *histGridV2JpsiVsPt5080 = new TH2D("histGridV2JpsiVsPt5080", "", 100, -0.5, 15.5, 100, -0.07, 0.3);
     histGridV2JpsiVsPt5080 -> GetXaxis() -> SetTitle("#it{p}_{T} (GeV/#it{c})");
-    histGridV2JpsiVsPt5080 -> GetYaxis() -> SetTitle("#it{v}_{2} {EP, |#Delta#eta| > 1.7}");
+    histGridV2JpsiVsPt5080 -> GetYaxis() -> SetTitle("#it{v}_{2} {EP, |#Delta#it{#eta}| > 1.7}");
     histGridV2JpsiVsPt5080 -> Draw();
     lineZeroV2Pt -> Draw();
     graStatV2JpsiEpVsPt5080Run3 -> Draw("EP SAME");
@@ -413,7 +536,7 @@ void plot_results_all_centr_and_pt() {
 
     TH2D *histGridV2JpsiEpVsCentr05 = new TH2D("histGridV2JpsiEpVsCentr05", "", 100, -0.5, 90.5, 100, -0.05, 0.20);
     histGridV2JpsiEpVsCentr05 -> GetXaxis() -> SetTitle("Centrality (%)");
-    histGridV2JpsiEpVsCentr05 -> GetYaxis() -> SetTitle("#it{v}_{2} {EP, |#Delta#eta| > 1.7}");
+    histGridV2JpsiEpVsCentr05 -> GetYaxis() -> SetTitle("#it{v}_{2} {EP, |#Delta#it{#eta}| > 1.7}");
     histGridV2JpsiEpVsCentr05 -> Draw();
     lineZeroV2Centr -> Draw();
     graStatV2JpsiEpVsCentr05Run3 -> Draw("EP SAME");
@@ -434,7 +557,7 @@ void plot_results_all_centr_and_pt() {
 
     TH2D *histGridV2JpsiSpVsCentr05 = new TH2D("histGridV2JpsiSpVsCentr05", "", 100, -0.5, 90.5, 100, -0.05, 0.20);
     histGridV2JpsiSpVsCentr05 -> GetXaxis() -> SetTitle("Centrality (%)");
-    histGridV2JpsiSpVsCentr05 -> GetYaxis() -> SetTitle("#it{v}_{2} {SP, |#Delta#eta| > 1.7}");
+    histGridV2JpsiSpVsCentr05 -> GetYaxis() -> SetTitle("#it{v}_{2} {SP, |#Delta#it{#eta}| > 1.7}");
     histGridV2JpsiSpVsCentr05 -> Draw();
     lineZeroV2Centr -> Draw();
     graStatV2JpsiSpVsCentr05Run3 -> Draw("EP SAME");
@@ -450,7 +573,7 @@ void plot_results_all_centr_and_pt() {
 
     TH2D *histGridV2JpsiEpVsCentr515 = new TH2D("histGridV2JpsiEpVsCentr515", "", 100, -0.5, 90.5, 100, -0.05, 0.30);
     histGridV2JpsiEpVsCentr515 -> GetXaxis() -> SetTitle("Centrality (%)");
-    histGridV2JpsiEpVsCentr515 -> GetYaxis() -> SetTitle("#it{v}_{2} {EP, |#Delta#eta| > 1.7}");
+    histGridV2JpsiEpVsCentr515 -> GetYaxis() -> SetTitle("#it{v}_{2} {EP, |#Delta#it{#eta}| > 1.7}");
     histGridV2JpsiEpVsCentr515 -> Draw();
     lineZeroV2Centr -> Draw();
     graStatV2JpsiEpVsCentr515Run3 -> Draw("EP SAME");
@@ -471,7 +594,7 @@ void plot_results_all_centr_and_pt() {
 
     TH2D *histGridV2JpsiSpVsCentr520 = new TH2D("histGridV2JpsiSpVsCentr520", "", 100, -0.5, 90.5, 100, -0.05, 0.30);
     histGridV2JpsiSpVsCentr520 -> GetXaxis() -> SetTitle("Centrality (%)");
-    histGridV2JpsiSpVsCentr520 -> GetYaxis() -> SetTitle("#it{v}_{2} {SP, |#Delta#eta| > 1.7}");
+    histGridV2JpsiSpVsCentr520 -> GetYaxis() -> SetTitle("#it{v}_{2} {SP, |#Delta#it{#eta}| > 1.7}");
     histGridV2JpsiSpVsCentr520 -> Draw();
     lineZeroV2Centr -> Draw();
     graStatV2JpsiSpVsCentr520Run3 -> Draw("EP SAME");
@@ -605,7 +728,7 @@ void plot_results_all_centr_and_pt() {
 
     TH2D *histGridV2JpsiEpVsPtCollPlot = new TH2D("histGridV2JpsiEpVsPtCollPlot", "", 100, -0.5, 15.5, 100, -0.07, 0.3);
     histGridV2JpsiEpVsPtCollPlot -> GetXaxis() -> SetTitle("#it{p}_{T} (GeV/#it{c})");
-    histGridV2JpsiEpVsPtCollPlot -> GetYaxis() -> SetTitle("#it{v}_{2} {EP, |#Delta#eta| > 1.7}");
+    histGridV2JpsiEpVsPtCollPlot -> GetYaxis() -> SetTitle("#it{v}_{2} {EP, |#Delta#it{#eta}| > 1.7}");
     histGridV2JpsiEpVsPtCollPlot -> Draw();
 
     lineZeroV2Pt -> Draw();
@@ -633,7 +756,7 @@ void plot_results_all_centr_and_pt() {
 
     TH2D *histGridV2JpsiSpVsPtCollPlot = new TH2D("histGridV2JpsiSpVsPtCollPlot", "", 100, -0.5, 15.5, 100, -0.07, 0.3);
     histGridV2JpsiSpVsPtCollPlot -> GetXaxis() -> SetTitle("#it{p}_{T} (GeV/#it{c})");
-    histGridV2JpsiSpVsPtCollPlot -> GetYaxis() -> SetTitle("#it{v}_{2} {SP, |#Delta#eta| > 1.7}");
+    histGridV2JpsiSpVsPtCollPlot -> GetYaxis() -> SetTitle("#it{v}_{2} {SP, |#Delta#it{#eta}| > 1.7}");
     histGridV2JpsiSpVsPtCollPlot -> Draw();
 
     lineZeroV2Pt -> Draw();
@@ -654,6 +777,194 @@ void plot_results_all_centr_and_pt() {
 
     latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary, Pb#minusPb,#kern[0.3]{#sqrt{#it{s}_{NN}}} = 5.36 TeV");
     latexTitle -> DrawLatex(0.18, 0.80, "J/#psi#rightarrow#mu^{#plus}#mu^{#minus}, 2.5 <#kern[0.7]{#it{y}} < 4");
+
+    // Collection plot vs HF (1)
+    TCanvas *canvasV2Hf1VsPtCollPlot = new TCanvas("canvasV2Hf1VsPtCollPlot", "", 800, 600);
+    canvasV2Hf1VsPtCollPlot -> SetTicks(1, 1);
+
+    TH2D *histGridV2Hf1VsPtCollPlot = new TH2D("histGridV2Hf1VsPtCollPlot", "", 100, -0.5, 25.5, 100, -0.10, 0.40);
+    histGridV2Hf1VsPtCollPlot -> GetXaxis() -> SetTitle("#it{p}_{T} (GeV/#it{c})");
+    histGridV2Hf1VsPtCollPlot -> GetYaxis() -> SetTitle("#it{v}_{2}");
+    histGridV2Hf1VsPtCollPlot -> Draw();
+
+    lineZeroV2HighPt -> Draw();
+    graStatV2PromptD0VsPt3050Run3 -> Draw("EP SAME");
+    graSystV2PromptD0VsPt3050Run3 -> Draw("E2 SAME");
+    //graStatV2NonPromptD0VsPt3050Run3 -> Draw("EP SAME");
+    //graSystV2NonPromptD0VsPt3050Run3 -> Draw("E2 SAME");
+    graStatV2JpsiSpVsPt3050Run3CollPlotHf -> Draw("EP SAME");
+    graSystV2JpsiSpVsPt3050Run3CollPlotHf -> Draw("E2 SAME");
+    graStatV2Ups1sVsPt560Run3 -> Draw("EP SAME");
+    graSystV2Ups1sVsPt560Run3 -> Draw("E2 SAME");
+
+    TLegend *legendV2Hf1VsPtCollPlot = new TLegend(0.20, 0.67, 0.40, 0.90, " ", "brNDC");
+    SetLegend(legendV2Hf1VsPtCollPlot);
+    legendV2Hf1VsPtCollPlot -> AddEntry(graSystV2PromptD0VsPt3050Run3, "Prompt D^{0}, 30#minus50%, |#it{y}| < 0.8", "PF");
+    legendV2Hf1VsPtCollPlot -> AddEntry(graSystV2JpsiSpVsPt3050Run3CollPlotHf, "J/#psi, 30#minus50%, 2.5 <#kern[0.7]{#it{y}} < 4", "PF");
+    legendV2Hf1VsPtCollPlot -> AddEntry(graSystV2Ups1sVsPt560Run3, "#varUpsilon(1S), 5#minus60%, 2.5 <#kern[0.7]{#it{y}} < 4", "PF");
+    legendV2Hf1VsPtCollPlot -> Draw();
+
+    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary, Pb#minusPb,#kern[0.3]{#sqrt{#it{s}_{NN}}} = 5.36 TeV");
+
+
+    // Collection plot vs HF (2)
+    TCanvas *canvasV2Hf2VsPtCollPlot = new TCanvas("canvasV2Hf2VsPtCollPlot", "", 800, 600);
+    canvasV2Hf2VsPtCollPlot -> SetTicks(1, 1);
+
+    TH2D *histGridV2Hf2VsPtCollPlot = new TH2D("histGridV2Hf2VsPtCollPlot", "", 100, -0.5, 25.5, 100, -0.10, 0.40);
+    histGridV2Hf2VsPtCollPlot -> GetXaxis() -> SetTitle("#it{p}_{T} (GeV/#it{c})");
+    histGridV2Hf2VsPtCollPlot -> GetYaxis() -> SetTitle("#it{v}_{2}");
+    histGridV2Hf2VsPtCollPlot -> Draw();
+
+    lineZeroV2HighPt -> Draw();
+    graStatV2PromptD0VsPt3050Run3 -> Draw("EP SAME");
+    graSystV2PromptD0VsPt3050Run3 -> Draw("E2 SAME");
+    graStatV2NonPromptD0VsPt3050Run3 -> Draw("EP SAME");
+    graSystV2NonPromptD0VsPt3050Run3 -> Draw("E2 SAME");
+    graStatV2JpsiSpVsPt3050Run3CollPlotHf -> Draw("EP SAME");
+    graSystV2JpsiSpVsPt3050Run3CollPlotHf -> Draw("E2 SAME");
+
+    TLegend *legendV2Hf2VsPtCollPlot = new TLegend(0.20, 0.67, 0.40, 0.90, " ", "brNDC");
+    SetLegend(legendV2Hf2VsPtCollPlot);
+    legendV2Hf2VsPtCollPlot -> AddEntry(graSystV2PromptD0VsPt3050Run3, "Prompt D^{0}, 30#minus50%, |#it{y}| < 0.8", "PF");
+    legendV2Hf2VsPtCollPlot -> AddEntry(graSystV2NonPromptD0VsPt3050Run3, "Non-Prompt D^{0}, 30#minus50%, |#it{y}| < 0.8", "PF");
+    legendV2Hf2VsPtCollPlot -> AddEntry(graSystV2JpsiSpVsPt3050Run3CollPlotHf, "J/#psi, 30#minus50%, 2.5 <#kern[0.7]{#it{y}} < 4", "PF");
+    legendV2Hf2VsPtCollPlot -> Draw();
+
+    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary, Pb#minusPb,#kern[0.3]{#sqrt{#it{s}_{NN}}} = 5.36 TeV");
+
+
+    // Collection plot vs HF (3)
+    TCanvas *canvasV2Hf3VsPtCollPlot = new TCanvas("canvasV2Hf3VsPtCollPlot", "", 800, 600);
+    canvasV2Hf3VsPtCollPlot -> SetTicks(1, 1);
+
+    TH2D *histGridV2Hf3VsPtCollPlot = new TH2D("histGridV2Hf3VsPtCollPlot", "", 100, -0.5, 25.5, 100, -0.10, 0.40);
+    histGridV2Hf3VsPtCollPlot -> GetXaxis() -> SetTitle("#it{p}_{T} (GeV/#it{c})");
+    histGridV2Hf3VsPtCollPlot -> GetYaxis() -> SetTitle("#it{v}_{2}");
+    histGridV2Hf3VsPtCollPlot -> Draw();
+
+    lineZeroV2HighPt -> Draw();
+    graStatV2PromptD0VsPt3050Run3 -> Draw("EP SAME");
+    graSystV2PromptD0VsPt3050Run3 -> Draw("E2 SAME");
+    graStatV2NonPromptD0VsPt3050Run3 -> Draw("EP SAME");
+    graSystV2NonPromptD0VsPt3050Run3 -> Draw("E2 SAME");
+    graStatV2JpsiSpVsPt3050Run3CollPlotHf -> Draw("EP SAME");
+    graSystV2JpsiSpVsPt3050Run3CollPlotHf -> Draw("E2 SAME");
+    graStatV2Ups1sVsPt560Run3 -> Draw("EP SAME");
+    graSystV2Ups1sVsPt560Run3 -> Draw("E2 SAME");
+
+    TLegend *legend1V2Hf3VsPtCollPlot = new TLegend(0.20, 0.63, 0.40, 0.86, " ", "brNDC");
+    SetLegend(legend1V2Hf3VsPtCollPlot);
+    legend1V2Hf3VsPtCollPlot->SetTextSize(0.045);
+    legend1V2Hf3VsPtCollPlot -> AddEntry(graSystV2JpsiSpVsPt3050Run3CollPlotHf, "J/#psi, 30#minus50%", "FP");
+    legend1V2Hf3VsPtCollPlot -> AddEntry(graStatV2Ups1sVsPt560Run3, "#varUpsilon(1S), 5#minus60%", "FP");
+    legend1V2Hf3VsPtCollPlot -> Draw();
+
+    TLegend *legend2V2Hf3VsPtCollPlot = new TLegend(0.55, 0.63, 0.75, 0.86, " ", "brNDC");
+    SetLegend(legend2V2Hf3VsPtCollPlot);
+    legend2V2Hf3VsPtCollPlot->SetTextSize(0.045);
+    legend2V2Hf3VsPtCollPlot -> AddEntry(graSystV2PromptD0VsPt3050Run3, "Prompt D^{0}, 30#minus50%", "FP");
+    legend2V2Hf3VsPtCollPlot -> AddEntry(graSystV2NonPromptD0VsPt3050Run3, "Non-Prompt D^{0}, 30#minus50%", "FP");
+    legend2V2Hf3VsPtCollPlot -> Draw();
+
+    TLatex *latexTitle2 = new TLatex();
+    latexTitle2 -> SetTextSize(0.045);
+    latexTitle2 -> SetNDC();
+    latexTitle2 -> SetTextFont(42);
+    latexTitle2 -> DrawLatex(0.20, 0.80, "2.5 <#kern[0.7]{#it{y}} < 4, |#Delta#it{#eta}| > 1.7");
+    latexTitle2 -> DrawLatex(0.55, 0.80, "|#it{y}| < 0.8, |#Delta#it{#eta}| > 1.3");
+
+    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary, Pb#minusPb,#kern[0.3]{#sqrt{#it{s}_{NN}}} = 5.36 TeV");
+
+    // Collection plot vs HF (4)
+    TCanvas *canvasV2Hf4VsPtCollPlot = new TCanvas("canvasV2Hf4VsPtCollPlot", "", 800, 600);
+    canvasV2Hf4VsPtCollPlot -> SetTicks(1, 1);
+
+    TH2D *histGridV2Hf4VsPtCollPlot = new TH2D("histGridV2Hf4VsPtCollPlot", "", 100, -0.5, 25.5, 100, -0.10, 0.30);
+    histGridV2Hf4VsPtCollPlot -> GetXaxis() -> SetTitle("#it{p}_{T} (GeV/#it{c})");
+    histGridV2Hf4VsPtCollPlot -> GetYaxis() -> SetTitle("#it{v}_{2}");
+    histGridV2Hf4VsPtCollPlot -> Draw();
+
+    lineZeroV2HighPt -> Draw();
+    graStatV2NonPromptD0VsPt3050Run3 -> Draw("EP SAME");
+    graSystV2NonPromptD0VsPt3050Run3 -> Draw("E2 SAME");
+    graStatV2Ups1sVsPt560Run3 -> Draw("EP SAME");
+    graSystV2Ups1sVsPt560Run3 -> Draw("E2 SAME");
+
+    TLegend *legend1V2Hf4VsPtCollPlot = new TLegend(0.20, 0.70, 0.40, 0.82, " ", "brNDC");
+    SetLegend(legend1V2Hf4VsPtCollPlot);
+    legend1V2Hf4VsPtCollPlot->SetTextSize(0.045);
+    legend1V2Hf4VsPtCollPlot -> AddEntry(graStatV2Ups1sVsPt560Run3, "#varUpsilon(1S), 5#minus60%", "FP");
+    legend1V2Hf4VsPtCollPlot -> Draw();
+
+    TLegend *legend2V2Hf4VsPtCollPlot = new TLegend(0.55, 0.70, 0.75, 0.82, " ", "brNDC");
+    SetLegend(legend2V2Hf4VsPtCollPlot);
+    legend2V2Hf4VsPtCollPlot->SetTextSize(0.045);
+    legend2V2Hf4VsPtCollPlot -> AddEntry(graSystV2NonPromptD0VsPt3050Run3, "Non-Prompt D^{0}, 30#minus50%", "FP");
+    legend2V2Hf4VsPtCollPlot -> Draw();
+
+    latexTitle2 -> DrawLatex(0.20, 0.80, "2.5 <#kern[0.7]{#it{y}} < 4, |#Delta#it{#eta}| > 1.7");
+    latexTitle2 -> DrawLatex(0.55, 0.80, "|#it{y}| < 0.8, |#Delta#it{#eta}| > 1.3");
+    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary, Pb#minusPb,#kern[0.3]{#sqrt{#it{s}_{NN}}} = 5.36 TeV");
+
+
+
+    // Collection plot vs HF (5)
+    TCanvas *canvasV2Hf5VsPtCollPlot = new TCanvas("canvasV2Hf5VsPtCollPlot", "", 800, 600);
+    canvasV2Hf5VsPtCollPlot -> SetTicks(1, 1);
+
+    TH2D *histGridV2Hf5VsPtCollPlot = new TH2D("histGridV2Hf5VsPtCollPlot", "", 100, -0.5, 25.5, 100, -0.10, 0.40);
+    histGridV2Hf5VsPtCollPlot -> GetXaxis() -> SetTitle("#it{p}_{T} (GeV/#it{c})");
+    histGridV2Hf5VsPtCollPlot -> GetYaxis() -> SetTitle("#it{v}_{2}");
+    histGridV2Hf5VsPtCollPlot -> Draw();
+
+    lineZeroV2HighPt -> Draw();
+    graSystV2PromptD0VsPt3050Run3 -> Draw("EP SAME");
+    graStatV2PromptD0VsPt3050Run3 -> Draw("E2 SAME");
+    graStatV2JpsiSpVsPt3050Run3CollPlotHf -> Draw("EP SAME");
+    graSystV2JpsiSpVsPt3050Run3CollPlotHf -> Draw("E2 SAME");
+
+    TLegend *legend1V2Hf5VsPtCollPlot = new TLegend(0.20, 0.70, 0.40, 0.82, " ", "brNDC");
+    SetLegend(legend1V2Hf5VsPtCollPlot);
+    legend1V2Hf5VsPtCollPlot->SetTextSize(0.045);
+    legend1V2Hf5VsPtCollPlot -> AddEntry(graSystV2JpsiSpVsPt3050Run3CollPlotHf, "J/#psi, 30#minus50%", "FP");
+    legend1V2Hf5VsPtCollPlot -> Draw();
+
+    TLegend *legend2V2Hf5VsPtCollPlot = new TLegend(0.55, 0.70, 0.75, 0.82, " ", "brNDC");
+    SetLegend(legend2V2Hf5VsPtCollPlot);
+    legend2V2Hf5VsPtCollPlot->SetTextSize(0.045);
+    legend2V2Hf5VsPtCollPlot -> AddEntry(graSystV2PromptD0VsPt3050Run3, "Prompt D^{0}, 30#minus50%", "FP");
+    legend2V2Hf5VsPtCollPlot -> Draw();
+
+    latexTitle2 -> DrawLatex(0.20, 0.80, "2.5 <#kern[0.7]{#it{y}} < 4, |#Delta#it{#eta}| > 1.7");
+    latexTitle2 -> DrawLatex(0.55, 0.80, "|#it{y}| < 0.8, |#Delta#it{#eta}| > 1.3");
+    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary, Pb#minusPb,#kern[0.3]{#sqrt{#it{s}_{NN}}} = 5.36 TeV");
+
+
+    // Collection plot vs HF (6)
+    TCanvas *canvasV2Hf6VsPtCollPlot = new TCanvas("canvasV2Hf6VsPtCollPlot", "", 800, 600);
+    canvasV2Hf6VsPtCollPlot -> SetTicks(1, 1);
+
+    TH2D *histGridV2Hf6VsPtCollPlot = new TH2D("histGridV2Hf6VsPtCollPlot", "", 100, -0.5, 15.5, 100, -0.10, 0.30);
+    histGridV2Hf6VsPtCollPlot -> GetXaxis() -> SetTitle("#it{p}_{T} (GeV/#it{c})");
+    histGridV2Hf6VsPtCollPlot -> GetYaxis() -> SetTitle("#it{v}_{2}");
+    histGridV2Hf6VsPtCollPlot -> Draw();
+
+    lineZeroV2Pt -> Draw();
+    graStatV2JpsiSpVsPt3050Run3CollPlotHf -> Draw("EP SAME");
+    graSystV2JpsiSpVsPt3050Run3CollPlotHf -> Draw("E2 SAME");
+    graStatV2Ups1sVsPt560Run3 -> Draw("EP SAME");
+    graSystV2Ups1sVsPt560Run3 -> Draw("E2 SAME");
+
+    TLegend *legendV2Hf6VsPtCollPlot = new TLegend(0.20, 0.70, 0.85, 0.85, " ", "brNDC");
+    SetLegend(legendV2Hf6VsPtCollPlot);
+    legendV2Hf6VsPtCollPlot -> SetNColumns(2);
+    legendV2Hf6VsPtCollPlot -> AddEntry(graSystV2JpsiSpVsPt3050Run3CollPlotHf, "J/#psi, 30#minus50%", "PF");
+    legendV2Hf6VsPtCollPlot -> AddEntry(graSystV2Ups1sVsPt560Run3, "#varUpsilon(1S), 5#minus60%", "PF"); 
+    legendV2Hf6VsPtCollPlot -> Draw();
+
+    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary, Pb#minusPb,#kern[0.3]{#sqrt{#it{s}_{NN}}} = 5.36 TeV");
+    latexTitle -> DrawLatex(0.18, 0.80, "J/#psi,#varUpsilon(1S)#rightarrow#mu^{+}#mu^{-}, 2.5 <#kern[0.7]{#it{y}} < 4");
 
     //******************************************************************************************//
     // J/psi v2 vs centrality vs Run 2
@@ -737,7 +1048,7 @@ void plot_results_all_centr_and_pt() {
 
     TH2D *histGridV2JpsiVsCentr515Run2VsRun3 = new TH2D("histGridV2JpsiVsCentr515Run2VsRun3", "", 100, -0.5, 90.5, 100, -0.07, 0.3);
     histGridV2JpsiVsCentr515Run2VsRun3 -> GetXaxis() -> SetTitle("Centrality (%)");
-    histGridV2JpsiVsCentr515Run2VsRun3 -> GetYaxis() -> SetTitle("#it{v}_{2} {EP, |#Delta#eta| > 1.7}");
+    histGridV2JpsiVsCentr515Run2VsRun3 -> GetYaxis() -> SetTitle("#it{v}_{2} {EP, |#Delta#it{#eta}| > 1.7}");
     histGridV2JpsiVsCentr515Run2VsRun3 -> Draw();
     lineZeroV2Centr -> Draw();
     graStatV2JpsiVsCentr515Run2 -> Draw("EP SAME");
@@ -750,9 +1061,66 @@ void plot_results_all_centr_and_pt() {
     latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary, Pb#minusPb");
     latexTitle -> DrawLatex(0.18, 0.80, "J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 <#kern[0.7]{#it{y}} < 4, 5 < #it{p}_{T} < 15 GeV/#it{c}");
 
+    //******************************************************************************************//
+    // J/psi v2 vs centrality collection plot
+    //******************************************************************************************//
     // EP
+    TCanvas *canvasV2JpsiEpVsCentrCollPlot = new TCanvas("canvasV2JpsiEpVsCentrCollPlot", "", 800, 600);
+    canvasV2JpsiEpVsCentrCollPlot -> SetTicks(1, 1);
+
+    TH2D *histGridV2JpsiEpVsCentrCollPlot = new TH2D("histGridV2JpsiEpVsCentrCollPlot", "", 100, -0.5, 90.5, 100, -0.07, 0.3);
+    histGridV2JpsiEpVsCentrCollPlot -> GetXaxis() -> SetTitle("Centrality (%)");
+    histGridV2JpsiEpVsCentrCollPlot -> GetYaxis() -> SetTitle("#it{v}_{2} {EP, |#Delta#it{#eta}| > 1.7}");
+    histGridV2JpsiEpVsCentrCollPlot -> Draw();
+
+    lineZeroV2Centr -> Draw();
+    graStatV2JpsiEpVsCentr05Run3CollPlot -> Draw("EP SAME");
+    graSystV2JpsiEpVsCentr05Run3CollPlot -> Draw("E2 SAME");
+    graStatV2JpsiEpVsCentr515Run3CollPlot -> Draw("EP SAME");
+    graSystV2JpsiEpVsCentr515Run3CollPlot -> Draw("E2 SAME");
+
+    TLegend *legendV2JpsiEpVsCentrColl = new TLegend(0.20, 0.70, 0.85, 0.85, " ", "brNDC");
+    SetLegend(legendV2JpsiEpVsCentrColl);
+    legendV2JpsiEpVsCentrColl -> SetNColumns(3);
+    legendV2JpsiEpVsCentrColl -> AddEntry(graSystV2JpsiEpVsCentr05Run3CollPlot, "#it{p}_{T} < 5 GeV/#it{c}", "PF");
+    legendV2JpsiEpVsCentrColl -> AddEntry(graSystV2JpsiEpVsCentr515Run3CollPlot, "5 < #it{p}_{T} < 15 GeV/#it{c}", "PF");
+    legendV2JpsiEpVsCentrColl -> Draw();
+
+    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary, Pb#minusPb,#kern[0.3]{#sqrt{#it{s}_{NN}}} = 5.36 TeV");
+    latexTitle -> DrawLatex(0.18, 0.80, "J/#psi#rightarrow#mu^{#plus}#mu^{#minus}, 2.5 <#kern[0.7]{#it{y}} < 4");
+
+    // SP
+    TCanvas *canvasV2JpsiSpVsCentrCollPlot = new TCanvas("canvasV2JpsiSpVsCentrCollPlot", "", 800, 600);
+    canvasV2JpsiSpVsCentrCollPlot -> SetTicks(1, 1);
+
+    TH2D *histGridV2JpsiSpVsCentrCollPlot = new TH2D("histGridV2JpsiSpVsCentrCollPlot", "", 100, -0.5, 90.5, 100, -0.07, 0.3);
+    histGridV2JpsiSpVsCentrCollPlot -> GetXaxis() -> SetTitle("Centrality (%)");
+    histGridV2JpsiSpVsCentrCollPlot -> GetYaxis() -> SetTitle("#it{v}_{2} {SP, |#Delta#it{#eta}| > 1.7}");
+    histGridV2JpsiSpVsCentrCollPlot -> Draw();
+
+    lineZeroV2Centr -> Draw();
+    graStatV2JpsiSpVsCentr05Run3CollPlot -> Draw("EP SAME");
+    graSystV2JpsiSpVsCentr05Run3CollPlot -> Draw("E2 SAME");
+    graStatV2JpsiSpVsCentr520Run3CollPlot -> Draw("EP SAME");
+    graSystV2JpsiSpVsCentr520Run3CollPlot -> Draw("E2 SAME");
+
+    TLegend *legendV2JpsiSpVsCentrColl = new TLegend(0.20, 0.70, 0.85, 0.85, " ", "brNDC");
+    SetLegend(legendV2JpsiSpVsCentrColl);
+    legendV2JpsiSpVsCentrColl -> SetNColumns(3);
+    legendV2JpsiSpVsCentrColl -> AddEntry(graSystV2JpsiSpVsCentr05Run3CollPlot, "#it{p}_{T} < 5 GeV/#it{c}", "PF");
+    legendV2JpsiSpVsCentrColl -> AddEntry(graSystV2JpsiSpVsCentr520Run3CollPlot, "5 < #it{p}_{T} < 20 GeV/#it{c}", "PF");
+    legendV2JpsiSpVsCentrColl -> Draw();
+
+    latexTitle -> DrawLatex(0.18, 0.87, "ALICE Preliminary, Pb#minusPb,#kern[0.3]{#sqrt{#it{s}_{NN}}} = 5.36 TeV");
+    latexTitle -> DrawLatex(0.18, 0.80, "J/#psi#rightarrow#mu^{#plus}#mu^{#minus}, 2.5 <#kern[0.7]{#it{y}} < 4");
+
+    //******************************************************************************************//
+    // Save results
+    //******************************************************************************************//
     canvasV2JpsiEpVsPt1030 -> SaveAs("QM2025_preliminary/v2JpsiEpVsPt1030.pdf");
+    canvasV2JpsiEpVsPt1030LargeBins -> SaveAs("QM2025_preliminary/v2JpsiEpVsPt1030LargeBins.pdf");
     canvasV2JpsiEpVsPt3050 -> SaveAs("QM2025_preliminary/v2JpsiEpVsPt3050.pdf");
+    canvasV2JpsiEpVsPt3050LargeBins -> SaveAs("QM2025_preliminary/v2JpsiEpVsPt3050LargeBins.pdf");
     canvasV2JpsiEpVsPt5080 -> SaveAs("QM2025_preliminary/v2JpsiEpVsPt5080.pdf");
     canvasV2JpsiEpVsPt1030Run2VsRun3 -> SaveAs("QM2025_preliminary/v2JpsiEpVsPt1030Run2VsRun3.pdf");
     canvasV2JpsiEpVsPt3050Run2VsRun3 -> SaveAs("QM2025_preliminary/v2JpsiEpVsPt3050Run2VsRun3.pdf");
@@ -762,6 +1130,7 @@ void plot_results_all_centr_and_pt() {
     canvasV2JpsiEpVsCentr515 -> SaveAs("QM2025_preliminary/v2JpsiEpVsCentr515.pdf");
     canvasV2JpsiEpVsCentr05Run2VsRun3 -> SaveAs("QM2025_preliminary/v2JpsiEpVsCentr05Run2VsRun3.pdf");
     canvasV2JpsiEpVsCentr515Run2VsRun3 -> SaveAs("QM2025_preliminary/v2JpsiEpVsCentr515Run2VsRun3.pdf");
+    canvasV2JpsiEpVsCentrCollPlot -> SaveAs("QM2025_preliminary/v2JpsiEpVsCentrCollPlot.pdf");
 
     // SP
     canvasV2JpsiSpVsPt010 -> SaveAs("QM2025_preliminary/v2JpsiSpVsPt010.pdf");
@@ -771,11 +1140,18 @@ void plot_results_all_centr_and_pt() {
     canvasV2JpsiSpVsPt1030Run2VsRun3 -> SaveAs("QM2025_preliminary/v2JpsiSpVsPt1030Run2VsRun3.pdf");
     canvasV2JpsiSpVsPt3050Run2VsRun3 -> SaveAs("QM2025_preliminary/v2JpsiSpVsPt3050Run2VsRun3.pdf");
     canvasV2JpsiSpVsPtCollPlot -> SaveAs("QM2025_preliminary/v2JpsiSpVsPtCollPlot.pdf");
+    canvasV2Hf1VsPtCollPlot -> SaveAs("QM2025_preliminary/v2Hf1VsPtCollPlot.pdf");
+    canvasV2Hf2VsPtCollPlot -> SaveAs("QM2025_preliminary/v2Hf2VsPtCollPlot.pdf");
+    canvasV2Hf3VsPtCollPlot -> SaveAs("QM2025_preliminary/v2Hf3VsPtCollPlot.pdf");
+    canvasV2Hf4VsPtCollPlot -> SaveAs("QM2025_preliminary/v2Hf4VsPtCollPlot.pdf");
+    canvasV2Hf5VsPtCollPlot -> SaveAs("QM2025_preliminary/v2Hf5VsPtCollPlot.pdf");*/
+    canvasV2Hf6VsPtCollPlot -> SaveAs("QM2025_preliminary/v2Hf6VsPtCollPlot.pdf");
 
-    canvasV2JpsiSpVsCentr05 -> SaveAs("QM2025_preliminary/v2JpsiSpVsCentr05.pdf");
+    /*canvasV2JpsiSpVsCentr05 -> SaveAs("QM2025_preliminary/v2JpsiSpVsCentr05.pdf");
     canvasV2JpsiSpVsCentr520 -> SaveAs("QM2025_preliminary/v2JpsiSpVsCentr520.pdf");
     canvasV2JpsiSpVsCentr05Run2VsRun3 -> SaveAs("QM2025_preliminary/v2JpsiSpVsCentr05Run2VsRun3.pdf");
     canvasV2JpsiSpVsCentr520Run2VsRun3 -> SaveAs("QM2025_preliminary/v2JpsiSpVsCentr520Run2VsRun3.pdf");
+    canvasV2JpsiSpVsCentrCollPlot -> SaveAs("QM2025_preliminary/v2JpsiSpVsCentrCollPlot.pdf");
 }
 ////////////////////////////////////////////////////////////////////////////////
 void LoadStyle(){
@@ -807,7 +1183,7 @@ void LoadStyle(){
     gStyle -> SetTitleOffset(0.9,"x");
     gStyle -> SetTitleOffset(1.02,"y");
     gStyle -> SetTitleSize(0.05,"xyz");
-    gStyle -> SetMarkerSize(1.3);
+    gStyle -> SetMarkerSize(1);
     gStyle -> SetOptStat(0);
     gStyle -> SetEndErrorSize(0);
     gStyle -> SetCanvasPreferGL(kTRUE);
