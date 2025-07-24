@@ -47,6 +47,7 @@ namespace fs = std::filesystem;
 #include "FlowAnalysis_Helper.h"
 #include "/home/dhananjaya/alice/O2/Framework/Logger/include/Framework/Logger.h"
 
+
 // Predefined binnings
 vector<double> Bin_pt_mass_3 = {0, 3, 5, 15};
 vector<double> Bin_pt_mass_3_bis = {1, 3, 5, 15};
@@ -79,7 +80,7 @@ vector<double> Bin_PoolEM = {0.,  5.,  10., 20., 30., 40.,
 
 void SetLegend(TLegend *);
 
-void Flow_EP_withEM(int flag_binning, int flag_sig, int flag_bkg, int flag_v2, int flag_run2,
+void Event_Plane_withEM(int flag_binning, int flag_sig, int flag_bkg, int flag_v2, int flag_run2,
     int flag_run2yield, std::string FileName = "AnalysisResults.root",
     double mass_min = 2.3, double mass_max = 4.3, double cent_min = 10.,
     double cent_max = 50., double chi2max_mass = 2., double chi2max_v2 = 2.,
@@ -174,8 +175,8 @@ void Flow_EP_withEM(int flag_binning, int flag_sig, int flag_bkg, int flag_v2, i
   string sig_enum[5] = {"CB2(data)", "CB2(MC)", "NA60", "Chebychev",
                         "EventMixing"};
   string bkg_v2_enum[2] = {"EventMixing(beta fix)", "EventMixing(beta free)"};
-  int sig_mass[3] = {0, 1, 2}; // CB2(MC,data) NA60
-  int bkg_mass[2] = {3, 4};    // Chebychev Event-Mixing
+  int sig_mass[3] = {0, 1, 2}; // CB2(data,MC),NA60
+  int bkg_mass[2] = {3, 4};    // Chebychev, Event-Mixing
   int bkg_v2[2] = {0, 1};      // Event-Mixing, beta fix or free
   int nb_trials = int(size(sig_mass)) * int(size(bkg_mass)) *
                   int(size(bkg_v2)) * int(size(mass_min_sys));
@@ -256,77 +257,8 @@ void Flow_EP_withEM(int flag_binning, int flag_sig, int flag_bkg, int flag_v2, i
   }
 
    // Create histogram for pt-differential v2
-  double *x_yield = new double[int(Bin_pt_mass.size()) - 1];
-  double *y_yield = new double[int(Bin_pt_mass.size()) - 1];
-  double *ex_yield = new double[int(Bin_pt_mass.size()) - 1];
-  double *ey_yield = new double[int(Bin_pt_mass.size()) - 1];
-  double *eysys_yield = new double[int(Bin_pt_mass.size()) - 1];
   double *SNR = new double[int(Bin_pt_mass.size()) - 1];
-  double *x_v2pt = new double[int(Bin_pt_mass.size()) - 1];
-  double *y_v2pt = new double[int(Bin_pt_mass.size()) - 1];
-  double *ex_v2pt = new double[int(Bin_pt_mass.size()) - 1];
-  double *ey_v2pt = new double[int(Bin_pt_mass.size()) - 1];
-  double *eysys_v2pt = new double[int(Bin_pt_mass.size()) - 1];
-
-   // Load Run2 data for comparaison
-  double *x_run2, *y_run2, *ex_run2, *ey_run2, *eysys_run2;
-  helper->LoadDataRun2(x_run2, y_run2, ex_run2, ey_run2, eysys_run2, flag_run2);
-
-  double *x_yield_run2, *ex_yield_run2, *y_yield_run2, *ey_yield_run2,
-      *eysys_yield_run2, *SNR_run2;
-  int nbins_run2yield = 15;
-  helper->LoadDataYieldRun2(x_yield_run2, y_yield_run2, ex_yield_run2,
-                            ey_yield_run2, eysys_yield_run2, SNR_run2,
-                            flag_run2yield);
-
-  // Initialize arrays for each trial of systematic study
-  const int nbCombo_v2 = int(size(sig_mass)) * int(size(bkg_mass)) *
-                         int(size(bkg_v2)) * int(size(mass_max_sys));
-  const int nbCombo_yield =
-      int(size(sig_mass)) * int(size(bkg_mass)) * int(size(mass_max_sys));
-
-  vector<double *> x_sys_pt, ex_sys_pt, y_sys_yield, ey_sys_yield, y_sys_v2,
-      ey_sys_v2, chi2_yield, chi2_v2, chi2_meanPt;
-  double *bins_sys_v2 = new double[nbCombo_v2 + 1];
-  double *bins_sys_yield = new double[nbCombo_yield + 1];
-  for (int i = 0; i < nbCombo_v2 + 1; i++) {
-    bins_sys_v2[i] = i;
-  }
-  for (int i = 0; i < nbCombo_yield + 1; i++) {
-    bins_sys_yield[i] = i;
-  }
-
-  vector<TH1D *> hist_sys_yield, hist_sys_v2, hist_sys_meanPt;
-  for (int i = 0; i < int(Bin_pt_mass.size()) - 1; i++) {
-    y_sys_yield.emplace_back(new double[nbCombo_yield]);
-    ey_sys_yield.emplace_back(new double[nbCombo_yield]);
-
-    y_sys_v2.emplace_back(new double[nbCombo_v2]);
-    ey_sys_v2.emplace_back(new double[nbCombo_v2]);
-
-    chi2_yield.emplace_back(new double[nbCombo_yield]);
-    chi2_v2.emplace_back(new double[nbCombo_v2]);
-
-    hist_sys_yield.emplace_back(new TH1D(
-        Form("hist_sys_yield_%g_%g", Bin_pt_mass[i], Bin_pt_mass[i + 1]),
-        Form("hist_sys_yield_%g_%g", Bin_pt_mass[i], Bin_pt_mass[i + 1]),
-        nbCombo_yield, bins_sys_yield));
-    hist_sys_v2.emplace_back(
-        new TH1D(Form("hist_sys_v2_%g_%g", Bin_pt_mass[i], Bin_pt_mass[i + 1]),
-                 Form("hist_sys_v2_%g_%g", Bin_pt_mass[i], Bin_pt_mass[i + 1]),
-                 nbCombo_v2, bins_sys_v2));
-
-    if (meanPt) {
-      x_sys_pt.emplace_back(new double[nbCombo_yield]);
-      ex_sys_pt.emplace_back(new double[nbCombo_yield]);
-      chi2_meanPt.emplace_back(new double[nbCombo_yield]);
-      hist_sys_meanPt.emplace_back(new TH1D(
-          Form("hist_sys_meanPt_%g_%g", Bin_pt_mass[i], Bin_pt_mass[i + 1]),
-          Form("hist_sys_meanPt_%g_%g", Bin_pt_mass[i], Bin_pt_mass[i + 1]),
-          nbCombo_yield, bins_sys_yield));
-    }
-  }
-
+  
   for (int i = 0; i < int(Bin_pt_mass.size()) - 1; i++) {
 
     // Normalisation for mixed-event spectra
