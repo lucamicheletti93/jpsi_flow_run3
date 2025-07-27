@@ -103,7 +103,7 @@ void SetLegend(TLegend *);
 using namespace std;
 
 
-void Event_Plane_withEM_sys()
+void Flow_EP_withEM_sys()
 {
     
     load_Library();
