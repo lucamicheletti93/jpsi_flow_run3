@@ -339,37 +339,7 @@ switch (flag_binning) {
     default:
         Bin_pt_mass = Bin_pt_mass_bins[0]; // Default case
 }
-
-  // Define the pool for systematics:
-  // combinations
-  double mass_min_sys[3] = {2.2, 2.3, 2.4};
-  double mass_max_sys[3] = {4.2, 4.3, 4.4};
-  string sig_enum[5] = {"CB2(data)", "CB2(MC)", "NA60", "Chebychev",
-                        "EventMixing"};
-  string bkg_v2_enum[2] = {"EventMixing(beta fix)", "EventMixing(beta free)"};
-  int sig_mass[3] = {0, 1, 2}; // CB2(data,MC),NA60
-  int bkg_mass[2] = {3, 4};    // Chebychev, Event-Mixing
-  int bkg_v2[2] = {0, 1};      // Event-Mixing, beta fix or free
-  int nb_trials = int(size(sig_mass)) * int(size(bkg_mass)) *
-                  int(size(bkg_v2)) * int(size(mass_min_sys));
-          
-  /*                
-  // Create output file
-  TFile *f = new TFile(
-      sys ? Form("FlowAnalysisResults_%s_"
-                 "EventMixing%d_%s_%g_%"
-                 "g_%dBinPt_%s_withSys.root",
-                 inputFlag.c_str(), nb_trials, muonCut.c_str(), cent_min,
-                 cent_max, int(Bin_pt_mass.size()) - 1,
-                 meanPt ? "MeanPt" : "NoMeanPt")
-          : Form("FlowAnalysisResults_%s_"
-                 "EventMixing_%s_%g_%"
-                 "g_%dBinPt_%s.root",
-                 inputFlag.c_str(), muonCut.c_str(), cent_min, cent_max,
-                 int(Bin_pt_mass.size()) - 1, meanPt ? "MeanPt" : "NoMeanPt"),
-      "RECREATE");
-   */
-
+        
 ///////////////////////////////////////////////////
   ///                                             ///
   ///   Analysis for Differential Flow of J/Psi   ///
