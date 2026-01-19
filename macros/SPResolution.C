@@ -1,0 +1,204 @@
+#include "TAxis.h"
+#include "TGraphAsymmErrors.h"
+#include "TGraphErrors.h"
+#include <TCanvas.h>
+#include <TChain.h>
+#include <TClass.h>
+#include <TCollection.h>
+#include <TDatabasePDG.h>
+#include <TF1.h>
+#include <TFile.h>
+#include <TGraph.h>
+#include <TGraphErrors.h>
+#include <TGraphMultiErrors.h>
+#include <TH1F.h>
+#include <TH2F.h>
+#include <THStack.h>
+#include <THashList.h>
+#include <THnSparse.h>
+#include <TKey.h>
+#include <TLegend.h>
+#include <TLine.h>
+#include <TList.h>
+#include <TMatrixD.h>
+#include <TMultiGraph.h>
+#include <TPad.h>
+#include <TParameter.h>
+#include <TProfile.h>
+#include <TProfile2D.h>
+#include <TProfile3D.h>
+#include <TROOT.h>
+#include <TString.h>
+#include <TStyle.h>
+#include <TSystem.h>
+#include <TTree.h>
+#include <TTreeReader.h>
+#include <TTreeReaderValue.h>
+#include <cmath>
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <vector>
+
+#include "FlowAnalysis_Helper.h"
+//#include "Framework/Logger.h"
+
+using namespace std;
+vector<double> GetMeanError(int size, double *sample);
+
+void SPResolution(
+    string Label, string FileName = "input_AnalysisResults2.txt") 
+{
+
+   gSystem->CompileMacro("FlowAnalysis_Helper.cxx");
+   gSystem->Load("FlowAnalysis_Helper_cxx.so");    
+
+  FlowAnalysis_Helper helper;
+  fstream InputFiles;
+  vector<vector<double>> stats;
+  THStack *hs_stack = new THStack("Run_by_Run_ResolutionFactors", "");
+  InputFiles.open(FileName, ios::in);
+  TList *ls = new TList();
+  TList *ls_run_sp = new TList();
+  TList *ls_run_ep = new TList();
+  int Nrow = 0;
+  int Ncol = 0;
+  int NBins_cent = 0;
+  int NBins_cent_profile = 0;
+  double *Bin_cent = nullptr;
+  double *Bin_cent_profile = nullptr;
+  TFile *f = new TFile("Sp_resolution_dummy.root","RECREATE");
+  if (InputFiles.is_open()) {
+    string File;
+    cout << "Start reading input AnalysisResults.root ..." << endl;
+    //TH1D *hist_r2sp[10];
+    while (getline(InputFiles, File)) {
+      cout << "Reading input from: " << File << endl;
+      TH2F *hs_R2SPAB, *hs_R2SPAC, *hs_R2SPBC;
+      TProfile *tp_R2SPAB, *tp_R2SPAC, *tp_R2SPBC;
+      TProfile *tp_R2SPAB_Im, *tp_R2SPAC_Im, *tp_R2SPBC_Im;
+      TProfile *tp_R2EPAB, *tp_R2EPAC, *tp_R2EPBC;
+      TProfile *tp_R2EPAB_Im, *tp_R2EPAC_Im, *tp_R2EPBC_Im;
+      vector<string> File_string = helper.tokenize(File);
+      string run_number = File_string[File_string.size() - 2];
+      helper.LoadReso(File.c_str(), hs_R2SPAB, hs_R2SPAC, hs_R2SPBC);
+
+      // From histograms
+      Bin_cent = helper.CreateBinsFromAxis(hs_R2SPAB->GetXaxis());
+      NBins_cent = hs_R2SPAB->GetXaxis()->GetNbins();
+      Ncol = NBins_cent;
+      TH1D *hist_r2sp =
+          new TH1D(Form("R2SP_Cent_%s", run_number.c_str()),
+                   Form("R_{2}{SP} for run: %s", run_number.c_str()),
+                   NBins_cent, Bin_cent);
+      hist_r2sp->GetXaxis()->SetTitle("Centrality FT0C(%)");
+      hist_r2sp->GetYaxis()->SetTitle("R_{2}{SP}");
+
+      vector<double> row;
+      for (int i = 0; i < NBins_cent; i++) {
+        // Resolution factor for SP
+        TH2F *hs_R2SPAB_cp = dynamic_cast<TH2F *>(hs_R2SPAB->Clone(
+            Form("R2SPAB_Cent_Copy_%g_%g", Bin_cent[i], Bin_cent[i + 1])));
+        TH2F *hs_R2SPAC_cp = dynamic_cast<TH2F *>(hs_R2SPAC->Clone(
+            Form("R2SPAC_Cent_Copy_%g_%g", Bin_cent[i], Bin_cent[i + 1])));
+        TH2F *hs_R2SPBC_cp = dynamic_cast<TH2F *>(hs_R2SPBC->Clone(
+            Form("R2SPBC_Cent_Copy_%g_%g", Bin_cent[i], Bin_cent[i + 1])));
+        hs_R2SPAB_cp->GetXaxis()->SetRangeUser(Bin_cent[i], Bin_cent[i + 1]);
+        hs_R2SPAC_cp->GetXaxis()->SetRangeUser(Bin_cent[i], Bin_cent[i + 1]);
+        hs_R2SPBC_cp->GetXaxis()->SetRangeUser(Bin_cent[i], Bin_cent[i + 1]);
+
+        double R2SPAB = hs_R2SPAB_cp->GetMean(2);
+        double R2SPAC = hs_R2SPAC_cp->GetMean(2);
+        double R2SPBC = hs_R2SPBC_cp->GetMean(2);
+        double R2SPABe = hs_R2SPAB_cp->GetMean(12);
+        double R2SPACe = hs_R2SPAC_cp->GetMean(12);
+        double R2SPBCe = hs_R2SPBC_cp->GetMean(12);
+
+        double R22SP = R2SPBC != 0 ? R2SPAB * R2SPAC / R2SPBC : 0.0;
+        double R2SP = R22SP > 0 ? TMath::Sqrt(R22SP) : 0.0;
+        double R2SPe =
+            R2SPAB * R2SPAC * R2SPBC == 0
+                ? 0.0
+                : TMath::Sqrt(
+                      1. / 4 * (R2SPAC / (R2SPAB * R2SPBC)) * pow(R2SPABe, 2.) +
+                      1. / 4 * (R2SPAB / (R2SPAC * R2SPBC)) * pow(R2SPACe, 2.) +
+                      1. / 4 * R2SPAC * R2SPAB / pow(R2SPBC, 3.) *
+                          pow(R2SPBCe, 2.));
+        R2SPe = isnan(R2SPe) || isinf(R2SPe) ? 0. : R2SPe;
+
+        hist_r2sp->SetBinContent(i + 1, R2SP);
+        hist_r2sp->SetBinError(i + 1, R2SPe);
+
+        //hist_r2sp->Rebin(2);
+        //if(ifile == 0) hist_r2sp[ifile]->Draw();
+        // else hist_r2sp[ifile]->Draw("same");
+
+        //if(ifile > 0) hist_r2sp[0]->Add(hist_r2sp[ifile]);
+        row.emplace_back(R2SP);
+        delete hs_R2SPAB_cp;
+        delete hs_R2SPAC_cp;
+        delete hs_R2SPBC_cp;
+       
+      }
+
+      ls->Add(hist_r2sp);
+      hs_stack->Add(hist_r2sp);
+      stats.emplace_back(row);
+      Nrow++;
+    }
+
+}
+ vector<double *> stats_trans;
+  for (int i = 0; i < Ncol; i++) {
+    stats_trans.emplace_back(new double[Nrow]);
+  }
+  for (int i = 0; i < Nrow; i++) {
+    for (int j = 0; j < Ncol; j++) {
+      stats_trans[j][i] = stats[i][j];
+    }
+  }
+
+  TH1D *hist_final =
+      new TH1D(Form("R2SP_All_%s", Label.c_str()),
+               Form("R2SP_All_%s", Label.c_str()), NBins_cent, Bin_cent);
+  hist_final->GetXaxis()->SetTitle("Centrality FT0C (%)");
+  hist_final->GetYaxis()->SetTitle("R_{2}{SP}");
+  for (int i = 0; i < Ncol; i++) {
+    vector<double> final_stats = GetMeanError(Nrow, stats_trans[i]);
+    hist_final->SetBinContent(i + 1, final_stats[0]);
+    hist_final->SetBinError(i + 1, final_stats[1]);
+  }
+  TList *ls_final = new TList();
+  ls_final->Add(hist_final);
+  ls_final->Add(hs_stack);
+
+  TFile froot(Form("ResolutionsAll_%s.root", Label.c_str()), "RECREATE");
+  ls->Write("RunByRun_Histogram", TObject::kSingleKey);
+  ls_run_sp->Write("RunByRun_HistogramFromProfile_SP", TObject::kSingleKey);
+  ls_run_ep->Write("RunByRun_HistogramFromProfile_EP", TObject::kSingleKey);
+  ls_final->Write("FinalStatistics", TObject::kSingleKey);
+  f->cd();
+  hist_final->Write();
+  f->Close();
+  froot.Close();
+  InputFiles.close();
+
+  }
+
+vector<double> GetMeanError(int size, double *sample) {
+  vector<double> results;
+  double mean = 0.;
+  for (int i = 0; i < size; i++) {
+    mean += sample[i] / size;
+  }
+  results.emplace_back(mean);
+
+  double sum2 = 0;
+  for (int i = 0; i < size; i++) {
+    sum2 += pow(sample[i] - mean, 2.) / size;
+  }
+  double rms = pow(sum2, 0.5);
+  results.emplace_back(rms);
+  return results;
+}
