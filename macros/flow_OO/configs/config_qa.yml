@@ -1,0 +1,8 @@
+inputs:
+  deltaRap: 1.5
+  fInRawYieldVsPt: /Users/lucamicheletti/GITHUB/dq_fitter/analysis/LHC25ae_pass2/centrality_0_10/pt_dependence/systematic_sig_Jpsi.txt
+  fInWidthVsPt: /Users/lucamicheletti/GITHUB/dq_fitter/analysis/LHC25ae_pass2/centrality_0_10/pt_dependence/systematic_width_Jpsi.txt
+  fInMeanVsPt: /Users/lucamicheletti/GITHUB/dq_fitter/analysis/LHC25ae_pass2/centrality_0_10/pt_dependence/systematic_mean_Jpsi.txt
+
+outputs:
+  fOut: output/jpsi_qa_centrality_0_10.root
