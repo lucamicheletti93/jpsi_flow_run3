@@ -24,22 +24,31 @@ TProfile* projectProfile(THnSparseF *, double , double , double , double , int);
 void project_histograms() {
     bool integrated = false;
     string pathToFin = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/LHC25ae";
-    string muonCut = "matchedMchMid";
+    string muonCut = "muonQualityCutsMUONStandalone"; // matchedMchMid, muonQualityCutsMUONStandalone
     string suffix = "";
     string methodName = "SP";
     int method = methodName == "SP" ? 4 : 5;
 
-    TFile *fInSE  = new TFile("/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/LHC25ae/AnalysisResults_654169.root", "READ");
-    TList *listSE = (TList*) fInSE -> Get("analysis-same-event-pairing/output");
+    TFile *fInSE  = new TFile("/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/LHC25ae/AnalysisResults_687739.root", "READ");
+    TList *listDir = (TList*) fInSE -> Get("analysis-same-event-pairing/output");
 
-    TList *listSEPM = (TList*) listSE -> FindObject(Form("PairsMuonSEPM_%s", muonCut.c_str()));
+    TList *listSEPM = (TList*) listDir -> FindObject(Form("PairsMuonSEPM_%s", muonCut.c_str()));
     THnSparseF* histSEPM = (THnSparseF*) listSEPM->FindObject("Mass_Pt_centrFT0C_V2");
 
-    TList *listSEPP = (TList*) listSE -> FindObject(Form("PairsMuonSEPP_%s", muonCut.c_str()));
+    TList *listSEPP = (TList*) listDir -> FindObject(Form("PairsMuonSEPP_%s", muonCut.c_str()));
     THnSparseF* histSEPP = (THnSparseF*) listSEPP -> FindObject("Mass_Pt_centrFT0C_V2");
 
-    TList *listSEMM = (TList*) listSE -> FindObject(Form("PairsMuonSEMM_%s", muonCut.c_str()));
+    TList *listSEMM = (TList*) listDir -> FindObject(Form("PairsMuonSEMM_%s", muonCut.c_str()));
     THnSparseF* histSEMM = (THnSparseF*) listSEMM -> FindObject("Mass_Pt_centrFT0C_V2");
+
+    TList *listMEPM = (TList*) listDir -> FindObject(Form("PairsMuonMEPM_%s", muonCut.c_str()));
+    THnSparseF* histMEPM = (THnSparseF*) listMEPM->FindObject("Mass_Pt_centrFT0C_V2");
+
+    TList *listMEPP = (TList*) listDir -> FindObject(Form("PairsMuonMEPP_%s", muonCut.c_str()));
+    THnSparseF* histMEPP = (THnSparseF*) listMEPP -> FindObject("Mass_Pt_centrFT0C_V2");
+
+    TList *listMEMM = (TList*) listDir -> FindObject(Form("PairsMuonMEMM_%s", muonCut.c_str()));
+    THnSparseF* histMEMM = (THnSparseF*) listMEMM -> FindObject("Mass_Pt_centrFT0C_V2");
 
     int nCentrBins = 1;
     double minCentrBins[] = {0};
@@ -59,12 +68,26 @@ void project_histograms() {
             TH1D *histMassSEMM = (TH1D*) projectHistogram(histSEMM, minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]);
             histMassSEMM -> SetName(Form("histMassSEMM_%0.1f_%0.1f__%1.0f_%1.0f", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
 
+            TH1D *histMassMEPM = (TH1D*) projectHistogram(histMEPM, minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]);
+            histMassMEPM -> SetName(Form("histMassMEPM_%0.1f_%0.1f__%1.0f_%1.0f", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
+            TH1D *histMassMEPP = (TH1D*) projectHistogram(histMEPP, minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]);
+            histMassMEPP -> SetName(Form("histMassMEPP_%0.1f_%0.1f__%1.0f_%1.0f", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
+            TH1D *histMassMEMM = (TH1D*) projectHistogram(histMEMM, minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]);
+            histMassMEMM -> SetName(Form("histMassMEMM_%0.1f_%0.1f__%1.0f_%1.0f", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
+
             TProfile *histV2SEPM = (TProfile*) projectProfile(histSEPM, minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr], method);
             histV2SEPM -> SetName(Form("histV2SEPM_%0.1f_%0.1f__%1.0f_%1.0f", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
 	        TProfile *histV2SEPP = (TProfile*) projectProfile(histSEPP, minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr], method);
             histV2SEPP -> SetName(Form("histV2SEPP_%0.1f_%0.1f__%1.0f_%1.0f", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
 	        TProfile *histV2SEMM = (TProfile*) projectProfile(histSEMM, minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr], method);
             histV2SEMM -> SetName(Form("histV2SEMM_%0.1f_%0.1f__%1.0f_%1.0f", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
+
+            TProfile *histV2MEPM = (TProfile*) projectProfile(histMEPM, minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr], method);
+            histV2MEPM -> SetName(Form("histV2MEPM_%0.1f_%0.1f__%1.0f_%1.0f", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
+	        TProfile *histV2MEPP = (TProfile*) projectProfile(histMEPP, minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr], method);
+            histV2MEPP -> SetName(Form("histV2MEPP_%0.1f_%0.1f__%1.0f_%1.0f", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
+	        TProfile *histV2MEMM = (TProfile*) projectProfile(histMEMM, minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr], method);
+            histV2MEMM -> SetName(Form("histV2MEMM_%0.1f_%0.1f__%1.0f_%1.0f", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
 	    
             TProfile *histPtSEPM = (TProfile*) projectProfile(histSEPM, minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr], 1);
             histPtSEPM -> SetName(Form("histPtSEPM_%0.1f_%0.1f__%1.0f_%1.0f", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
@@ -72,19 +95,34 @@ void project_histograms() {
             histMassSEPM -> SetTitle(Form("SEPM - %0.1f < #it{p}_{T} < %0.1f GeV/#it{c}, %1.0f #minus %1.0f %%", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
             histMassSEPP -> SetTitle(Form("SEPP - %0.1f < #it{p}_{T} < %0.1f GeV/#it{c}, %1.0f #minus %1.0f %%", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
             histMassSEMM -> SetTitle(Form("SEMM - %0.1f < #it{p}_{T} < %0.1f GeV/#it{c}, %1.0f #minus %1.0f %%", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
+            histMassMEPM -> SetTitle(Form("MEPM - %0.1f < #it{p}_{T} < %0.1f GeV/#it{c}, %1.0f #minus %1.0f %%", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
+            histMassMEPP -> SetTitle(Form("MEPP - %0.1f < #it{p}_{T} < %0.1f GeV/#it{c}, %1.0f #minus %1.0f %%", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
+            histMassMEMM -> SetTitle(Form("MEMM - %0.1f < #it{p}_{T} < %0.1f GeV/#it{c}, %1.0f #minus %1.0f %%", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
+
             histV2SEPM -> SetTitle(Form("V2 SEPM - %0.1f < #it{p}_{T} < %0.1f GeV/#it{c}, %1.0f #minus %1.0f %%", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
 	        histV2SEPP -> SetTitle(Form("V2 SEPP - %0.1f < #it{p}_{T} < %0.1f GeV/#it{c}, %1.0f #minus %1.0f %%", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
 	        histV2SEMM -> SetTitle(Form("V2 SEMM - %0.1f < #it{p}_{T} < %0.1f GeV/#it{c}, %1.0f #minus %1.0f %%", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
+
+            histV2MEPM -> SetTitle(Form("V2 MEPM - %0.1f < #it{p}_{T} < %0.1f GeV/#it{c}, %1.0f #minus %1.0f %%", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
+	        histV2MEPP -> SetTitle(Form("V2 MEPP - %0.1f < #it{p}_{T} < %0.1f GeV/#it{c}, %1.0f #minus %1.0f %%", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
+	        histV2MEMM -> SetTitle(Form("V2 MEMM - %0.1f < #it{p}_{T} < %0.1f GeV/#it{c}, %1.0f #minus %1.0f %%", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
+
             histPtSEPM -> SetTitle(Form("<pT> SEPM - %0.1f < #it{p}_{T} < %0.1f GeV/#it{c}, %1.0f #minus %1.0f %%", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
 
             fOut -> cd();
             histMassSEPM -> Write();
 	        histMassSEPP -> Write();
-	        histMassSEMM -> Write();   
+	        histMassSEMM -> Write();
+            histMassMEPM -> Write();
+	        histMassMEPP -> Write();
+	        histMassMEMM -> Write(); 
 
 	        histV2SEPM -> Write();
             histV2SEPP -> Write();
             histV2SEMM -> Write();
+            histV2MEPM -> Write();
+            histV2MEPP -> Write();
+            histV2MEMM -> Write();
 
             histPtSEPM -> Write();
         }

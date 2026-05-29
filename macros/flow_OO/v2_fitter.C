@@ -54,8 +54,8 @@ Double_t xmax= 4.8;
 
 const int nSigFuncs = 1;
 string sigFuncs[] = {"CB2"};
-const int nBkgFuncs = 1;
-string bkgFuncs[] = {"VWG"};
+const int nBkgFuncs = 2;
+string bkgFuncs[] = {"VWG", "Pol4Exp"};
 const int nBkgV2Funcs = 2;
 string bkgV2Funcs[] = {"Pol2", "Cheb"};
 const int nTailSets = 2;
@@ -69,7 +69,7 @@ string parNames_NA60_Pol4Exp[] = {"bkg","aa","bb","cc","dd","ee","ff","sig_Jpsi"
 //--------------------------
 // v2 pT dependence
 double minFixVarBins[] = {0};
-double maxFixVarBins[] = {10};
+double maxFixVarBins[] = {20};
 string varAxisTitle = "#it{p}_{T} (GeV/#it{c})";
 string varName = "Pt";
 string varFixName = "centrality";
@@ -100,7 +100,8 @@ double varBins[] = {0.0, 2.0, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 15.0};*/
 
 // Single Fit
 //double resolution[] = {1.9015745, 1.9015745, 1.9015745, 1.9015745, 1.9015745, 1.9015745}; // average RSP in 0-20%, to be redone with dimuon weights
-double resolution[] = {1.8481931, 1.8481931, 1.8481931, 1.8481931, 1.8481931, 1.8481931}; // average RSP in 0-10%, to be redone with dimuon weights
+//double resolution[] = {1.8481931, 1.8481931, 1.8481931, 1.8481931, 1.8481931, 1.8481931}; // average RSP in 0-10%, to be redone with dimuon weights
+double resolution[] = {2.6293717, 2.6293717, 2.6293717, 2.6293717, 2.6293717, 2.6293717}; // average RSP in 0-20%, to be redone with dimuon weights
 
 
 const int nVarBins = 6;
@@ -112,7 +113,8 @@ double varBins[] = {0.0, 1.0, 2.0, 3.0, 4.0, 6.0, 8.0};
 string dirInPath = Form("/Users/lucamicheletti/GITHUB/dq_fitter/analysis/LHC25ae_pass2/centrality_%1.0f_%1.0f/pt_dependence", minFixVarBins[0], maxFixVarBins[0]);
 //string fInName = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/data/pass4/LHC23_full/Histograms_Fullpass4PbPbQualitymatchedMchMid_centr_Mixing_10_50.root";
 //string fInName = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/data/pass4/LHC23_full/Histograms_Fullpass4PbPbQualitymatchedMchMid_CentBins_MchMid__20_40.root";
-string fInName = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/LHC25ae/Histograms_OO_matchedMchMid_Centrality_0_10_SP.root";
+//string fInName = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/LHC25ae/Histograms_OO_matchedMchMid_Centrality_0_20_SP.root";
+string fInName = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/LHC25ae/Histograms_OO_muonQualityCutsMUONStandalone_Centrality_0_20_SP.root";
 string dirOutPath = "systematics_LHC25ae_pass2";
 
 //--------------------------
