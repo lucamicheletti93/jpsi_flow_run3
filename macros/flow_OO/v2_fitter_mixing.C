@@ -76,52 +76,52 @@ string parNames_NA60_Pol4Exp[] = {"bkg","aa","bb","cc","dd","ee","ff","sig_Jpsi"
 
 //--------------------------
 // v2 pT dependence
-double minFixVarBins[] = {0};
-double maxFixVarBins[] = {20};
+double minFixVarBins[] = {20};
+double maxFixVarBins[] = {60};
 string varAxisTitle = "#it{p}_{T} (GeV/#it{c})";
 string varName = "Pt";
 string varFixName = "centrality";
-// 10-30%
-/*double resolution[] = {1.16148};// 1.2782435627 10-30%
-const int nVarBins = 13;
-double minVarBins[] = {0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0};
-double maxVarBins[] = {0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0, 15.0};
-double varBins[] = {0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0, 15.0};*/
-// 20-40%
-/*double resolution[] = {1.13508}; // 1.2782435627 20-40%
-const int nVarBins = 13;
-double minVarBins[] = {0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0};
-double maxVarBins[] = {0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0, 15.0};
-double varBins[] = {0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0, 15.0};*/
-// 30-50%
-/*double resolution[] = {1.15516}; // 1.2782435627 30-50%
-const int nVarBins = 13;
-double minVarBins[] = {0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0};
-double maxVarBins[] = {0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0, 15.0};
-double varBins[] = {0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0, 15.0};*/
-// 50-80%
-/*double resolution[] = {1.43847}; // 50-80%
-const int nVarBins = 8;
-double minVarBins[] = {0.0, 2.0, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0};
-double maxVarBins[] = {2.0, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 15.0};
-double varBins[] = {0.0, 2.0, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 15.0};*/
 
 // Single Fit
-double resolution[] = {2.6293717};
+// 05/06/2026
+//double resolution[] = {2.6293717}; // average RSP in 0-20%, to be redone with dimuon weights
+//double resolution[] = {3.4229578}; // average RSP in 20-60%, to be redone with dimuon weights
+
+double resolution[1];
+if (minFixVarBins[0] == 0 && maxFixVarBins[0] == 20) {
+  resolution[0] = 1.9778990;
+} else if (minFixVarBins[0] == 20 && maxFixVarBins[0] == 60) {
+  resolution[0] = 2.4828559;
+} else {
+  std::cout << "*** ERROR: incorrect centrality range ***" << std::endl;
+  resolution[0] = -9999.;
+}
+
 const int nVarBins = 6;
 double minVarBins[] = {0.0, 1.0, 2.0, 3.0, 4.0, 6.0};
 double maxVarBins[] = {1.0, 2.0, 3.0, 4.0, 6.0, 8.0};
 double varBins[] = {0.0, 1.0, 2.0, 3.0, 4.0, 6.0, 8.0};
 
+/*const int nVarBins = 4;
+double minVarBins[] = {0.0, 2.0, 4.0, 6.0};
+double maxVarBins[] = {2.0, 4.0, 6.0, 8.0};
+double varBins[] = {0.0, 2.0, 4.0, 6.0, 8.0};*/
+
+/*const int nVarBins = 1;
+double minVarBins[] = {6.0};
+double maxVarBins[] = {8.0};
+double varBins[] = {8.0};*/
+
 std::map<std::pair<double, double>, double> inputV2VsPtCentr3050 = {{{0.0, 0.5}, 0.00674}, {{0.5, 1.0}, 0.01865}, {{1.0, 1.5}, 0.03371}, {{1.5, 2.0}, 0.03932}, {{2.0, 2.5}, 0.07062}, 
-                                                                   {{2.5, 3.0}, 0.06541}, {{3.0, 4.0}, 0.09357}, {{4.0, 5.0}, 0.08581}, {{5.0, 6.0}, 0.07073}, {{6.0, 8.0}, 0.06867}, 
+                                                                   {{2.5, 3.0}, 0.06541}, {{3.0, 4.0}, 0.09357}, {{4.0, 5.0}, 0.08581}, {{5.0, 6.0}, 0.07073}, {{6.0, 8.0}, -0.06867}, 
                                                                    {{8.0, 10.0}, 0.07321}, {{10.0, 12.0}, 0.07151}, {{12.0, 15.0}, 0.08718}};
 //string dirInPath = Form("/Users/lucamicheletti/GITHUB/dq_fitter/analysis/LHC23_pass4_full/centrality_%1.0f_%1.0f/pt_dependence_narrow_bins", minFixVarBins[0], maxFixVarBins[0]);
 string dirInPath = Form("/Users/lucamicheletti/GITHUB/dq_fitter/analysis/LHC25ae_pass2/centrality_%1.0f_%1.0f/pt_dependence", minFixVarBins[0], maxFixVarBins[0]);
 //string fInName = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/data/pass4/LHC23_full/Histograms_Fullpass4PbPbQualitymatchedMchMid_centr_Mixing_10_50.root"; // default
 //string fInName = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/data/pass4/LHC23_full/Histograms_Fullpass4PbPbQualitymatchedMchMid_CentBins_MchMid__20_40.root"; // For cross check with SP
-string fInName = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/LHC25ae/Histograms_OO_muonQualityCutsMUONStandalone_Centrality_0_20_SP.root";
-string dirOutPath = "systematics_LHC25ae_pass2_mix";
+string fInName = Form("/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/LHC25ae/Histograms_OO_muonQualityCutsMUONStandalone_Centrality_%1.0f_%1.0f_SP.root", minFixVarBins[0], maxFixVarBins[0]);
+//string fInName = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/LHC25ae/Histograms_OO_muonQualityCutsMUONStandalone_Centrality_20_60_SP.root";
+string dirOutPath = "systematics_mix_fit";
 
 //--------------------------
 // v2 centrality dependence
@@ -244,6 +244,12 @@ void v2_fitter_mixing() {
             TH1D *histMass = (TH1D*) fIn -> Get(histMassName.c_str());
             TProfile *profV2 = (TProfile*) fIn -> Get(profV2Name.c_str());
             TProfile *profV2Mix = (TProfile*) fIn -> Get(profV2MixName.c_str());
+
+            if (iSigFunc == 0 && iBkgFunc == 0 && iTailSet == 0 && iFitRange == 0 && iVar == nVarBins-1 && maxFixVarBins[0] == 60) {
+              histMass->Rebin(2);
+              profV2->Rebin(2);
+              profV2Mix->Rebin(2);
+            }
 	    
             // Plot options
             histMass -> GetXaxis() -> SetRangeUser(minFitRange, maxFitRange);
@@ -463,9 +469,7 @@ double* DoFlowFit(TH1D *histMassFitPars, TH1D *histMass, TProfile *profV2,TProfi
     bck2->SetLineStyle(2);
     histoV2Mix->Scale(Norm_factv2); //Normalization
     histoV2Mix -> Fit(bck2, "RL0");
-  }
-  else
-    {
+  } else {
       bck2 = new TF1("bck2",FitFunctionBackgroundPol2Cheb,minFitRange, maxFitRange,4);
       bck2 -> SetParameter(0, 0.0323879);
       bck2 -> SetParameter(1, -0.0117933);
@@ -927,6 +931,9 @@ double* DoFlowFit(TH1D *histMassFitPars, TH1D *histMass, TProfile *profV2,TProfi
   histoV2Mix->Draw("EP SAME");
   bck2->Draw("same");
   funcFlowSigBkg -> Draw("SAME");
+  // This clone is added to allow the drawing with plot_v2_fit.C
+  TF1 *funcFlowSigBkgToDraw = (TF1*) funcFlowSigBkg -> Clone("funcFlowSigBkgToDraw");
+  funcFlowSigBkgToDraw -> Draw("SAME");
   legend2->Draw();
   canvasFit -> Update();
 

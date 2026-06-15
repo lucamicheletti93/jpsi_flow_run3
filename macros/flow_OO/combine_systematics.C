@@ -1,6 +1,6 @@
-void combine_systematics(string fixVar = "centrality", double minFixVar = 0, double maxFixVar = 20, string binning = "large") {
-    string dirInPathStd = Form("/Users/lucamicheletti/GITHUB/jpsi_flow_run3/macros/flow_OO/systematics_LHC25ae_pass2/%s_%1.0f_%1.0f", fixVar.c_str(), minFixVar, maxFixVar);
-    string dirInPathMix = Form("/Users/lucamicheletti/GITHUB/jpsi_flow_run3/macros/flow_OO/systematics_LHC25ae_pass2_mix/%s_%1.0f_%1.0f", fixVar.c_str(), minFixVar, maxFixVar);
+void combine_systematics(string fixVar = "centrality", double minFixVar = 0, double maxFixVar = 20, string binning = "narrow") {
+    string dirInPathStd = Form("/Users/lucamicheletti/GITHUB/jpsi_flow_run3/macros/flow_OO/systematics_std_fit/%s_%1.0f_%1.0f", fixVar.c_str(), minFixVar, maxFixVar);
+    string dirInPathMix = Form("/Users/lucamicheletti/GITHUB/jpsi_flow_run3/macros/flow_OO/systematics_mix_fit/%s_%1.0f_%1.0f", fixVar.c_str(), minFixVar, maxFixVar);
     string dirOutPath = Form("combined_systematics/%s_%1.0f_%1.0f", fixVar.c_str(), minFixVar, maxFixVar);
 
     const int nTrials = 48;
@@ -9,7 +9,7 @@ void combine_systematics(string fixVar = "centrality", double minFixVar = 0, dou
     vector <double> vecMinVarBins, vecMaxVarBins, vecVarBins;
 
     //WARNING! 1% systematic applied to all centrality for pT integrated results
-    std::map<std::pair<double, double>, double> mapResoRelErr = {{{0, 20}, 0.01}, {{10, 30}, 0.01}, {{30, 50}, 0.01}, {{50, 80}, 0.017}, {{0, 5}, 0.01}, {{5, 15}, 0.01}};
+    std::map<std::pair<double, double>, double> mapResoRelErr = {{{0, 20}, 0.01}, {{20, 60}, 0.01}, {{10, 30}, 0.01}, {{30, 50}, 0.01}, {{50, 80}, 0.017}, {{0, 5}, 0.01}, {{5, 15}, 0.01}};
 
     if (fixVar == "centrality") {
         // Pt dependence
@@ -18,10 +18,10 @@ void combine_systematics(string fixVar = "centrality", double minFixVar = 0, dou
         varFixName = "centrality";
 
         if (binning == "narrow") {
-            nVarBins = 13;
-            double minVarBins[] = {0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0};
-            double maxVarBins[] = {0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0, 15.0};
-            double varBins[] = {0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0, 15.0};
+            nVarBins = 6;
+            double minVarBins[] = {0.0, 1.0, 2.0, 3.0, 4.0, 6.0};
+            double maxVarBins[] = {1.0, 2.0, 3.0, 4.0, 6.0, 8.0};
+            double varBins[] = {0.0, 1.0, 2.0, 3.0, 4.0, 6.0, 8.0};
 
             for (int iPt = 0;iPt < nVarBins+1;iPt++) {
                 if (iPt < nVarBins) {
@@ -31,10 +31,10 @@ void combine_systematics(string fixVar = "centrality", double minFixVar = 0, dou
                 vecVarBins.push_back(varBins[iPt]);
             }
         } else {
-            nVarBins = 6;
-            double minVarBins[] = {0.0, 1.0, 2.0, 3.0, 4.0, 6.0};
-            double maxVarBins[] = {1.0, 2.0, 3.0, 4.0, 6.0, 8.0};
-            double varBins[] = {0.0, 1.0, 2.0, 3.0, 4.0, 6.0, 8.0};
+            nVarBins = 4;
+            double minVarBins[] = {0.0, 2.0, 4.0, 6.0};
+            double maxVarBins[] = {2.0, 4.0, 6.0, 8.0};
+            double varBins[] = {0.0, 2.0, 4.0, 6.0, 8.0};
 
             for (int iPt = 0;iPt < nVarBins+1;iPt++) {
                 if (iPt < nVarBins) {
@@ -65,7 +65,7 @@ void combine_systematics(string fixVar = "centrality", double minFixVar = 0, dou
     }
 
     TCanvas *canvasChi2Ndf = new TCanvas("canvasChi2Ndf", "", 3000, 1800);
-    canvasChi2Ndf -> Divide(5, 3);
+    canvasChi2Ndf -> Divide(3, 2);
 
     TH1D *histStatJpsiV2 = new TH1D("histStatJpsiV2", "", nVarBins, &(vecVarBins[0]));
     histStatJpsiV2 -> GetXaxis() -> SetTitle(varAxisTitle.c_str());
@@ -189,11 +189,14 @@ void combine_systematics(string fixVar = "centrality", double minFixVar = 0, dou
         canvasCombinedSysts -> SetBottomMargin(0.5);
         histCombinedSysts -> SetStats(0);
         histCombinedSysts -> GetXaxis() -> LabelsOption("v");
-        if (meanJpsiV2 > 0.01) {
+        histCombinedSysts -> GetYaxis() -> SetRangeUser(meanJpsiV2 -  0.12, meanJpsiV2 + 0.12);
+        /*if (meanJpsiV2 > 0.01) {
             histCombinedSysts -> GetYaxis() -> SetRangeUser(meanJpsiV2 -  (2*meanJpsiV2), meanJpsiV2 + (2*meanJpsiV2));
-        } else {
+        } else if (meanJpsiV2 < 0){ 
+            histCombinedSysts -> GetYaxis() -> SetRangeUser(-0.15, 0.1);
+        }else {
             histCombinedSysts -> GetYaxis() -> SetRangeUser(-0.05, 0.05);
-        }
+        }*/
         
         if (vecMinVarBins[iVar] >= 10) {
             //histCombinedSysts -> GetYaxis() -> SetRangeUser(-0.05, 0.2);
