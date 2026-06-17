@@ -1,7 +1,7 @@
 void LoadStyle();
 void SetLegend(TLegend *);
 
-void plot_v2_fit(double minPtBin = 0, double maxPtBin = 1, bool mixing = false) {
+void plot_v2_fit(double minPtBin = 0, double maxPtBin = 1, int minCentrBin = 0, int maxCentrBin = 20, bool mixing = false) {
     LoadStyle();
     gStyle -> SetOptStat(0);
     // For 2-3 --> v2_fit_2.1_4.7_CB2_VWG_data_Pol2_v2bkg
@@ -9,9 +9,9 @@ void plot_v2_fit(double minPtBin = 0, double maxPtBin = 1, bool mixing = false) 
 
     string dirName;
     if (mixing) {
-        dirName = "/Users/lucamicheletti/GITHUB/jpsi_flow_run3/macros/flow_OO/systematics_mix_fit/centrality_0_20";
+        dirName = Form("/Users/lucamicheletti/GITHUB/jpsi_flow_run3/macros/flow_OO/systematics_mix_fit/etaGap17/centrality_%d_%d", minCentrBin, maxCentrBin);
     } else {
-        dirName = "/Users/lucamicheletti/GITHUB/jpsi_flow_run3/macros/flow_OO/systematics_std_fit/centrality_0_20";
+        dirName = Form("/Users/lucamicheletti/GITHUB/jpsi_flow_run3/macros/flow_OO/systematics_std_fit/etaGap17/centrality_%d_%d", minCentrBin, maxCentrBin);
     }
      
 
@@ -20,10 +20,10 @@ void plot_v2_fit(double minPtBin = 0, double maxPtBin = 1, bool mixing = false) 
     TCanvas *canvasFit = (TCanvas*) fIn -> Get("v2_fit_2.3_4.7_CB2_VWG_data_Pol2_v2bkg");
 
     TPad *padMassFit = (TPad*) canvasFit -> GetPrimitive("pad1");
-    TH1D *histMassSEPM = (TH1D*) padMassFit -> GetPrimitive(Form("histMassSEPM_%2.1f_%2.1f__0_20", minPtBin, maxPtBin));
+    TH1D *histMassSEPM = (TH1D*) padMassFit -> GetPrimitive(Form("histMassSEPM_%2.1f_%2.1f__%d_%d", minPtBin, maxPtBin, minCentrBin, maxCentrBin));
     TH1D *histMassMEPM;
     if (mixing) {
-        histMassMEPM = (TH1D*) padMassFit -> GetPrimitive(Form("histMassMEPM_%2.1f_%2.1f__0_20", minPtBin, maxPtBin));
+        histMassMEPM = (TH1D*) padMassFit -> GetPrimitive(Form("histMassMEPM_%2.1f_%2.1f__%d_%d", minPtBin, maxPtBin, minCentrBin, maxCentrBin));
     }
 
     TF1 *funcMassSigBkg = (TF1*) padMassFit -> GetPrimitive("funcMassSigBkg");
@@ -63,7 +63,7 @@ void plot_v2_fit(double minPtBin = 0, double maxPtBin = 1, bool mixing = false) 
             }
         }
     } else {
-        histFlowSEPM = (TH1D*) padFlowFit -> GetPrimitive(Form("histV2SEPM_%2.1f_%2.1f__0_20", minPtBin, maxPtBin));
+        histFlowSEPM = (TH1D*) padFlowFit -> GetPrimitive(Form("histV2SEPM_%2.1f_%2.1f__%d_%d", minPtBin, maxPtBin, minCentrBin, maxCentrBin));
     }
 
     // Retrieve the fit result
@@ -90,23 +90,27 @@ void plot_v2_fit(double minPtBin = 0, double maxPtBin = 1, bool mixing = false) 
 
     histMassSEPM -> SetTitle("");
     double minMassBin, maxMassBin;
+    std::map<std::pair<double, double>, double> mapMinMassWeight[2];
+    std::map<std::pair<double, double>, double> mapMaxMassWeight[2];
+    // 0-20%
+    mapMinMassWeight[0] = {{{0, 1}, 0.001}, {{1, 2}, 0.001}, {{2, 3}, 0.010}, {{3, 4}, 0.010}, {{4, 6}, 0.010}, {{6, 8}, 0.010}};
+    mapMaxMassWeight[0] = {{{0, 1}, 1.010}, {{1, 2}, 1.010}, {{2, 3}, 1.500}, {{3, 4}, 2.200}, {{4, 6}, 3.200}, {{6, 8}, 5.000}};
+    // 20-60%
+    mapMinMassWeight[1] = {{{0, 1}, 0.001}, {{1, 2}, 0.001}, {{2, 3}, 0.010}, {{3, 4}, 0.010}, {{4, 6}, 0.010}, {{6, 8}, 0.010}};
+    mapMaxMassWeight[1] = {{{0, 1}, 1.500}, {{1, 2}, 1.800}, {{2, 3}, 2.500}, {{3, 4}, 3.500}, {{4, 6}, 6.000}, {{6, 8}, 8.000}};
 
-    if (maxPtBin <= 2) {
-        minMassBin = 0.001 * histMassSEPM -> GetBinContent(histMassSEPM -> FindBin(2.5));
-        maxMassBin = 1.01 * histMassSEPM -> GetBinContent(histMassSEPM -> FindBin(2.5));
-    } else if (minPtBin >= 2 && maxPtBin <= 3) {
-        minMassBin = 0.01 * histMassSEPM -> GetBinContent(histMassSEPM -> FindBin(2.5));
-        maxMassBin = 1.50 * histMassSEPM -> GetBinContent(histMassSEPM -> FindBin(2.5));
-    } else if (minPtBin >= 3 && maxPtBin <= 4) {
-        minMassBin = 0.01 * histMassSEPM -> GetBinContent(histMassSEPM -> FindBin(2.5));
-        maxMassBin = 2.20 * histMassSEPM -> GetBinContent(histMassSEPM -> FindBin(2.5));
-    } else if (minPtBin >= 4 && maxPtBin <=6) {
-        minMassBin = 0.01 * histMassSEPM -> GetBinContent(histMassSEPM -> FindBin(2.5));
-        maxMassBin = 3.20 * histMassSEPM -> GetBinContent(histMassSEPM -> FindBin(2.5));
+    double minMassWeight, maxMassWeight;
+    if (maxCentrBin == 20) {
+        minMassWeight = mapMinMassWeight[0].at({minPtBin, maxPtBin});
+        maxMassWeight = mapMaxMassWeight[0].at({minPtBin, maxPtBin});
     } else {
-        minMassBin = 0.01 * histMassSEPM -> GetBinContent(histMassSEPM -> FindBin(2.5));
-        maxMassBin = 5.00 * histMassSEPM -> GetBinContent(histMassSEPM -> FindBin(2.5));
+        minMassWeight = mapMinMassWeight[1].at({minPtBin, maxPtBin});
+        maxMassWeight = mapMaxMassWeight[1].at({minPtBin, maxPtBin});
     }
+
+    minMassBin = minMassWeight * histMassSEPM -> GetBinContent(histMassSEPM -> FindBin(2.5));
+    maxMassBin = maxMassWeight * histMassSEPM -> GetBinContent(histMassSEPM -> FindBin(2.5));
+
     histMassSEPM -> GetXaxis() -> SetRangeUser(2.48, 4.52);
     histMassSEPM -> GetYaxis() -> SetRangeUser(minMassBin, maxMassBin);
     histMassSEPM -> GetYaxis() -> SetLabelSize(0.07);
@@ -142,7 +146,7 @@ void plot_v2_fit(double minPtBin = 0, double maxPtBin = 1, bool mixing = false) 
     latexTitle -> SetNDC();
     latexTitle -> SetTextFont(42);
     latexTitle -> DrawLatex(0.27, 0.85, "ALICE Preliminary");
-    latexTitle -> DrawLatex(0.27, 0.75, "OO, #sqrt{#it{s}_{NN}} = 5.36 TeV, 0#minus20\%");
+    latexTitle -> DrawLatex(0.27, 0.75, Form("OO, #sqrt{#it{s}_{NN}} = 5.36 TeV, %d#minus%d%%", minCentrBin, maxCentrBin));
     latexTitle -> DrawLatex(0.27, 0.65, Form("J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 < y < 4, %1.0f < #it{p}_{T} < %1.0f GeV/#it{c}", minPtBin, maxPtBin));
 
     canvasMassFlow -> cd();
@@ -253,9 +257,9 @@ void plot_v2_fit(double minPtBin = 0, double maxPtBin = 1, bool mixing = false) 
 
     canvasMassFlow -> Update();
     if (mixing) {
-        canvasMassFlow -> SaveAs(Form("ICHEP2026/fitFlowVsMassPt_%1.0f_%1.0f_MixedEvent.pdf", minPtBin, maxPtBin));
+        canvasMassFlow -> SaveAs(Form("ICHEP2026/signal_extraction_%d_%d/fitFlowVsMassPt_%1.0f_%1.0f_MixedEvent.pdf", minCentrBin, maxCentrBin, minPtBin, maxPtBin));
     } else {
-        canvasMassFlow -> SaveAs(Form("ICHEP2026/fitFlowVsMassPt_%1.0f_%1.0f.pdf", minPtBin, maxPtBin));
+        canvasMassFlow -> SaveAs(Form("ICHEP2026/signal_extraction_%d_%d/fitFlowVsMassPt_%1.0f_%1.0f.pdf", minCentrBin, maxCentrBin, minPtBin, maxPtBin));
     }
 }
 ////////////////////////////////////////////////////////////////////////////////

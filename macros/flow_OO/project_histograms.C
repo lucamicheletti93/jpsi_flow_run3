@@ -21,91 +21,113 @@ void SetLegend(TLegend *);
 TH1D* projectHistogram(THnSparseF *, double , double , double , double );
 TProfile* projectProfile(THnSparseF *, double , double , double , double , int);
 
-void project_histograms() {
+void project_histograms(string train = "687739", bool mixing = true, string sparseName = "Mass_Pt_centrFT0C_V2", string suffix = "") {
     bool integrated = false;
-    string pathToFin = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/LHC25ae";
+    string pathToFin = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/LHC25ae/train_701103/564445";
     string muonCut = "muonQualityCutsMUONStandalone"; // matchedMchMid, muonQualityCutsMUONStandalone
-    string suffix = "";
     string methodName = "SP";
     int method = methodName == "SP" ? 4 : 5;
 
-    TFile *fInSE  = new TFile("/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/LHC25ae/AnalysisResults_687739.root", "READ");
+    int nCentrBins = 1;
+    double minCentrBins[] = {20};
+    double maxCentrBins[] = {60};
+
+    const int nPtBins = 9;
+    double minPtBins[] = {0.0, 1.0, 2.0, 3.0, 4.0, 6.0, 8.0, 0.0, 2.0};
+    double maxPtBins[] = {1.0, 2.0, 3.0, 4.0, 6.0, 8.0, 15.0, 2.0, 4.0};
+
+    // Train: 687739 -> SE & ME
+    // Train: 689454 -> SE [POS & NEG]
+    // Train: 698032 ==> Default, Eta gap 1.7
+    // Train: 698144 ==> Eta gap 2.0
+
+    TList *listSEPM, *listSEPP, *listSEMM, *listMEPM, *listMEPP, *listMEMM;
+    THnSparseF *histSEPM, *histSEPP, *histSEMM, *histMEPM, *histMEPP, *histMEMM;
+
+    //std::cout << "Opening " << Form("%s/AnalysisResults_%s.root", pathToFin.c_str(), train.c_str()) << " ..." << std::endl;
+    //TFile *fInSE  = new TFile(Form("%s/AnalysisResults_%s.root", pathToFin.c_str(), train.c_str()), "READ");
+    std::cout << "Opening " << Form("%s/AnalysisResults.root", pathToFin.c_str()) << " ..." << std::endl;
+    TFile *fInSE  = new TFile(Form("%s/AnalysisResults.root", pathToFin.c_str()), "READ");
     TList *listDir = (TList*) fInSE -> Get("analysis-same-event-pairing/output");
 
-    TList *listSEPM = (TList*) listDir -> FindObject(Form("PairsMuonSEPM_%s", muonCut.c_str()));
-    THnSparseF* histSEPM = (THnSparseF*) listSEPM->FindObject("Mass_Pt_centrFT0C_V2");
+    listSEPM = (TList*) listDir -> FindObject(Form("PairsMuonSEPM_%s", muonCut.c_str()));
+    histSEPM = (THnSparseF*) listSEPM->FindObject(sparseName.c_str());
 
-    TList *listSEPP = (TList*) listDir -> FindObject(Form("PairsMuonSEPP_%s", muonCut.c_str()));
-    THnSparseF* histSEPP = (THnSparseF*) listSEPP -> FindObject("Mass_Pt_centrFT0C_V2");
+    listSEPP = (TList*) listDir -> FindObject(Form("PairsMuonSEPP_%s", muonCut.c_str()));
+    histSEPP = (THnSparseF*) listSEPP -> FindObject(sparseName.c_str());
 
-    TList *listSEMM = (TList*) listDir -> FindObject(Form("PairsMuonSEMM_%s", muonCut.c_str()));
-    THnSparseF* histSEMM = (THnSparseF*) listSEMM -> FindObject("Mass_Pt_centrFT0C_V2");
+    listSEMM = (TList*) listDir -> FindObject(Form("PairsMuonSEMM_%s", muonCut.c_str()));
+    histSEMM = (THnSparseF*) listSEMM -> FindObject(sparseName.c_str());
 
-    TList *listMEPM = (TList*) listDir -> FindObject(Form("PairsMuonMEPM_%s", muonCut.c_str()));
-    THnSparseF* histMEPM = (THnSparseF*) listMEPM->FindObject("Mass_Pt_centrFT0C_V2");
+    if (mixing) {
+        listMEPM = (TList*) listDir -> FindObject(Form("PairsMuonMEPM_%s", muonCut.c_str()));
+        histMEPM = (THnSparseF*) listMEPM->FindObject(sparseName.c_str());
 
-    TList *listMEPP = (TList*) listDir -> FindObject(Form("PairsMuonMEPP_%s", muonCut.c_str()));
-    THnSparseF* histMEPP = (THnSparseF*) listMEPP -> FindObject("Mass_Pt_centrFT0C_V2");
+        listMEPP = (TList*) listDir -> FindObject(Form("PairsMuonMEPP_%s", muonCut.c_str()));
+        histMEPP = (THnSparseF*) listMEPP -> FindObject(sparseName.c_str());
 
-    TList *listMEMM = (TList*) listDir -> FindObject(Form("PairsMuonMEMM_%s", muonCut.c_str()));
-    THnSparseF* histMEMM = (THnSparseF*) listMEMM -> FindObject("Mass_Pt_centrFT0C_V2");
+        listMEMM = (TList*) listDir -> FindObject(Form("PairsMuonMEMM_%s", muonCut.c_str()));
+        histMEMM = (THnSparseF*) listMEMM -> FindObject(sparseName.c_str());
+    }
 
-    int nCentrBins = 1;
-    double minCentrBins[] = {0};
-    double maxCentrBins[] = {10};
 
-    const int nPtBins = 8;
-    double minPtBins[] = {0.0, 1.0, 2.0, 3.0, 4.0, 6.0, 8.0};
-    double maxPtBins[] = {1.0, 2.0, 3.0, 4.0, 6.0, 8.0, 15.0};
-
-    TFile *fOut = new TFile(Form("%s/Histograms_OO_%s_Centrality_%1.f_%1.f_%s.root", pathToFin.c_str(), muonCut.c_str(), minCentrBins[0], maxCentrBins[0], methodName.c_str()), "RECREATE");
+    TFile *fOut = new TFile(Form("%s/Histograms_OO_%s_Centrality_%1.f_%1.f_%s%s.root", pathToFin.c_str(), muonCut.c_str(), minCentrBins[0], maxCentrBins[0], methodName.c_str(), suffix.c_str()), "RECREATE");
     for (int iCentr = 0;iCentr < nCentrBins;iCentr++) {
         for (int iPt = 0;iPt < nPtBins;iPt++) {
-            TH1D *histMassSEPM = (TH1D*) projectHistogram(histSEPM, minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]);
+            TH1D *histMassSEPM, *histMassSEPP, *histMassSEMM, *histMassMEPM, *histMassMEPP, *histMassMEMM;
+            TProfile *histV2SEPM, *histV2SEPP, *histV2SEMM, *histV2MEPM, *histV2MEPP, *histV2MEMM;
+            TProfile *histPtSEPM;
+
+            histMassSEPM = (TH1D*) projectHistogram(histSEPM, minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]);
             histMassSEPM -> SetName(Form("histMassSEPM_%0.1f_%0.1f__%1.0f_%1.0f", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
-            TH1D *histMassSEPP = (TH1D*) projectHistogram(histSEPP, minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]);
+            histMassSEPP = (TH1D*) projectHistogram(histSEPP, minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]);
             histMassSEPP -> SetName(Form("histMassSEPP_%0.1f_%0.1f__%1.0f_%1.0f", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
-            TH1D *histMassSEMM = (TH1D*) projectHistogram(histSEMM, minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]);
+            histMassSEMM = (TH1D*) projectHistogram(histSEMM, minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]);
             histMassSEMM -> SetName(Form("histMassSEMM_%0.1f_%0.1f__%1.0f_%1.0f", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
 
-            TH1D *histMassMEPM = (TH1D*) projectHistogram(histMEPM, minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]);
-            histMassMEPM -> SetName(Form("histMassMEPM_%0.1f_%0.1f__%1.0f_%1.0f", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
-            TH1D *histMassMEPP = (TH1D*) projectHistogram(histMEPP, minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]);
-            histMassMEPP -> SetName(Form("histMassMEPP_%0.1f_%0.1f__%1.0f_%1.0f", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
-            TH1D *histMassMEMM = (TH1D*) projectHistogram(histMEMM, minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]);
-            histMassMEMM -> SetName(Form("histMassMEMM_%0.1f_%0.1f__%1.0f_%1.0f", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
-
-            TProfile *histV2SEPM = (TProfile*) projectProfile(histSEPM, minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr], method);
+            histV2SEPM = (TProfile*) projectProfile(histSEPM, minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr], method);
             histV2SEPM -> SetName(Form("histV2SEPM_%0.1f_%0.1f__%1.0f_%1.0f", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
-	        TProfile *histV2SEPP = (TProfile*) projectProfile(histSEPP, minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr], method);
+	        histV2SEPP = (TProfile*) projectProfile(histSEPP, minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr], method);
             histV2SEPP -> SetName(Form("histV2SEPP_%0.1f_%0.1f__%1.0f_%1.0f", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
-	        TProfile *histV2SEMM = (TProfile*) projectProfile(histSEMM, minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr], method);
+	        histV2SEMM = (TProfile*) projectProfile(histSEMM, minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr], method);
             histV2SEMM -> SetName(Form("histV2SEMM_%0.1f_%0.1f__%1.0f_%1.0f", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
 
-            TProfile *histV2MEPM = (TProfile*) projectProfile(histMEPM, minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr], method);
-            histV2MEPM -> SetName(Form("histV2MEPM_%0.1f_%0.1f__%1.0f_%1.0f", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
-	        TProfile *histV2MEPP = (TProfile*) projectProfile(histMEPP, minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr], method);
-            histV2MEPP -> SetName(Form("histV2MEPP_%0.1f_%0.1f__%1.0f_%1.0f", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
-	        TProfile *histV2MEMM = (TProfile*) projectProfile(histMEMM, minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr], method);
-            histV2MEMM -> SetName(Form("histV2MEMM_%0.1f_%0.1f__%1.0f_%1.0f", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
+            if (mixing) {
+                histMassMEPM = (TH1D*) projectHistogram(histMEPM, minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]);
+                histMassMEPM -> SetName(Form("histMassMEPM_%0.1f_%0.1f__%1.0f_%1.0f", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
+                histMassMEPP = (TH1D*) projectHistogram(histMEPP, minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]);
+                histMassMEPP -> SetName(Form("histMassMEPP_%0.1f_%0.1f__%1.0f_%1.0f", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
+                histMassMEMM = (TH1D*) projectHistogram(histMEMM, minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]);
+                histMassMEMM -> SetName(Form("histMassMEMM_%0.1f_%0.1f__%1.0f_%1.0f", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
+
+                histV2MEPM = (TProfile*) projectProfile(histMEPM, minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr], method);
+                histV2MEPM -> SetName(Form("histV2MEPM_%0.1f_%0.1f__%1.0f_%1.0f", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
+                histV2MEPP = (TProfile*) projectProfile(histMEPP, minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr], method);
+                histV2MEPP -> SetName(Form("histV2MEPP_%0.1f_%0.1f__%1.0f_%1.0f", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
+                histV2MEMM = (TProfile*) projectProfile(histMEMM, minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr], method);
+                histV2MEMM -> SetName(Form("histV2MEMM_%0.1f_%0.1f__%1.0f_%1.0f", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
+            }
 	    
-            TProfile *histPtSEPM = (TProfile*) projectProfile(histSEPM, minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr], 1);
+            histPtSEPM = (TProfile*) projectProfile(histSEPM, minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr], 1);
             histPtSEPM -> SetName(Form("histPtSEPM_%0.1f_%0.1f__%1.0f_%1.0f", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
 
             histMassSEPM -> SetTitle(Form("SEPM - %0.1f < #it{p}_{T} < %0.1f GeV/#it{c}, %1.0f #minus %1.0f %%", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
             histMassSEPP -> SetTitle(Form("SEPP - %0.1f < #it{p}_{T} < %0.1f GeV/#it{c}, %1.0f #minus %1.0f %%", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
             histMassSEMM -> SetTitle(Form("SEMM - %0.1f < #it{p}_{T} < %0.1f GeV/#it{c}, %1.0f #minus %1.0f %%", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
-            histMassMEPM -> SetTitle(Form("MEPM - %0.1f < #it{p}_{T} < %0.1f GeV/#it{c}, %1.0f #minus %1.0f %%", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
-            histMassMEPP -> SetTitle(Form("MEPP - %0.1f < #it{p}_{T} < %0.1f GeV/#it{c}, %1.0f #minus %1.0f %%", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
-            histMassMEMM -> SetTitle(Form("MEMM - %0.1f < #it{p}_{T} < %0.1f GeV/#it{c}, %1.0f #minus %1.0f %%", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
 
             histV2SEPM -> SetTitle(Form("V2 SEPM - %0.1f < #it{p}_{T} < %0.1f GeV/#it{c}, %1.0f #minus %1.0f %%", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
 	        histV2SEPP -> SetTitle(Form("V2 SEPP - %0.1f < #it{p}_{T} < %0.1f GeV/#it{c}, %1.0f #minus %1.0f %%", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
 	        histV2SEMM -> SetTitle(Form("V2 SEMM - %0.1f < #it{p}_{T} < %0.1f GeV/#it{c}, %1.0f #minus %1.0f %%", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
 
-            histV2MEPM -> SetTitle(Form("V2 MEPM - %0.1f < #it{p}_{T} < %0.1f GeV/#it{c}, %1.0f #minus %1.0f %%", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
-	        histV2MEPP -> SetTitle(Form("V2 MEPP - %0.1f < #it{p}_{T} < %0.1f GeV/#it{c}, %1.0f #minus %1.0f %%", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
-	        histV2MEMM -> SetTitle(Form("V2 MEMM - %0.1f < #it{p}_{T} < %0.1f GeV/#it{c}, %1.0f #minus %1.0f %%", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
+            if (mixing) {
+                histMassMEPM -> SetTitle(Form("MEPM - %0.1f < #it{p}_{T} < %0.1f GeV/#it{c}, %1.0f #minus %1.0f %%", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
+                histMassMEPP -> SetTitle(Form("MEPP - %0.1f < #it{p}_{T} < %0.1f GeV/#it{c}, %1.0f #minus %1.0f %%", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
+                histMassMEMM -> SetTitle(Form("MEMM - %0.1f < #it{p}_{T} < %0.1f GeV/#it{c}, %1.0f #minus %1.0f %%", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
+
+                histV2MEPM -> SetTitle(Form("V2 MEPM - %0.1f < #it{p}_{T} < %0.1f GeV/#it{c}, %1.0f #minus %1.0f %%", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
+                histV2MEPP -> SetTitle(Form("V2 MEPP - %0.1f < #it{p}_{T} < %0.1f GeV/#it{c}, %1.0f #minus %1.0f %%", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
+                histV2MEMM -> SetTitle(Form("V2 MEMM - %0.1f < #it{p}_{T} < %0.1f GeV/#it{c}, %1.0f #minus %1.0f %%", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
+            }
 
             histPtSEPM -> SetTitle(Form("<pT> SEPM - %0.1f < #it{p}_{T} < %0.1f GeV/#it{c}, %1.0f #minus %1.0f %%", minPtBins[iPt], maxPtBins[iPt], minCentrBins[iCentr], maxCentrBins[iCentr]));
 
@@ -113,21 +135,26 @@ void project_histograms() {
             histMassSEPM -> Write();
 	        histMassSEPP -> Write();
 	        histMassSEMM -> Write();
-            histMassMEPM -> Write();
-	        histMassMEPP -> Write();
-	        histMassMEMM -> Write(); 
 
 	        histV2SEPM -> Write();
             histV2SEPP -> Write();
             histV2SEMM -> Write();
-            histV2MEPM -> Write();
-            histV2MEPP -> Write();
-            histV2MEMM -> Write();
+
+            if (mixing) {
+                histMassMEPM -> Write();
+                histMassMEPP -> Write();
+                histMassMEMM -> Write();
+
+                histV2MEPM -> Write();
+                histV2MEPP -> Write();
+                histV2MEMM -> Write();
+            }
 
             histPtSEPM -> Write();
         }
     }
     fOut -> Close();
+    std::cout << Form("Writing output in %s/Histograms_OO_%s_Centrality_%1.f_%1.f_%s%s.root...", pathToFin.c_str(), muonCut.c_str(), minCentrBins[0], maxCentrBins[0], methodName.c_str(), suffix.c_str()) << std::endl;
 }
 ////////////////////////////////////////////////////////////////////////////////
 void LoadStyle(){

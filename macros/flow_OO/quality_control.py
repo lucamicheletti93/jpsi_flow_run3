@@ -66,8 +66,8 @@ def qa(config):
     jpsiSystMeanVsPt = dfJpsiMeanVsPt["syst"]
 
 
-    histStatRawYieldVsPt = ROOT.TH1D("histStatRawYieldVsPt", ";#it{p}_{T} (GeV/#it{c});dN/d#it{p}_{T}", len(ptEdges)-1, ptEdges)
-    histSystRawYieldVsPt = ROOT.TH1D("histSystRawYieldVsPt", ";#it{p}_{T} (GeV/#it{c});dN/d#it{p}_{T}", len(ptEdges)-1, ptEdges)
+    histStatRawYieldVsPt = ROOT.TH1D("histStatRawYieldVsPt", ";#it{p}_{T} (GeV/#it{c});d#it{N}/d#it{p}_{T}", len(ptEdges)-1, ptEdges)
+    histSystRawYieldVsPt = ROOT.TH1D("histSystRawYieldVsPt", ";#it{p}_{T} (GeV/#it{c});d#it{N}/d#it{p}_{T}", len(ptEdges)-1, ptEdges)
 
     histStatWidthVsPt = ROOT.TH1D("histStatWidthVsPt", ";#it{p}_{T} (GeV/#it{c});#sigma_{J/#psi}", len(ptEdges)-1, ptEdges)
     histSystWidthVsPt = ROOT.TH1D("histSystWidthVsPt", ";#it{p}_{T} (GeV/#it{c});#sigma_{J/#psi}", len(ptEdges)-1, ptEdges)
@@ -91,20 +91,37 @@ def qa(config):
         histSystMeanVsPt.SetBinContent(iBin+1, jpsiMeanVsPt[iBin])
         histSystMeanVsPt.SetBinError(iBin+1, jpsiSystMeanVsPt[iBin])
 
+    SetHistSyst(histSystRawYieldVsPt, 20, ROOT.kRed+1)
+    SetHistStat(histStatRawYieldVsPt, 20, ROOT.kRed+1)
+    SetHistSyst(histSystWidthVsPt, 20, ROOT.kRed+1)
+    SetHistStat(histStatWidthVsPt, 20, ROOT.kRed+1)
+    SetHistSyst(histSystMeanVsPt, 20, ROOT.kRed+1)
+    SetHistStat(histStatMeanVsPt, 20, ROOT.kRed+1)
+
+    latexTitle = ROOT.TLatex()
+    latexTitle.SetTextSize(0.050)
+    latexTitle.SetNDC()
+    latexTitle.SetTextFont(42)
+
     canvasRawYieldVsPt = ROOT.TCanvas("canvasRawYieldVsPt", "", 800, 600)
     ROOT.gPad.SetLogy(True)
     histSystRawYieldVsPt.Draw("E2P SAME")
     histStatRawYieldVsPt.Draw("EP SAME")
+    latexTitle.DrawLatex(0.5, 0.85, "OO, #sqrt{#it{s}_{NN}} = 5.36 TeV, 20#minus60%")
     canvasRawYieldVsPt.Update()
 
     canvasWidthVsPt = ROOT.TCanvas("canvasWidthVsPt", "", 800, 600)
+    histSystWidthVsPt.GetYaxis().SetRangeUser(0, 0.15)
     histSystWidthVsPt.Draw("E2P SAME")
     histStatWidthVsPt.Draw("EP SAME")
+    latexTitle.DrawLatex(0.5, 0.85, "OO, #sqrt{#it{s}_{NN}} = 5.36 TeV, 20#minus60%")
     canvasWidthVsPt.Update()
 
     canvasMeanVsPt = ROOT.TCanvas("canvasMeanVsPt", "", 800, 600)
+    histSystMeanVsPt.GetYaxis().SetRangeUser(3, 3.15)
     histSystMeanVsPt.Draw("E2P SAME")
     histStatMeanVsPt.Draw("EP SAME")
+    latexTitle.DrawLatex(0.5, 0.85, "OO, #sqrt{#it{s}_{NN}} = 5.36 TeV, 20#minus60%")
     canvasMeanVsPt.Update()
 
     input()
@@ -118,6 +135,10 @@ def qa(config):
     histStatMeanVsPt.Write()
     fOut.Close()
 
+    canvasRawYieldVsPt.SaveAs(f'{config["outputs"]["figOut"]}_raw_yield.pdf')
+    canvasWidthVsPt.SaveAs(f'{config["outputs"]["figOut"]}_width.pdf')
+    canvasMeanVsPt.SaveAs(f'{config["outputs"]["figOut"]}_mean.pdf')
+
 def compare():
     """
     function to compare results
@@ -125,11 +146,11 @@ def compare():
     LoadStyle()
     ROOT.gStyle.SetOptStat(False)
 
-    fInCentr010 = ROOT.TFile("output/jpsi_qa_centrality_0_10.root")
-    histStatRawYieldCentr010VsPt = fInCentr010.Get("histStatRawYieldVsPt")
-    histSystRawYieldCentr010VsPt = fInCentr010.Get("histSystRawYieldVsPt")
-    histStatWidthCentr010VsPt = fInCentr010.Get("histStatWidthVsPt")
-    histStatMeanCentr010VsPt = fInCentr010.Get("histStatMeanVsPt")
+    #fInCentr010 = ROOT.TFile("output/jpsi_qa_centrality_0_10.root")
+    #histStatRawYieldCentr010VsPt = fInCentr010.Get("histStatRawYieldVsPt")
+    #histSystRawYieldCentr010VsPt = fInCentr010.Get("histSystRawYieldVsPt")
+    #histStatWidthCentr010VsPt = fInCentr010.Get("histStatWidthVsPt")
+    #histStatMeanCentr010VsPt = fInCentr010.Get("histStatMeanVsPt")
 
     fInCentr020 = ROOT.TFile("output/jpsi_qa_centrality_0_20.root")
     histStatRawYieldCentr020VsPt = fInCentr020.Get("histStatRawYieldVsPt")
@@ -137,15 +158,26 @@ def compare():
     histStatWidthCentr020VsPt = fInCentr020.Get("histStatWidthVsPt")
     histStatMeanCentr020VsPt = fInCentr020.Get("histStatMeanVsPt")
 
-    SetHistStat(histStatRawYieldCentr010VsPt, 20, ROOT.kOrange+7)
-    SetHistSyst(histSystRawYieldCentr010VsPt, 20, ROOT.kOrange+7)
-    SetHistStat(histStatWidthCentr010VsPt, 20, ROOT.kOrange+7)
-    SetHistStat(histStatMeanCentr010VsPt, 20, ROOT.kOrange+7)
+    fInCentr2060 = ROOT.TFile("output/jpsi_qa_centrality_20_60.root")
+    histStatRawYieldCentr2060VsPt = fInCentr2060.Get("histStatRawYieldVsPt")
+    histSystRawYieldCentr2060VsPt = fInCentr2060.Get("histSystRawYieldVsPt")
+    histStatWidthCentr2060VsPt = fInCentr2060.Get("histStatWidthVsPt")
+    histStatMeanCentr2060VsPt = fInCentr2060.Get("histStatMeanVsPt")
+
+    #SetHistStat(histStatRawYieldCentr010VsPt, 20, ROOT.kOrange+7)
+    #SetHistSyst(histSystRawYieldCentr010VsPt, 20, ROOT.kOrange+7)
+    #SetHistStat(histStatWidthCentr010VsPt, 20, ROOT.kOrange+7)
+    #SetHistStat(histStatMeanCentr010VsPt, 20, ROOT.kOrange+7)
 
     SetHistStat(histStatRawYieldCentr020VsPt, 20, ROOT.kRed+1)
     SetHistSyst(histSystRawYieldCentr020VsPt, 20, ROOT.kRed+1)
     SetHistStat(histStatWidthCentr020VsPt, 20, ROOT.kRed+1)
     SetHistStat(histStatMeanCentr020VsPt, 20, ROOT.kRed+1)
+
+    SetHistStat(histStatRawYieldCentr2060VsPt, 20, ROOT.kAzure+2)
+    SetHistSyst(histSystRawYieldCentr2060VsPt, 20, ROOT.kAzure+2)
+    SetHistStat(histStatWidthCentr2060VsPt, 20, ROOT.kAzure+2)
+    SetHistStat(histStatMeanCentr2060VsPt, 20, ROOT.kAzure+2)
 
 
 
@@ -153,14 +185,17 @@ def compare():
     ROOT.gPad.SetLogy(True)
     histStatRawYieldCentr020VsPt.Draw("EP")
     histSystRawYieldCentr020VsPt.Draw("E2P SAME")
-    histStatRawYieldCentr010VsPt.Draw("EP SAME")
-    histSystRawYieldCentr010VsPt.Draw("E2P SAME")
+    histStatRawYieldCentr2060VsPt.Draw("EP SAME")
+    histSystRawYieldCentr2060VsPt.Draw("E2P SAME")
+    #histStatRawYieldCentr010VsPt.Draw("EP SAME")
+    #histSystRawYieldCentr010VsPt.Draw("E2P SAME")
 
     legendRawYieldVsPt = ROOT.TLegend(0.70, 0.70, 0.85, 0.85, " ", "brNDC")
     SetLegend(legendRawYieldVsPt)
-    legendRawYieldVsPt.SetTextSize(0.045)
+    legendRawYieldVsPt.SetTextSize(0.050)
     legendRawYieldVsPt.AddEntry(histStatRawYieldCentr020VsPt, "0 #minus 20%", "P")
-    legendRawYieldVsPt.AddEntry(histStatRawYieldCentr010VsPt, "0 #minus 10%", "P")
+    legendRawYieldVsPt.AddEntry(histStatRawYieldCentr2060VsPt, "20 #minus 60%", "P")
+    #legendRawYieldVsPt.AddEntry(histStatRawYieldCentr010VsPt, "0 #minus 10%", "P")
     legendRawYieldVsPt.Draw("SAME")
 
     canvasRawYieldVsPt.Update()
@@ -168,13 +203,15 @@ def compare():
     canvasWidthVsPt = ROOT.TCanvas("canvasWidthVsPt", "", 800, 600)
     histStatWidthCentr020VsPt.GetYaxis().SetRangeUser(0, 0.150)
     histStatWidthCentr020VsPt.Draw("EP")
-    histStatWidthCentr010VsPt.Draw("EP SAME")
+    #histStatWidthCentr010VsPt.Draw("EP SAME")
+    histStatWidthCentr2060VsPt.Draw("EP SAME")
 
     legendWidthVsPt = ROOT.TLegend(0.70, 0.25, 0.85, 0.40, " ", "brNDC")
     SetLegend(legendWidthVsPt)
-    legendWidthVsPt.SetTextSize(0.045)
+    legendWidthVsPt.SetTextSize(0.050)
     legendWidthVsPt.AddEntry(histStatWidthCentr020VsPt, "0 #minus 20%", "P")
-    legendWidthVsPt.AddEntry(histStatWidthCentr010VsPt, "0 #minus 10%", "P")
+    #legendWidthVsPt.AddEntry(histStatWidthCentr010VsPt, "0 #minus 10%", "P")
+    legendWidthVsPt.AddEntry(histStatWidthCentr2060VsPt, "20 #minus 60%", "P")
     legendWidthVsPt.Draw("SAME")
 
     canvasWidthVsPt.Update()
@@ -182,13 +219,15 @@ def compare():
     canvasMeanVsPt = ROOT.TCanvas("canvasMeanVsPt", "", 800, 600)
     histStatMeanCentr020VsPt.GetYaxis().SetRangeUser(3.00, 3.15)
     histStatMeanCentr020VsPt.Draw("EP")
-    histStatMeanCentr010VsPt.Draw("EP SAME")
+    #histStatMeanCentr010VsPt.Draw("EP SAME")
+    histStatMeanCentr2060VsPt.Draw("EP SAME")
 
     legendMeanVsPt = ROOT.TLegend(0.70, 0.70, 0.85, 0.85, " ", "brNDC")
     SetLegend(legendMeanVsPt)
-    legendMeanVsPt.SetTextSize(0.045)
+    legendMeanVsPt.SetTextSize(0.050)
     legendMeanVsPt.AddEntry(histStatMeanCentr020VsPt, "0 #minus 20%", "P")
-    legendMeanVsPt.AddEntry(histStatMeanCentr010VsPt, "0 #minus 10%", "P")
+    #legendMeanVsPt.AddEntry(histStatMeanCentr010VsPt, "0 #minus 10%", "P")
+    legendMeanVsPt.AddEntry(histStatMeanCentr2060VsPt, "20 #minus 60%", "P")
     legendMeanVsPt.Draw("SAME")
 
     canvasMeanVsPt.Update()

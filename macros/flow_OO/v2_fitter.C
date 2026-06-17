@@ -74,6 +74,7 @@ double maxFixVarBins[] = {60};
 string varAxisTitle = "#it{p}_{T} (GeV/#it{c})";
 string varName = "Pt";
 string varFixName = "centrality";
+string train = "698032";
 
 // Single Fit
 //double resolution[] = {1.9015745, 1.9015745, 1.9015745, 1.9015745, 1.9015745, 1.9015745}; // average RSP in 0-20%, to be redone with dimuon weights
@@ -85,15 +86,24 @@ string varFixName = "centrality";
 //double resolution[] = {1.9778990, 1.9778990, 1.9778990, 1.9778990, 1.9778990, 1.9778990}; // average RSP in 0-20%, to be redone with dimuon weights
 //double resolution[] = {2.4828559, 2.4828559, 2.4828559, 2.4828559, 2.4828559, 2.4828559}; // average RSP in 20-60%, to be redone with dimuon weights
 
+TFile *fIn = TFile::Open(Form("output/resolution_TPC_train_%s.root", train.c_str()));
+TH1D *hWMeanR2SP = (TH1D*) fIn -> Get("hWMeanR2SP");
+double r2sp;
 double resolution[6];
 if (minFixVarBins[0] == 0 && maxFixVarBins[0] == 20) {
   for (int iTmp1 = 0;iTmp1 < 6;iTmp1++) {
-    resolution[iTmp1] = 1.9778990;
+    //resolution[iTmp1] = 1.9778990;
+    //resolution[iTmp1] = 2.6595320; // TPC-POS
+    r2sp = hWMeanR2SP -> GetBinContent(1);
+    resolution[iTmp1] = 1. / r2sp;
     std::cout << resolution[iTmp1] << std::endl;
   }
 } else if (minFixVarBins[0] == 20 && maxFixVarBins[0] == 60) {
   for (int iTmp2 = 0;iTmp2 < 6;iTmp2++) {
-    resolution[iTmp2] = 2.4828559;
+    //resolution[iTmp2] = 2.4828559;
+    //resolution[iTmp2] = 3.4647874; // TPC-POS
+    r2sp = hWMeanR2SP -> GetBinContent(2);
+    resolution[iTmp2] = 1. / r2sp;
     std::cout << resolution[iTmp2] << std::endl;
   }
 } else {
@@ -103,6 +113,10 @@ if (minFixVarBins[0] == 0 && maxFixVarBins[0] == 20) {
     std::cout << resolution[iTmp3] << std::endl;
   }
 }
+
+string strEtaGap = "etaGap17";
+//string strEtaGap = "etaGap20";
+//string strEtaGap = "etaGap25";
 
 /*const int nVarBins = 6;
 double minVarBins[] = {0.0, 1.0, 2.0, 3.0, 4.0, 6.0};
@@ -119,34 +133,9 @@ string dirInPath = Form("/Users/lucamicheletti/GITHUB/dq_fitter/analysis/LHC25ae
 //string fInName = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/data/pass4/LHC23_full/Histograms_Fullpass4PbPbQualitymatchedMchMid_centr_Mixing_10_50.root";
 //string fInName = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/data/pass4/LHC23_full/Histograms_Fullpass4PbPbQualitymatchedMchMid_CentBins_MchMid__20_40.root";
 //string fInName = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/LHC25ae/Histograms_OO_matchedMchMid_Centrality_0_20_SP.root";
-string fInName = Form("/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/LHC25ae/Histograms_OO_muonQualityCutsMUONStandalone_Centrality_%1.0f_%1.0f_SP.root", minFixVarBins[0], maxFixVarBins[0]);
+string fInName = Form("/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/LHC25ae/%s/Histograms_OO_muonQualityCutsMUONStandalone_Centrality_%1.0f_%1.0f_SP.root", strEtaGap.c_str(), minFixVarBins[0], maxFixVarBins[0]);
 //string fInName = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/LHC25ae/Histograms_OO_muonQualityCutsMUONStandalone_Centrality_20_60_SP.root";
-string dirOutPath = "systematics_std_fit";
-
-//--------------------------
-// v2 centrality dependence
-/*double minFixVarBins[] = {5};
-double maxFixVarBins[] = {15};
-string varAxisTitle = "Centrality (%)";
-string varName = "Centr";
-string varFixName = "pt";*/
-
-/*double resolution[] = {1.56041, 1.17495, 1.1283, 1.14024, 1.1949, 1.31888, 1.5944, 2.25324};
-const int nVarBins = 8;
-double minVarBins[] = {0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0};
-double maxVarBins[] = {10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0};
-double varBins[] = {0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0};*/
-
-// Single Fit
-/*double resolution[] = {1.5944};
-const int nVarBins = 1;
-double minVarBins[] = {60.0};
-double maxVarBins[] = {70.0};
-double varBins[] = {60.0, 70.0};
-
-string dirInPath = Form("/Users/lucamicheletti/GITHUB/dq_fitter/analysis/LHC23_pass4_full/pt_%1.0f_%1.0f/centrality_dependence", minFixVarBins[0], maxFixVarBins[0]);
-string fInName = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/data/pass4/LHC23_full/Histograms_Fullpass4PbPbQualitymatchedMchMid_mergedpT_Mixing_0_80.root";
-string dirOutPath = "systematics_pass4_std_fit";*/
+string dirOutPath = Form("systematics_std_fit/%s", strEtaGap.c_str());
 
 const int nFitRanges = 3;
 //double minFitRanges[] = {2.3, 2.4, 2.5};
@@ -157,6 +146,20 @@ double maxFitRanges[] = {4.9, 4.8, 4.7};
 int nTrials = 0;
 
 void v2_fitter() {
+  Printf(".......................................");
+  Printf("Centrality: %1.0f - %1.0f", minFixVarBins[0], maxFixVarBins[0]);
+  Printf("Variable:   %s", varName.c_str());
+  Printf("Train:      %s", train.c_str());
+  Printf("Eta gap:    %s", strEtaGap.c_str());
+  Printf("Resolution: %f", r2sp);
+  Printf(".......................................");
+  Printf("The setting is fine? (true = 1/ false = 0)");
+  bool proceed = false;
+  std::cin >> proceed;
+  if (!proceed) {
+    return;
+  }
+  
   if (!gSystem -> AccessPathName(dirInPath.c_str())) {
     std::cout << "The output directory already exists! " << std::endl;
   } else {

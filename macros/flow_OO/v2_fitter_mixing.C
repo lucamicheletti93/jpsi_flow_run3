@@ -81,36 +81,50 @@ double maxFixVarBins[] = {60};
 string varAxisTitle = "#it{p}_{T} (GeV/#it{c})";
 string varName = "Pt";
 string varFixName = "centrality";
+string train = "698032";
 
 // Single Fit
 // 05/06/2026
 //double resolution[] = {2.6293717}; // average RSP in 0-20%, to be redone with dimuon weights
 //double resolution[] = {3.4229578}; // average RSP in 20-60%, to be redone with dimuon weights
 
+TFile *fIn = TFile::Open(Form("output/resolution_TPC_train_%s.root", train.c_str()));
+TH1D *hWMeanR2SP = (TH1D*) fIn -> Get("hWMeanR2SP");
+double r2sp;
 double resolution[1];
 if (minFixVarBins[0] == 0 && maxFixVarBins[0] == 20) {
-  resolution[0] = 1.9778990;
+  //resolution[0] = 1.9778990;
+  //resolution[0] = 2.6595320; // TPC-POS
+  r2sp = hWMeanR2SP -> GetBinContent(1);
+  resolution[0] = 1. / r2sp;
 } else if (minFixVarBins[0] == 20 && maxFixVarBins[0] == 60) {
-  resolution[0] = 2.4828559;
+  //resolution[0] = 2.4828559;
+  //resolution[0] = 3.4647874; // TPC-POS
+  r2sp = hWMeanR2SP -> GetBinContent(2);
+  resolution[0] = 1. / r2sp;
 } else {
   std::cout << "*** ERROR: incorrect centrality range ***" << std::endl;
   resolution[0] = -9999.;
 }
 
-const int nVarBins = 6;
+string strEtaGap = "etaGap17";
+//string strEtaGap = "etaGap20";
+//string strEtaGap = "etaGap25";
+
+/*const int nVarBins = 6;
 double minVarBins[] = {0.0, 1.0, 2.0, 3.0, 4.0, 6.0};
 double maxVarBins[] = {1.0, 2.0, 3.0, 4.0, 6.0, 8.0};
-double varBins[] = {0.0, 1.0, 2.0, 3.0, 4.0, 6.0, 8.0};
+double varBins[] = {0.0, 1.0, 2.0, 3.0, 4.0, 6.0, 8.0};*/
 
-/*const int nVarBins = 4;
+const int nVarBins = 4;
 double minVarBins[] = {0.0, 2.0, 4.0, 6.0};
 double maxVarBins[] = {2.0, 4.0, 6.0, 8.0};
-double varBins[] = {0.0, 2.0, 4.0, 6.0, 8.0};*/
+double varBins[] = {0.0, 2.0, 4.0, 6.0, 8.0};
 
 /*const int nVarBins = 1;
-double minVarBins[] = {6.0};
-double maxVarBins[] = {8.0};
-double varBins[] = {8.0};*/
+double minVarBins[] = {0.0};
+double maxVarBins[] = {2.0};
+double varBins[] = {0.0};*/
 
 std::map<std::pair<double, double>, double> inputV2VsPtCentr3050 = {{{0.0, 0.5}, 0.00674}, {{0.5, 1.0}, 0.01865}, {{1.0, 1.5}, 0.03371}, {{1.5, 2.0}, 0.03932}, {{2.0, 2.5}, 0.07062}, 
                                                                    {{2.5, 3.0}, 0.06541}, {{3.0, 4.0}, 0.09357}, {{4.0, 5.0}, 0.08581}, {{5.0, 6.0}, 0.07073}, {{6.0, 8.0}, -0.06867}, 
@@ -119,41 +133,9 @@ std::map<std::pair<double, double>, double> inputV2VsPtCentr3050 = {{{0.0, 0.5},
 string dirInPath = Form("/Users/lucamicheletti/GITHUB/dq_fitter/analysis/LHC25ae_pass2/centrality_%1.0f_%1.0f/pt_dependence", minFixVarBins[0], maxFixVarBins[0]);
 //string fInName = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/data/pass4/LHC23_full/Histograms_Fullpass4PbPbQualitymatchedMchMid_centr_Mixing_10_50.root"; // default
 //string fInName = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/data/pass4/LHC23_full/Histograms_Fullpass4PbPbQualitymatchedMchMid_CentBins_MchMid__20_40.root"; // For cross check with SP
-string fInName = Form("/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/LHC25ae/Histograms_OO_muonQualityCutsMUONStandalone_Centrality_%1.0f_%1.0f_SP.root", minFixVarBins[0], maxFixVarBins[0]);
+string fInName = Form("/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/LHC25ae/%s/Histograms_OO_muonQualityCutsMUONStandalone_Centrality_%1.0f_%1.0f_SP.root", strEtaGap.c_str(), minFixVarBins[0], maxFixVarBins[0]);
 //string fInName = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/LHC25ae/Histograms_OO_muonQualityCutsMUONStandalone_Centrality_20_60_SP.root";
-string dirOutPath = "systematics_mix_fit";
-
-//--------------------------
-// v2 centrality dependence
-/*double minFixVarBins[] = {5};
-double maxFixVarBins[] = {15};
-string varAxisTitle = "Centrality (%)";
-string varName = "Centr";
-string varFixName = "pt";*/
-
-/*double resolution[] = {1.56041, 1.17495, 1.1283, 1.14024, 1.1949, 1.31888, 1.5944, 2.25324};
-const int nVarBins = 8;
-double minVarBins[] = {0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0};
-double maxVarBins[] = {10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0};
-double varBins[] = {0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0};*/
-
-// Single Fit
-/*double resolution[] = {1.31888};
-const int nVarBins = 1;
-double minVarBins[] = {50.0};
-double maxVarBins[] = {60.0};
-double varBins[] = {50.0, 60.0};*/
-
-// pt < 5 GeV/c
-/*std::map<std::pair<double, double>, double> inputV2VsPtCentr3050 = {{{0.0, 10.0}, 0.0002}, {{10.0, 20.0}, 0.0807206}, {{20.0, 30.0}, 0.047}, {{30.0, 40.0}, 0.0502}, {{40.0, 50.0}, 0.07062}, 
-                                                                   {{50.0, 60.0}, 0.0469286}, {{60.0, 70.0}, 0.0469286}, {{70.0, 80.0}, 0.0469286}};*/
-// 5 < pt < 15 GeV/c
-/*std::map<std::pair<double, double>, double> inputV2VsPtCentr3050 = {{{0.0, 10.0}, 0.0002}, {{10.0, 20.0}, 0.01199}, {{20.0, 30.0}, 0.047}, {{30.0, 40.0}, 0.0502}, {{40.0, 50.0}, 0.0260}, 
-                                                                   {{50.0, 60.0}, 0.0469286}, {{60.0, 70.0}, 0.0469286}, {{70.0, 80.0}, 0.0469286}};
-
-string dirInPath = Form("/Users/lucamicheletti/GITHUB/dq_fitter/analysis/LHC23_pass4_full/pt_%1.0f_%1.0f/centrality_dependence", minFixVarBins[0], maxFixVarBins[0]);
-string fInName = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/data/pass4/LHC23_full/Histograms_Fullpass4PbPbQualitymatchedMchMid_mergedpT_Mixing_0_80.root";
-string dirOutPath = "systematics_pass4_mix_fit";*/
+string dirOutPath = Form("systematics_mix_fit/%s", strEtaGap.c_str());
 
 const int nFitRanges = 3;
 double minFitRanges[] = {2.1, 2.2, 2.3};
@@ -162,6 +144,20 @@ double maxFitRanges[] = {4.9, 4.8, 4.7};
 int nTrials = 0;
 
 void v2_fitter_mixing() {
+  Printf(".......................................");
+  Printf("Centrality: %1.0f - %1.0f", minFixVarBins[0], maxFixVarBins[0]);
+  Printf("Variable:   %s", varName.c_str());
+  Printf("Train:      %s", train.c_str());
+  Printf("Eta gap:    %s", strEtaGap.c_str());
+  Printf("Resolution: %f", r2sp);
+  Printf(".......................................");
+  Printf("The setting is fine? (true = 1/ false = 0)");
+  bool proceed = false;
+  std::cin >> proceed;
+  if (!proceed) {
+    return;
+  }
+
   if (!gSystem -> AccessPathName(dirInPath.c_str())) {
     std::cout << "The output directory already exists! " << std::endl;
   } else {

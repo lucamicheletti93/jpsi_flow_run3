@@ -1,7 +1,7 @@
-void combine_systematics(string fixVar = "centrality", double minFixVar = 0, double maxFixVar = 20, string binning = "narrow") {
-    string dirInPathStd = Form("/Users/lucamicheletti/GITHUB/jpsi_flow_run3/macros/flow_OO/systematics_std_fit/%s_%1.0f_%1.0f", fixVar.c_str(), minFixVar, maxFixVar);
-    string dirInPathMix = Form("/Users/lucamicheletti/GITHUB/jpsi_flow_run3/macros/flow_OO/systematics_mix_fit/%s_%1.0f_%1.0f", fixVar.c_str(), minFixVar, maxFixVar);
-    string dirOutPath = Form("combined_systematics/%s_%1.0f_%1.0f", fixVar.c_str(), minFixVar, maxFixVar);
+void combine_systematics(string fixVar = "centrality", double minFixVar = 0, double maxFixVar = 20, string binning = "narrow", string strEtaGap = "etaGap17") {
+    string dirInPathStd = Form("/Users/lucamicheletti/GITHUB/jpsi_flow_run3/macros/flow_OO/systematics_std_fit/%s/%s_%1.0f_%1.0f", strEtaGap.c_str(), fixVar.c_str(), minFixVar, maxFixVar);
+    string dirInPathMix = Form("/Users/lucamicheletti/GITHUB/jpsi_flow_run3/macros/flow_OO/systematics_mix_fit/%s/%s_%1.0f_%1.0f", strEtaGap.c_str(), fixVar.c_str(), minFixVar, maxFixVar);
+    string dirOutPath = Form("combined_systematics/%s/%s_%1.0f_%1.0f", strEtaGap.c_str(), fixVar.c_str(), minFixVar, maxFixVar);
 
     const int nTrials = 48;
     string varAxisTitle, varName, varFixName;
