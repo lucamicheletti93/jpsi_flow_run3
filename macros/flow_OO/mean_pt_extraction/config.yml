@@ -1,0 +1,17 @@
+prefilter:  
+  data: data_tree.root
+  treeIn: "DF_2423890592932256/O2rtdileptmtree"
+  treeOut: "O2rtdileptmtree"
+  cuts: "(fCentFT0C >= 20  && fCentFT0C < 60)"
+  suffix: _Centr_20_60
+
+input:
+  fInList: ["mean_pt_Centr_0_20__Pt_0_2.root", 
+            "mean_pt_Centr_0_20__Pt_0_2.root",
+            "mean_pt_Centr_0_20__Pt_2_4.root",
+            "mean_pt_Centr_0_20__Pt_4_6.root",
+            "mean_pt_Centr_0_20__Pt_6_8.root",
+            "mean_pt_Centr_20_60__Pt_0_2.root",
+            "mean_pt_Centr_20_60__Pt_2_4.root",
+            "mean_pt_Centr_20_60__Pt_4_6.root",
+            "mean_pt_Centr_20_60__Pt_6_8.root"]
