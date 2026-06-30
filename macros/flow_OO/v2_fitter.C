@@ -87,7 +87,7 @@ string train = "698032";
 //double resolution[] = {2.4828559, 2.4828559, 2.4828559, 2.4828559, 2.4828559, 2.4828559}; // average RSP in 20-60%, to be redone with dimuon weights
 
 TFile *fIn = TFile::Open(Form("output/resolution_TPC_train_%s.root", train.c_str()));
-TH1D *hWMeanR2SP = (TH1D*) fIn -> Get("hWMeanR2SP");
+TH1D *hWMeanR2SP = (TH1D*) fIn -> Get("hDimuWmeanR2SP");
 double r2sp;
 double resolution[6];
 if (minFixVarBins[0] == 0 && maxFixVarBins[0] == 20) {
@@ -137,6 +137,11 @@ string fInName = Form("/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/LHC25ae/%s/H
 //string fInName = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/LHC25ae/Histograms_OO_muonQualityCutsMUONStandalone_Centrality_20_60_SP.root";
 string dirOutPath = Form("systematics_std_fit/%s", strEtaGap.c_str());
 
+//string dirInPath = Form("/Users/lucamicheletti/GITHUB/dq_fitter/analysis/LHC25ae_pass2/centrality_%1.0f_%1.0f/time_assoc/pt_dependence", minFixVarBins[0], maxFixVarBins[0]);
+//string fInName = Form("/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/LHC25ae/%s/time_assoc/Histograms_OO_muonQualityCutsMUONStandalone_Centrality_%1.0f_%1.0f_SP.root", strEtaGap.c_str(), minFixVarBins[0], maxFixVarBins[0]);
+//string dirOutPath = Form("systematics_std_fit/%s/time_assoc", strEtaGap.c_str());
+
+
 const int nFitRanges = 3;
 //double minFitRanges[] = {2.3, 2.4, 2.5};
 //double maxFitRanges[] = {4.7, 4.6, 4.5};
@@ -147,6 +152,9 @@ int nTrials = 0;
 
 void v2_fitter() {
   Printf(".......................................");
+  Printf("Directory:  %s", dirInPath.c_str());
+  Printf("Input file: %s", fInName.c_str());
+  Printf("Output dir: %s", dirOutPath.c_str());
   Printf("Centrality: %1.0f - %1.0f", minFixVarBins[0], maxFixVarBins[0]);
   Printf("Variable:   %s", varName.c_str());
   Printf("Train:      %s", train.c_str());
@@ -159,7 +167,7 @@ void v2_fitter() {
   if (!proceed) {
     return;
   }
-  
+
   if (!gSystem -> AccessPathName(dirInPath.c_str())) {
     std::cout << "The output directory already exists! " << std::endl;
   } else {
@@ -237,9 +245,12 @@ void v2_fitter() {
             TH1D *histMass = (TH1D*) fIn -> Get(histMassName.c_str());
             TProfile *profV2 = (TProfile*) fIn -> Get(profV2Name.c_str());
 
-            if (iSigFunc == 0 && iBkgFunc == 0 && iTailSet == 0 && iFitRange == 0 && iVar == nVarBins-1 && maxFixVarBins[0] == 60) {
-              histMass->Rebin(2);
-              profV2->Rebin(2);
+            if (iSigFunc == 0 && iBkgFunc == 0 && iTailSet == 0 && iFitRange == 0) {
+              histMass->Rebin(2); // project_histograms.C already rebin the v2 profile
+              if (iVar == nVarBins-1 && maxFixVarBins[0] == 60) {
+                histMass->Rebin(2);
+                profV2->Rebin(2);
+              }
             }
 
             // Plot options

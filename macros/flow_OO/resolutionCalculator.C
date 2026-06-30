@@ -28,7 +28,7 @@ void SetHist(TH1D *, Color_t , int , bool );
 TH1D* ComputeResolution(TH2F *, TH2F *, TH2F *, string );
 TCanvas* DoRatioPlot(TH1D *, std::vector<TH1D*> , string , string );
 
-void resolutionCalculator(string train = "687739", string detector = "TPC", bool runByRun = false) {
+void resolutionCalculator(string train = "698032", string detector = "TPC", bool runByRun = false) {
     LoadStyle();
     string estimators[3];
     if (detector == "TPCPOS") {
@@ -148,30 +148,45 @@ void resolutionCalculator(string train = "687739", string detector = "TPC", bool
         hMeanR2SP->SetMarkerColor(kRed);
         hMeanR2SP->SetLineColor(kRed);
 
-        TH1D *hWMeanR2SP = new TH1D("hWMeanR2SP", ";Centrality FT0C(%);#it{R}_{2}^{SP}", 3, centrBins);
-        hWMeanR2SP->SetMarkerStyle(24);
-        hWMeanR2SP->SetMarkerColor(kRed);
-        hWMeanR2SP->SetLineColor(kRed);
+        TH1D *hWmeanR2SP = new TH1D("hWmeanR2SP", ";Centrality FT0C(%);#it{R}_{2}^{SP}", 3, centrBins);
+        hWmeanR2SP->SetMarkerStyle(25);
+        hWmeanR2SP->SetMarkerColor(kRed);
+        hWmeanR2SP->SetLineColor(kRed);
+
+        TH1D *hDimuWmeanR2SP = new TH1D("hDimuWmeanR2SP", ";Centrality FT0C(%);#it{R}_{2}^{SP}", 3, centrBins);
+        hDimuWmeanR2SP->SetMarkerStyle(24);
+        hDimuWmeanR2SP->SetMarkerColor(kRed);
+        hDimuWmeanR2SP->SetLineColor(kRed);
 
 
         for (int iCentrBin = 0;iCentrBin < 3;iCentrBin++) {
             int binBegin = hSumR2RebinSP->FindBin(minCentrBins[iCentrBin]);
             int binEnd = hSumR2RebinSP->FindBin(maxCentrBins[iCentrBin]);
 
-            double meanR2SP = 0, wMeanR2SP = 0, wSum = 0;
+            double meanR2SP = 0, wMeanR2SP = 0, wSum =0, dimuWmeanR2SP = 0, dimuWsum = 0;
             for (int iBin = binBegin;iBin < binEnd;iBin++) {
                 meanR2SP += hSumR2RebinSP->GetBinContent(iBin);
-                wMeanR2SP += hSumR2RebinSP->GetBinContent(iBin)*hWeight->GetBinContent(iBin);
-                wSum += hWeight->GetBinContent(iBin);
-                std::cout << hSumR2RebinSP->GetBinContent(iBin) << " " << hWeight->GetBinContent(iBin) << std::endl;
+
+                wMeanR2SP += hSumR2RebinSP->GetBinContent(iBin) / (hSumR2RebinSP->GetBinError(iBin) * hSumR2RebinSP->GetBinError(iBin));
+                wSum += 1 / (hSumR2RebinSP->GetBinError(iBin) * hSumR2RebinSP->GetBinError(iBin));
+
+                dimuWmeanR2SP += hSumR2RebinSP->GetBinContent(iBin)*hWeight->GetBinContent(iBin);
+                dimuWsum += hWeight->GetBinContent(iBin);
+
+                //std::cout << hSumR2RebinSP->GetBinContent(iBin) << " " << hWeight->GetBinContent(iBin) << std::endl;
             }
             meanR2SP = meanR2SP/(binEnd-binBegin);
             hMeanR2SP->SetBinContent(iCentrBin+1, meanR2SP);
             hMeanR2SP->SetBinError(iCentrBin+1, 0);
+
             wMeanR2SP = wMeanR2SP/wSum;
-            hWMeanR2SP->SetBinContent(iCentrBin+1, wMeanR2SP);
-            hWMeanR2SP->SetBinError(iCentrBin+1, 1./TMath::Sqrt(wSum));
-            //std::cout << "mean = " << meanR2SP << std::endl; 
+            hWmeanR2SP->SetBinContent(iCentrBin+1, wMeanR2SP);
+            hWmeanR2SP->SetBinError(iCentrBin+1, 1./TMath::Sqrt(wSum));
+
+            dimuWmeanR2SP = dimuWmeanR2SP/dimuWsum;
+            hDimuWmeanR2SP->SetBinContent(iCentrBin+1, dimuWmeanR2SP);
+            hDimuWmeanR2SP->SetBinError(iCentrBin+1, 1./TMath::Sqrt(dimuWsum));
+            std::cout << "mean = " << meanR2SP << " ; w. mean = " << wMeanR2SP << " ; dimu. w. mean = " << dimuWmeanR2SP << std::endl; 
         }
 
         TCanvas *canvasR2SP = new TCanvas("canvasR2SP", "", 800, 600);
@@ -182,21 +197,24 @@ void resolutionCalculator(string train = "687739", string detector = "TPC", bool
         hSumR2RebinSP->GetYaxis()->SetRangeUser(0, 0.7);
         hSumR2RebinSP->Draw("EP");
         hMeanR2SP->Draw("EP SAME");
-        hWMeanR2SP->Draw("EP SAME");
+        hWmeanR2SP->Draw("EP SAME");
+        hDimuWmeanR2SP->Draw("EP SAME");
 
-        TLegend *legendR2RebinSP = new TLegend(0.65, 0.68, 0.85, 0.88, " ", "brNDC");
+        TLegend *legendR2RebinSP = new TLegend(0.55, 0.68, 0.85, 0.88, " ", "brNDC");
         SetLegend(legendR2RebinSP);
         legendR2RebinSP -> SetTextSize(0.035);
         legendR2RebinSP -> AddEntry(hSumR2RebinSP, "Resolution", "PL");
         legendR2RebinSP -> AddEntry(hMeanR2SP, "Normal average", "PL");
-        legendR2RebinSP -> AddEntry(hWMeanR2SP, "Weighted average", "PL");
+        legendR2RebinSP -> AddEntry(hWmeanR2SP, "Weighted average", "PL");
+        legendR2RebinSP -> AddEntry(hDimuWmeanR2SP, "Weighted average with #mu^{+}#mu^{-}", "PL");
         legendR2RebinSP -> Draw();
         
         TFile *fOut = new TFile(Form("output/resolution_%s_train_%s.root", detector.c_str(), train.c_str()), "RECREATE");
         hSumR2SP->Write("hR2SP_original");
         hSumR2RebinSP->Write("hR2SP_original_rebin");
         hMeanR2SP->Write("hMeanR2SP");
-        hWMeanR2SP->Write("hWMeanR2SP");
+        hWmeanR2SP->Write("hWmeanR2SP");
+        hDimuWmeanR2SP->Write("hDimuWmeanR2SP");
         fOut->Close();
 
         canvasR2RebinSP->SaveAs(Form("figures/resolution_%s_train_%s.pdf", detector.c_str(), train.c_str()));
@@ -277,7 +295,7 @@ TCanvas* DoRatioPlot(TH1D *histSum, std::vector<TH1D*> hist, string canvasName, 
     histSum->GetXaxis()->SetRangeUser(xRangeMin, xRangeMax);
     histSum->GetXaxis()->SetTitleSize(0.045);
     histSum->GetXaxis()->SetLabelSize(0.045);
-    histSum->GetYaxis()->SetRangeUser(0.02, 0.5);
+    histSum->GetYaxis()->SetRangeUser(0.02, 0.7);
     histSum->GetYaxis()->SetTitleSize(0.045);
     histSum->GetYaxis()->SetLabelSize(0.045);
 

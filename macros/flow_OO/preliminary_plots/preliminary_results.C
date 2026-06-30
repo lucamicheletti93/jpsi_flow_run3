@@ -173,9 +173,9 @@ void preliminary_results() {
     double ptJpsiFwdSyst[] = {0.15, 0.15, 0.15, 0.15};
 
     double ptJpsiOOFwdCentr020[] = {1.28, 2.87, 4.82, 6.84};
-    double v2JpsiOOFwdCentr020Vals[] = {0.0144323, 0.0329074, 0.0698103, 0.0844539};
-    double v2JpsiOOFwdCentr020Stats[] = {0.0180728, 0.0188962, 0.0303064, 0.049283};
-    double v2JpsiOOFwdCentr020Systs[] = {0.00312387, 0.00928278, 0.0194577, 0.0269159};
+    double v2JpsiOOFwdCentr020Vals[] = {0.0143719, 0.0321096, 0.072157, 0.0819288};
+    double v2JpsiOOFwdCentr020Stats[] = {0.0179254, 0.0187689, 0.0300562, 0.0488713};
+    double v2JpsiOOFwdCentr020Systs[] = {0.00310963, 0.0101671, 0.0069517, 0.0301406};
 
     TGraphErrors *graStatV2JpsiOOFwdCentr020 = new TGraphErrors(nPtBins, ptJpsiOOFwdCentr020, v2JpsiOOFwdCentr020Vals, ptJpsiFwdWidth, v2JpsiOOFwdCentr020Stats);
     SetGraph(graStatV2JpsiOOFwdCentr020, kRed+1, 1.5, 20, 1, false);
@@ -184,9 +184,9 @@ void preliminary_results() {
     SetGraph(graSystV2JpsiOOFwdCentr020, kRed+1, 1.5, 20, 1, true);
 
     double ptJpsiOOFwdCentr2060[] = {1.24, 2.87, 4.83, 6.76};
-    double v2JpsiOOFwdCentr2060Vals[] = {-0.00894195, 0.00854762, 0.0418244, 0.12257};
-    double v2JpsiOOFwdCentr2060Stats[] = {0.0214885, 0.0221865, 0.0350661, 0.0639947};
-    double v2JpsiOOFwdCentr2060Systs[] = {0.00690191, 0.00723872, 0.00867721, 0.0234387};
+    double v2JpsiOOFwdCentr2060Vals[] = {-0.00880563, 0.00844508, 0.0413613, 0.119999};
+    double v2JpsiOOFwdCentr2060Stats[] = {0.0213792, 0.0220216, 0.0348384, 0.0635753};
+    double v2JpsiOOFwdCentr2060Systs[] = {0.0069356, 0.00718644, 0.00866651, 0.0273761};
 
     TGraphErrors *graStatV2JpsiOOFwdCentr2060 = new TGraphErrors(nPtBins, ptJpsiOOFwdCentr2060, v2JpsiOOFwdCentr2060Vals, ptJpsiFwdWidth, v2JpsiOOFwdCentr2060Stats);
     SetGraph(graStatV2JpsiOOFwdCentr2060, kRed+1, 1.5, 20, 1, false);

@@ -81,6 +81,20 @@ void combine_systematics(string fixVar = "centrality", double minFixVar = 0, dou
     histSystJpsiV2 -> SetLineColor(kRed+1);
     histSystJpsiV2 -> SetFillStyle(0);
 
+    TH1D *histStatJpsiMixV2 = new TH1D("histStatJpsiMixV2", "", nVarBins, &(vecVarBins[0]));
+    histStatJpsiMixV2 -> GetXaxis() -> SetTitle(varAxisTitle.c_str());
+    histStatJpsiMixV2 -> GetYaxis() -> SetRangeUser(-0.05, 0.4);
+    histStatJpsiMixV2 -> GetYaxis() -> SetTitle("#it{v}_{2}");
+    histStatJpsiMixV2 -> SetMarkerStyle(20);
+    histStatJpsiMixV2 -> SetMarkerColor(kBlue+1);
+    histStatJpsiMixV2 -> SetLineColor(kBlue+1);
+
+    TH1D *histSystJpsiMixV2 = new TH1D("histSystJpsiMixV2", "", nVarBins, &(vecVarBins[0]));
+    histSystJpsiMixV2 -> SetMarkerStyle(20);
+    histSystJpsiMixV2 -> SetMarkerColor(kBlue+1);
+    histSystJpsiMixV2 -> SetLineColor(kBlue+1);
+    histSystJpsiMixV2 -> SetFillStyle(0);
+
     for (int iVar = 0;iVar < nVarBins;iVar++) {
         TFile *fInStdFit = new TFile(Form("%s/fitResults_%s_%2.1f_%2.1f.root", dirInPathStd.c_str(), varName.c_str(), vecMinVarBins[iVar], vecMaxVarBins[iVar]));
         TFile *fInMixFit = new TFile(Form("%s/fitResults_%s_%2.1f_%2.1f.root", dirInPathMix.c_str(), varName.c_str(), vecMinVarBins[iVar], vecMaxVarBins[iVar]));
@@ -101,8 +115,17 @@ void combine_systematics(string fixVar = "centrality", double minFixVar = 0, dou
         histCombinedSysts -> SetMarkerColor(kBlack);
         histCombinedSysts -> SetLineColor(kBlack);
 
+        vector<double> jpsiMixV2s;
+        vector<double> errJpsiMixV2s;
+
+        TH1D *histMixSysts = new TH1D("histMixSysts", "", nTrials/2, 0, nTrials/2);
+        histMixSysts -> SetMarkerStyle(20);
+        histMixSysts -> SetMarkerColor(kBlack);
+        histMixSysts -> SetLineColor(kBlack);
+
         TH1D *histChi2NdfAll = new TH1D("histChi2NdfAll", Form("%2.1f < #it{p}_{T} < %2.1f GeV/#it{c} ; #chi^{2} / NDF", vecMinVarBins[iVar], vecMaxVarBins[iVar]), 100, 0, 5);
         int nTrueTrials = 0;
+        int nTrueTrialsMix = 0;
         for (int iTrial = 0;iTrial < nTrials;iTrial++) {
             if (iTrial < nTrials/2) {
                 double chi2Ndf = histChi2NdfStdFit -> GetBinContent(iTrial+1);
@@ -133,9 +156,18 @@ void combine_systematics(string fixVar = "centrality", double minFixVar = 0, dou
                 histCombinedSysts -> SetBinContent(iTrial+1, histMixFit -> GetBinContent(iTrial+1-(nTrials/2)));
                 histCombinedSysts -> SetBinError(iTrial+1, histMixFit -> GetBinError(iTrial+1-(nTrials/2)));
                 histCombinedSysts -> GetXaxis() -> SetBinLabel(iTrial+1, Form("#color[864]{%s}", trialName.c_str()));
+
+                nTrueTrialsMix++;
+                jpsiMixV2s.push_back(histMixFit -> GetBinContent(iTrial+1-(nTrials/2)));
+                errJpsiMixV2s.push_back(histMixFit -> GetBinError(iTrial+1-(nTrials/2)));
+
+                histMixSysts -> SetBinContent(iTrial+1-(nTrials/2), histMixFit -> GetBinContent(iTrial+1-(nTrials/2)));
+                histMixSysts -> SetBinError(iTrial+1-(nTrials/2), histMixFit -> GetBinError(iTrial+1-(nTrials/2)));
+                histMixSysts -> GetXaxis() -> SetBinLabel(iTrial+1-(nTrials/2), Form("%s", trialName.c_str()));
             }
         }
 
+        // combined std and mix fits
         // compute the mean v2, the mean v2 error and the systematic
         double sumJpsiV2s = 0; 
         double statErrJpsiV2s = 0;
@@ -220,11 +252,87 @@ void combine_systematics(string fixVar = "centrality", double minFixVar = 0, dou
         TText *text1 = display1 -> AddText(Form(" v_{2}^{J/#psi} [%1.0f < #it{p}_{T} < %1.0f GeV/#it{c}] = %5.4f #pm %5.4f #pm %5.4f", vecMinVarBins[iVar], vecMaxVarBins[iVar], meanJpsiV2, meanStatErrJpsiV2, meanSystErrJpsiV2));
         display1 -> Draw("same");
 
+
+        // combined mix fits only
+        // compute the mean v2, the mean v2 error and the systematic
+        double sumMixJpsiV2s = 0; 
+        double statErrMixJpsiV2s = 0;
+
+        for (int iTrial = 0;iTrial < nTrueTrialsMix;iTrial++) {
+            sumMixJpsiV2s = sumMixJpsiV2s + jpsiMixV2s[iTrial];
+            statErrMixJpsiV2s = statErrMixJpsiV2s + errJpsiMixV2s[iTrial];
+        }
+        double meanJpsiMixV2 = sumMixJpsiV2s / nTrueTrialsMix;
+        double meanStatErrJpsiMixV2 = statErrMixJpsiV2s / nTrueTrialsMix;
+
+        double sumMixSyst = 0;
+        for (int iTrial = 0;iTrial < nTrueTrialsMix;iTrial++) {
+        double dev = (jpsiMixV2s[iTrial] - meanJpsiV2);
+            sumMixSyst = sumMixSyst + dev * dev;
+        }
+        double meanSystErrJpsiMixV2 = TMath::Sqrt(sumMixSyst / nTrueTrialsMix);
+
+        histStatJpsiMixV2 -> SetBinContent(iVar+1, meanJpsiMixV2);
+        histStatJpsiMixV2 -> SetBinError(iVar+1, meanStatErrJpsiMixV2);
+        histSystJpsiMixV2 -> SetBinContent(iVar+1, meanJpsiMixV2);
+        histSystJpsiMixV2 -> SetBinError(iVar+1, meanSystErrJpsiMixV2);
+
+        TLine *lineMeanMix = new TLine(0, meanJpsiMixV2, nTrials/2, meanJpsiMixV2);
+        lineMeanMix -> SetLineStyle(1);
+        lineMeanMix -> SetLineColor(kBlue);
+        lineMeanMix -> SetLineWidth(2);
+
+        TLine *lineSystUpMix = new TLine(0, meanJpsiMixV2 + meanSystErrJpsiMixV2, nTrials/2, meanJpsiMixV2 + meanSystErrJpsiMixV2);
+        lineSystUpMix-> SetLineStyle(2);
+        lineSystUpMix-> SetLineColor(kBlue);
+        lineSystUpMix-> SetLineWidth(2);
+
+        TLine *lineSystLwMix = new TLine(0, meanJpsiMixV2 - meanSystErrJpsiMixV2, nTrials/2, meanJpsiMixV2 - meanSystErrJpsiMixV2);
+        lineSystLwMix -> SetLineStyle(2);
+        lineSystLwMix -> SetLineColor(kBlue);
+        lineSystLwMix -> SetLineWidth(2);
+
+        TLine *lineStatUpMix = new TLine(0, meanJpsiMixV2 + meanStatErrJpsiMixV2, nTrials/2, meanJpsiMixV2 + meanStatErrJpsiMixV2);
+        lineStatUpMix-> SetLineStyle(2);
+        lineStatUpMix-> SetLineColor(kGray+1);
+        lineStatUpMix-> SetLineWidth(2);
+
+        TLine *lineStatLwMix = new TLine(0, meanJpsiMixV2 - meanStatErrJpsiMixV2, nTrials/2, meanJpsiMixV2 - meanStatErrJpsiMixV2);
+        lineStatLwMix -> SetLineStyle(2);
+        lineStatLwMix -> SetLineColor(kGray+1);
+        lineStatLwMix -> SetLineWidth(2);
+
+        TCanvas *canvasMixSysts = new TCanvas("canvasMixSysts", "", 1400, 900);
+        canvasMixSysts -> SetTopMargin(0.05);
+        canvasMixSysts -> SetBottomMargin(0.5);
+        histMixSysts -> SetStats(0);
+        histMixSysts -> GetXaxis() -> LabelsOption("v");
+        histMixSysts -> GetYaxis() -> SetRangeUser(meanJpsiV2 -  0.12, meanJpsiV2 + 0.12);
+        histMixSysts -> Draw();
+        canvasMixSysts -> Update();
+
+        lineMeanMix -> Draw();
+        lineSystUpMix-> Draw();
+        lineSystLwMix -> Draw();
+        lineStatUpMix -> Draw();
+        lineStatLwMix -> Draw();
+
+        TPaveText *displayMix1 = new TPaveText(0.20, 0.88, 0.80, 0.90, "blNDC");
+        displayMix1 -> SetTextFont(42);
+        displayMix1 -> SetTextSize(0.036);
+        displayMix1 -> SetTextColor(kBlack);
+        displayMix1 -> SetBorderSize(0);
+        displayMix1 -> SetFillColor(0);
+
+        TText *textMix1 = displayMix1 -> AddText(Form(" v_{2}^{J/#psi} [%1.0f < #it{p}_{T} < %1.0f GeV/#it{c}] = %5.4f #pm %5.4f #pm %5.4f", vecMinVarBins[iVar], vecMaxVarBins[iVar], meanJpsiMixV2, meanStatErrJpsiMixV2, meanSystErrJpsiMixV2));
+        displayMix1 -> Draw("same");
+
         if (varName == "Centr") {
             canvasCombinedSysts -> SaveAs(Form("%s/v2_sys_cent_%1.0f_%1.0f_pt_%1.0f_%1.0f.pdf", dirOutPath.c_str(), vecMinVarBins[iVar], vecMaxVarBins[iVar], minFixVar, maxFixVar));
         }
         if (varName == "Pt") {
             canvasCombinedSysts -> SaveAs(Form("%s/v2_sys_pt_%1.0f_%1.0f_cent_%1.0f_%1.0f.pdf", dirOutPath.c_str(), vecMinVarBins[iVar], vecMaxVarBins[iVar], minFixVar, maxFixVar));
+            canvasMixSysts -> SaveAs(Form("%s/v2_sys_pt_%1.0f_%1.0f_cent_%1.0f_%1.0f_mixing_only.pdf", dirOutPath.c_str(), vecMinVarBins[iVar], vecMaxVarBins[iVar], minFixVar, maxFixVar));
         }
 
         canvasChi2Ndf -> cd(iVar+1);
@@ -238,6 +346,8 @@ void combine_systematics(string fixVar = "centrality", double minFixVar = 0, dou
     TCanvas *canvasJpsiV2 = new TCanvas("canvasJpsiV2", "", 800, 600);
     histStatJpsiV2 -> Draw("EP");
     histSystJpsiV2 -> Draw("E2P SAME");
+    histStatJpsiMixV2 -> Draw("EP SAME");
+    histSystJpsiMixV2 -> Draw("E2P SAME");
 
     cout << "----------------------------------------------------------------------------------" << endl;
     std::pair<int, int> key = {minFixVar, maxFixVar};
@@ -257,6 +367,7 @@ void combine_systematics(string fixVar = "centrality", double minFixVar = 0, dou
         Printf("%3.2f %3.2f %6.5f %6.5f %6.5f ", vecMinVarBins[iVar], vecMaxVarBins[iVar], histStatJpsiV2 -> GetBinContent(iVar+1), histStatJpsiV2 -> GetBinError(iVar+1), systAll);
     }
     cout << "----------------------------------------------------------------------------------" << endl;
+    cout << "* * * Combining standard and mixing fits * * *" << endl;
     for (int iVar = 0;iVar < nVarBins;iVar++) {
         std::cout << histStatJpsiV2 -> GetBinContent(iVar+1) << ", ";
     }
@@ -268,6 +379,25 @@ void combine_systematics(string fixVar = "centrality", double minFixVar = 0, dou
     for (int iVar = 0;iVar < nVarBins;iVar++) {
         double systSigExtr = histSystJpsiV2 -> GetBinError(iVar+1);
         double systReso = histStatJpsiV2 -> GetBinContent(iVar+1) * resoRelErr;
+        double systAll = TMath::Sqrt(systSigExtr*systSigExtr + systReso*systReso);
+        std::cout << systAll << ", ";
+    }
+    std::cout << std::endl;
+    cout << "----------------------------------------------------------------------------------" << endl;
+
+    cout << "----------------------------------------------------------------------------------" << endl;
+    cout << "* * * Mixing fits only * * *" << endl;
+    for (int iVar = 0;iVar < nVarBins;iVar++) {
+        std::cout << histStatJpsiMixV2 -> GetBinContent(iVar+1) << ", ";
+    }
+    std::cout << std::endl;
+    for (int iVar = 0;iVar < nVarBins;iVar++) {
+        std::cout << histStatJpsiMixV2 -> GetBinError(iVar+1) << ", ";
+    }
+    std::cout << std::endl;
+    for (int iVar = 0;iVar < nVarBins;iVar++) {
+        double systSigExtr = histSystJpsiMixV2 -> GetBinError(iVar+1);
+        double systReso = histStatJpsiMixV2 -> GetBinContent(iVar+1) * resoRelErr;
         double systAll = TMath::Sqrt(systSigExtr*systSigExtr + systReso*systReso);
         std::cout << systAll << ", ";
     }

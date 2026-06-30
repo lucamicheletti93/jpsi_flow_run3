@@ -89,7 +89,7 @@ string train = "698032";
 //double resolution[] = {3.4229578}; // average RSP in 20-60%, to be redone with dimuon weights
 
 TFile *fIn = TFile::Open(Form("output/resolution_TPC_train_%s.root", train.c_str()));
-TH1D *hWMeanR2SP = (TH1D*) fIn -> Get("hWMeanR2SP");
+TH1D *hWMeanR2SP = (TH1D*) fIn -> Get("hDimuWmeanR2SP");
 double r2sp;
 double resolution[1];
 if (minFixVarBins[0] == 0 && maxFixVarBins[0] == 20) {
@@ -130,12 +130,17 @@ std::map<std::pair<double, double>, double> inputV2VsPtCentr3050 = {{{0.0, 0.5},
                                                                    {{2.5, 3.0}, 0.06541}, {{3.0, 4.0}, 0.09357}, {{4.0, 5.0}, 0.08581}, {{5.0, 6.0}, 0.07073}, {{6.0, 8.0}, -0.06867}, 
                                                                    {{8.0, 10.0}, 0.07321}, {{10.0, 12.0}, 0.07151}, {{12.0, 15.0}, 0.08718}};
 //string dirInPath = Form("/Users/lucamicheletti/GITHUB/dq_fitter/analysis/LHC23_pass4_full/centrality_%1.0f_%1.0f/pt_dependence_narrow_bins", minFixVarBins[0], maxFixVarBins[0]);
-string dirInPath = Form("/Users/lucamicheletti/GITHUB/dq_fitter/analysis/LHC25ae_pass2/centrality_%1.0f_%1.0f/pt_dependence", minFixVarBins[0], maxFixVarBins[0]);
 //string fInName = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/data/pass4/LHC23_full/Histograms_Fullpass4PbPbQualitymatchedMchMid_centr_Mixing_10_50.root"; // default
 //string fInName = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/data/pass4/LHC23_full/Histograms_Fullpass4PbPbQualitymatchedMchMid_CentBins_MchMid__20_40.root"; // For cross check with SP
-string fInName = Form("/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/LHC25ae/%s/Histograms_OO_muonQualityCutsMUONStandalone_Centrality_%1.0f_%1.0f_SP.root", strEtaGap.c_str(), minFixVarBins[0], maxFixVarBins[0]);
 //string fInName = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/LHC25ae/Histograms_OO_muonQualityCutsMUONStandalone_Centrality_20_60_SP.root";
+
+string dirInPath = Form("/Users/lucamicheletti/GITHUB/dq_fitter/analysis/LHC25ae_pass2/centrality_%1.0f_%1.0f/pt_dependence", minFixVarBins[0], maxFixVarBins[0]);
+string fInName = Form("/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/LHC25ae/%s/Histograms_OO_muonQualityCutsMUONStandalone_Centrality_%1.0f_%1.0f_SP.root", strEtaGap.c_str(), minFixVarBins[0], maxFixVarBins[0]);
 string dirOutPath = Form("systematics_mix_fit/%s", strEtaGap.c_str());
+
+//string dirInPath = Form("/Users/lucamicheletti/GITHUB/dq_fitter/analysis/LHC25ae_pass2/centrality_%1.0f_%1.0f/time_assoc/pt_dependence", minFixVarBins[0], maxFixVarBins[0]);
+//string fInName = Form("/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/LHC25ae/%s/time_assoc/Histograms_OO_muonQualityCutsMUONStandalone_Centrality_%1.0f_%1.0f_SP.root", strEtaGap.c_str(), minFixVarBins[0], maxFixVarBins[0]);
+//string dirOutPath = Form("systematics_mix_fit/%s/time_assoc", strEtaGap.c_str());
 
 const int nFitRanges = 3;
 double minFitRanges[] = {2.1, 2.2, 2.3};
@@ -145,6 +150,9 @@ int nTrials = 0;
 
 void v2_fitter_mixing() {
   Printf(".......................................");
+  Printf("Directory:  %s", dirInPath.c_str());
+  Printf("Input file: %s", fInName.c_str());
+  Printf("Output dir: %s", dirOutPath.c_str());
   Printf("Centrality: %1.0f - %1.0f", minFixVarBins[0], maxFixVarBins[0]);
   Printf("Variable:   %s", varName.c_str());
   Printf("Train:      %s", train.c_str());
@@ -241,10 +249,19 @@ void v2_fitter_mixing() {
             TProfile *profV2 = (TProfile*) fIn -> Get(profV2Name.c_str());
             TProfile *profV2Mix = (TProfile*) fIn -> Get(profV2MixName.c_str());
 
-            if (iSigFunc == 0 && iBkgFunc == 0 && iTailSet == 0 && iFitRange == 0 && iVar == nVarBins-1 && maxFixVarBins[0] == 60) {
+            /*if (iSigFunc == 0 && iBkgFunc == 0 && iTailSet == 0 && iFitRange == 0 && iVar == nVarBins-1 && maxFixVarBins[0] == 60) {
               histMass->Rebin(2);
               profV2->Rebin(2);
               profV2Mix->Rebin(2);
+            }*/
+
+            if (iSigFunc == 0 && iBkgFunc == 0 && iTailSet == 0 && iFitRange == 0) {
+              histMass->Rebin(2); // project_histograms.C already rebin the v2 profile
+              if (iVar == nVarBins-1 && maxFixVarBins[0] == 60) {
+                histMass->Rebin(2);
+                profV2->Rebin(2);
+                profV2Mix->Rebin(2);
+              }
             }
 	    
             // Plot options

@@ -17,7 +17,7 @@ void plot_v2_fit(double minPtBin = 0, double maxPtBin = 1, int minCentrBin = 0, 
 
     TFile *fIn = new TFile(Form("%s/fitResults_Pt_%2.1f_%2.1f.root", dirName.c_str(), minPtBin, maxPtBin), "READ");
     TH1D *histChi2Ndf = (TH1D*) fIn -> Get("histChi2Ndf");
-    TCanvas *canvasFit = (TCanvas*) fIn -> Get("v2_fit_2.3_4.7_CB2_VWG_data_Pol2_v2bkg");
+    TCanvas *canvasFit = (TCanvas*) fIn -> Get("v2_fit_2.2_4.8_CB2_VWG_data_Pol2_v2bkg");
 
     TPad *padMassFit = (TPad*) canvasFit -> GetPrimitive("pad1");
     TH1D *histMassSEPM = (TH1D*) padMassFit -> GetPrimitive(Form("histMassSEPM_%2.1f_%2.1f__%d_%d", minPtBin, maxPtBin, minCentrBin, maxCentrBin));
@@ -37,7 +37,7 @@ void plot_v2_fit(double minPtBin = 0, double maxPtBin = 1, int minCentrBin = 0, 
     // The histogram has no names -> necessary to retrieve with primitives
     TList* primitives = padFlowFit -> GetListOfPrimitives();
     string funcFlowName = mixing ? "funcFlowSigBkgToDraw" : "funcFlowSigBkg";
-    TF1 *funcFlowSigBkg = (TF1*) padFlowFit -> GetPrimitive("funcFlowSigBkgToDraw");
+    TF1 *funcFlowSigBkg = (TF1*) padFlowFit -> GetPrimitive(funcFlowName.c_str());
 
     TIter next(primitives);
     TObject* obj = nullptr;
@@ -174,6 +174,11 @@ void plot_v2_fit(double minPtBin = 0, double maxPtBin = 1, int minCentrBin = 0, 
         minFlowBin = 0.01 * histFlowSEPM -> GetBinContent(histFlowSEPM -> FindBin(2.5));
         maxFlowBin = 1.50 * histFlowSEPM -> GetBinContent(histFlowSEPM -> FindBin(2.5));
     }*/
+
+    if (minPtBin >= 6 && maxPtBin <= 8) {
+        minFlowBin = -0.35;
+        maxFlowBin = 0.35;
+    }
     
     TH2D *histGridFlow = new TH2D("histGridFlow", "", 100, 2.48, 4.52, 100, minFlowBin, maxFlowBin);
     histGridFlow -> SetTitle("");
@@ -196,7 +201,6 @@ void plot_v2_fit(double minPtBin = 0, double maxPtBin = 1, int minCentrBin = 0, 
         histFlowMEPM -> SetMarkerStyle(24);
         histFlowMEPM -> SetMarkerSize(1);
         histFlowMEPM -> Draw("EP SAME");
-        std::cout << "PIPPO" << std::endl;
     } else {
         funcFlowBkg = new TF1("funcFlowBkg", "[0] + [1]*x + [2]*x*x", 2.48, 4.52);
 
@@ -216,20 +220,25 @@ void plot_v2_fit(double minPtBin = 0, double maxPtBin = 1, int minCentrBin = 0, 
             std::smatch match;
             if (std::regex_search(line, match, regexPatter0)) {
                 funcFlowBkg -> SetParameter(0, std::stod(match[1]));
+                std::cout << "TEST: " << std::stod(match[1]) << std::endl;
             }
             if (std::regex_search(line, match, regexPatter1)) {
                 funcFlowBkg -> SetParameter(1, std::stod(match[1]));
+                std::cout << "TEST: " << std::stod(match[1]) << std::endl;
             }
             if (std::regex_search(line, match, regexPatter2)) {
                 funcFlowBkg -> SetParameter(2, std::stod(match[1]));
+                std::cout << "TEST: " << std::stod(match[1]) << std::endl;
             }
         }
     }
 
-    funcFlowBkg -> SetLineColor(kGray+1);
-    funcFlowBkg -> SetLineStyle(kDashed);
-    funcFlowBkg -> Draw("SAME");
-    if (mixing) {funcFlowSigBkg -> Draw("SAME");}
+    if (mixing) {
+        funcFlowBkg -> SetLineColor(kGray+1);
+        funcFlowBkg -> SetLineStyle(kDashed);
+        funcFlowBkg -> Draw("SAME");
+        funcFlowSigBkg -> Draw("SAME");
+    }
 
     histFlowSEPM -> SetStats(0);
     histFlowSEPM -> SetMarkerSize(1);
@@ -257,9 +266,9 @@ void plot_v2_fit(double minPtBin = 0, double maxPtBin = 1, int minCentrBin = 0, 
 
     canvasMassFlow -> Update();
     if (mixing) {
-        canvasMassFlow -> SaveAs(Form("ICHEP2026/signal_extraction_%d_%d/fitFlowVsMassPt_%1.0f_%1.0f_MixedEvent.pdf", minCentrBin, maxCentrBin, minPtBin, maxPtBin));
+        canvasMassFlow -> SaveAs(Form("ICHEP2026/approved_plots/signal_extraction_%d_%d/fitFlowVsMassPt_%1.0f_%1.0f_MixedEvent.pdf", minCentrBin, maxCentrBin, minPtBin, maxPtBin));
     } else {
-        canvasMassFlow -> SaveAs(Form("ICHEP2026/signal_extraction_%d_%d/fitFlowVsMassPt_%1.0f_%1.0f.pdf", minCentrBin, maxCentrBin, minPtBin, maxPtBin));
+        canvasMassFlow -> SaveAs(Form("ICHEP2026/approved_plots/signal_extraction_%d_%d/fitFlowVsMassPt_%1.0f_%1.0f.pdf", minCentrBin, maxCentrBin, minPtBin, maxPtBin));
     }
 }
 ////////////////////////////////////////////////////////////////////////////////
