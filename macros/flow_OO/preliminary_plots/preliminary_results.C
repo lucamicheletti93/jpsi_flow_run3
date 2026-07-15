@@ -9,23 +9,59 @@ void preliminary_results() {
     // ***************************************************************************************** //
     // Theory predictions from THU
     // ***************************************************************************************** //
-    string fInNameCentr020 = "/Users/lucamicheletti/GITHUB/dq_run3_analyses/charmonia_production_pO_OO_NeNe/theory/THU/forward/data_v2_jpsi_020_y254.dat";
-    TGraphAsymmErrors *graTheorFwdCentr020CentrVal = DoGraphFromTheory(fInNameCentr020);
+    string fInNameFwdCentr020 = "/Users/lucamicheletti/GITHUB/dq_run3_analyses/charmonia_production_pO_OO_NeNe/theory/THU/forward/data_v2_jpsi_020_y254.dat";
+    TGraphAsymmErrors *graTheorFwdCentr020CentrVal = DoGraphFromTheory(fInNameFwdCentr020);
     gStyle->SetLineStyleString(9,"80 20");
-    graTheorFwdCentr020CentrVal->SetLineColor(kOrange+7);
-    graTheorFwdCentr020CentrVal->SetLineWidth(2);
+    graTheorFwdCentr020CentrVal->SetLineColorAlpha(kRed+1,0.7);
+    graTheorFwdCentr020CentrVal->SetLineWidth(3);
     graTheorFwdCentr020CentrVal->SetLineStyle(9);
 
-    string fInNameCentr2060 = "/Users/lucamicheletti/GITHUB/dq_run3_analyses/charmonia_production_pO_OO_NeNe/theory/THU/forward/data_v2_jpsi_2060_y254.dat";
-    TGraphAsymmErrors *graTheorFwdCentr2060CentrVal = DoGraphFromTheory(fInNameCentr2060);
+    string fInNameFwdCentr2060 = "/Users/lucamicheletti/GITHUB/dq_run3_analyses/charmonia_production_pO_OO_NeNe/theory/THU/forward/data_v2_jpsi_2060_y254.dat";
+    TGraphAsymmErrors *graTheorFwdCentr2060CentrVal = DoGraphFromTheory(fInNameFwdCentr2060);
     gStyle->SetLineStyleString(9,"80 20");
-    graTheorFwdCentr2060CentrVal->SetLineColor(kOrange+7);
-    graTheorFwdCentr2060CentrVal->SetLineWidth(2);
+    graTheorFwdCentr2060CentrVal->SetLineColorAlpha(kRed+1,0.7);
+    graTheorFwdCentr2060CentrVal->SetLineWidth(3);
     graTheorFwdCentr2060CentrVal->SetLineStyle(9);
+
+    string fInNameMidCentr020 = "/Users/lucamicheletti/GITHUB/dq_run3_analyses/charmonia_production_pO_OO_NeNe/theory/THU/central/data_v2_jpsi_020_y08.dat";
+    TGraphAsymmErrors *graTheorMidCentr020CentrVal = DoGraphFromTheory(fInNameMidCentr020);
+    gStyle->SetLineStyleString(9,"80 20");
+    graTheorMidCentr020CentrVal->SetLineColorAlpha(kAzure+2,0.7);
+    graTheorMidCentr020CentrVal->SetLineWidth(3);
+    graTheorMidCentr020CentrVal->SetLineStyle(9);
+    
+
+    string fInNameMidCentr2060 = "/Users/lucamicheletti/GITHUB/dq_run3_analyses/charmonia_production_pO_OO_NeNe/theory/THU/central/data_v2_jpsi_2060_y08.dat";
+    TGraphAsymmErrors *graTheorMidCentr2060CentrVal = DoGraphFromTheory(fInNameMidCentr2060);
+    gStyle->SetLineStyleString(9,"80 20");
+    graTheorMidCentr2060CentrVal->SetLineColorAlpha(kAzure+2,0.7);
+    graTheorMidCentr2060CentrVal->SetLineWidth(3);
+    graTheorMidCentr2060CentrVal->SetLineStyle(9);
+
+
+    string fInNameMid09Centr020 = "/Users/lucamicheletti/GITHUB/dq_run3_analyses/charmonia_production_pO_OO_NeNe/theory/THU/central/data_v2_jpsi_020_y09.dat";
+    TGraphAsymmErrors *graTheorMid09Centr020CentrVal = DoGraphFromTheory(fInNameMid09Centr020);
+    gStyle->SetLineStyleString(9,"80 20");
+    graTheorMid09Centr020CentrVal->SetLineColorAlpha(kAzure+2,0.7);
+    graTheorMid09Centr020CentrVal->SetLineWidth(3);
+    graTheorMid09Centr020CentrVal->SetLineStyle(9);
+    
+
+    string fInNameMid09Centr2060 = "/Users/lucamicheletti/GITHUB/dq_run3_analyses/charmonia_production_pO_OO_NeNe/theory/THU/central/data_v2_jpsi_2060_y09.dat";
+    TGraphAsymmErrors *graTheorMid09Centr2060CentrVal = DoGraphFromTheory(fInNameMid09Centr2060);
+    gStyle->SetLineStyleString(9,"80 20");
+    graTheorMid09Centr2060CentrVal->SetLineColorAlpha(kAzure+2,0.7);
+    graTheorMid09Centr2060CentrVal->SetLineWidth(3);
+    graTheorMid09Centr2060CentrVal->SetLineStyle(9);
+
 
     // ***************************************************************************************** //
     // LF results
     // ***************************************************************************************** //
+    TFile *fInPi = new TFile("v2_piKp_OO_nch_0_5.root", "READ");
+    TGraphErrors *graStatV2PiMidCentr010 = (TGraphErrors*) fInPi->Get("gv2_pi_OO_nch_0_5");
+    SetGraph(graStatV2PiMidCentr010, kBlack, 1.5, 20, 1, false);
+
     TFile *fInLambda = new TFile("v2Lambda.root", "READ");
     TGraphErrors *graStatV2LambdaMidCentr010 = (TGraphErrors*) fInLambda->Get("gist_lambda_010");
     SetGraph(graStatV2LambdaMidCentr010, kGreen+2, 1.5, 20, 1, false);
@@ -42,7 +78,7 @@ void preliminary_results() {
     // ***************************************************************************************** //
     // D-meson results
     // ***************************************************************************************** //
-    TFile *fInDzero = new TFile("v2Dzero.root", "READ");
+    TFile *fInDzero = new TFile("v2Dzero_020.root", "READ");
     TGraphAsymmErrors *graStatV2DzeroMidCentr020 = (TGraphAsymmErrors*) fInDzero->Get("gvn_prompt_stat");
     SetAsymmGraph(graStatV2DzeroMidCentr020, kAzure+4, 1.5, 20, 1, false);
 
@@ -213,6 +249,8 @@ void preliminary_results() {
     latexTitle->SetNDC();
     latexTitle->SetTextFont(42);
 
+    TLatex latexTable;
+
     TH2D *histGridV2JpsiOO = new TH2D("histGridV2JpsiOO", ";#it{p}_{T} (GeV/#it{c});#it{#nu}_{2}^{SP} {|#Delta#it{#eta}| > 1.7}", 100, 0, 8, 100, -0.05, 0.20);
     TH2D *histGridV2JpsiAllSystems = new TH2D("histGridV2JpsiAllSystems", ";#it{p}_{T} (GeV/#it{c});#it{#nu}_{2}^{J/#psi}", 100, 0, 8, 100, -0.05, 0.30);
     TH2D *histGridV2JpsiAllSpecies = new TH2D("histGridV2JpsiAllSpecies", ";#it{p}_{T} (GeV/#it{c});#it{#nu}_{2}", 100, 0, 8, 100, -0.03, 0.37);
@@ -251,7 +289,7 @@ void preliminary_results() {
     latexTitle->DrawLatex(0.20, 0.82, "J/#psi #rightarrow #mu^{+}#mu^{-}, 2.5 < #it{y} < 4, 0#minus20%");
 
 
-    TCanvas *canvasV2JpsiOOSemientral = new TCanvas("canvasV2JpsiOOSemientral", "", 800, 600);
+    TCanvas *canvasV2JpsiOOSemicentral = new TCanvas("canvasV2JpsiOOSemicentral", "", 800, 600);
     histGridV2JpsiOO->Draw();
     lineUnity->Draw("SAME");
     graSystV2JpsiOOFwdCentr2060->Draw("E2P SAME");
@@ -359,11 +397,11 @@ void preliminary_results() {
     graSystV2JpsiOOFwdCentr2060->Draw("E2P SAME");
     graStatV2JpsiOOFwdCentr2060->Draw("P SAME");
 
-    TLegend *legendV2JpsiOOVsTheorSemientral = new TLegend(0.20,0.60,0.40,0.73);
-    SetLegend(legendV2JpsiOOVsTheorSemientral);
-    legendV2JpsiOOVsTheorSemientral->AddEntry(graTheorFwdCentr020CentrVal,"Tsinghua Transport + MUSIC Hydro.","L");
-    legendV2JpsiOOVsTheorSemientral->AddEntry(graStatV2JpsiOOFwdCentr020,"Data, SP, |#Delta#it{#eta}| > 1.7","P");
-    legendV2JpsiOOVsTheorSemientral->Draw();
+    TLegend *legendV2JpsiOOVsTheorSemicentral = new TLegend(0.20,0.60,0.40,0.73);
+    SetLegend(legendV2JpsiOOVsTheorSemicentral);
+    legendV2JpsiOOVsTheorSemicentral->AddEntry(graTheorFwdCentr020CentrVal,"Tsinghua Transport + MUSIC Hydro.","L");
+    legendV2JpsiOOVsTheorSemicentral->AddEntry(graStatV2JpsiOOFwdCentr020,"Data, SP, |#Delta#it{#eta}| > 1.7","P");
+    legendV2JpsiOOVsTheorSemicentral->Draw();
 
     latexTitle->DrawLatex(0.20, 0.88, "ALICE Preliminary");
     latexTitle->DrawLatex(0.20, 0.82, "OO, #sqrt{#it{s}_{NN}} = 5.36 TeV");
@@ -388,6 +426,45 @@ void preliminary_results() {
     latexTitle->DrawLatex(0.20, 0.88, "ALICE Preliminary");
     latexTitle->DrawLatex(0.20, 0.82, "OO, #sqrt{#it{s}_{NN}} = 5.36 TeV, 0#minus20%");
 
+    TCanvas *canvasV2JpsiMidFwdOOVsTheorCentral = new TCanvas("canvasV2JpsiMidFwdOOVsTheorCentral", "", 800, 600);
+    histGridV2JpsiFwdVsMid->Draw();
+    lineUnity->Draw("SAME");
+    graTheorFwdCentr020CentrVal->Draw("L SAME");
+    graTheorMid09Centr020CentrVal->Draw("L SAME");
+    graSystV2JpsiOOMidCentr020->Draw("E2P SAME");
+    graStatV2JpsiOOMidCentr020->Draw("P SAME");
+    graSystV2JpsiOOFwdCentr020->Draw("E2P SAME");
+    graStatV2JpsiOOFwdCentr020->Draw("P SAME");
+
+    latexTable.SetNDC();
+    latexTable.SetTextSize(0.045);
+
+    latexTable.SetTextAlign(22);
+    //latexTable.DrawLatex(0.66,0.37,"J/#psi #rightarrow #mu^{+}#mu^{-}");
+    //latexTable.DrawLatex(0.82,0.37,"J/#psi #rightarrow e^{+}e^{-}");
+    latexTable.DrawLatex(0.66,0.37,"2.5 < #it{y} < 4");
+    latexTable.DrawLatex(0.82,0.37,"|#it{y}| < 0.9");
+
+    //latexTable.SetTextAlign(12);
+    latexTable.DrawLatex(0.50,0.315,"Data");
+    latexTable.DrawLatex(0.50,0.245,"Tsinghua model");
+
+    TLegend *legendV2JpsiMidFwdOOVsTheorCentral = new TLegend(0.65,0.20,0.95,0.35);
+    legendV2JpsiMidFwdOOVsTheorCentral->SetNColumns(2);
+    legendV2JpsiMidFwdOOVsTheorCentral->SetBorderSize(0);
+    legendV2JpsiMidFwdOOVsTheorCentral->SetFillStyle(0);
+    legendV2JpsiMidFwdOOVsTheorCentral->SetMargin(0.15);
+    legendV2JpsiMidFwdOOVsTheorCentral->SetTextSize(0.0);
+    legendV2JpsiMidFwdOOVsTheorCentral->AddEntry(graStatV2JpsiOOFwdCentr020,  " ", "P");
+    legendV2JpsiMidFwdOOVsTheorCentral->AddEntry(graStatV2JpsiOOMidCentr020,  " ", "P");
+    legendV2JpsiMidFwdOOVsTheorCentral->AddEntry(graTheorFwdCentr020CentrVal, " ", "L");
+    legendV2JpsiMidFwdOOVsTheorCentral->AddEntry(graTheorMid09Centr020CentrVal, " ", "L");
+    legendV2JpsiMidFwdOOVsTheorCentral->Draw();
+
+    latexTitle->DrawLatex(0.20, 0.88, "ALICE Preliminary");
+    latexTitle->DrawLatex(0.20, 0.82, "OO, #sqrt{#it{s}_{NN}} = 5.36 TeV, 0#minus20%");
+    latexTitle->DrawLatex(0.20, 0.76, "J/#psi #rightarrow #mu^{+}#mu^{-}, e^{+}e^{-}");
+
 
     TCanvas *canvasV2JpsiFwdVsMidSemicentral = new TCanvas("canvasV2JpsiFwdVsMidSemicentral", "", 800, 600);
     histGridV2JpsiFwdVsMid->Draw();
@@ -405,6 +482,36 @@ void preliminary_results() {
 
     latexTitle->DrawLatex(0.20, 0.88, "ALICE Preliminary");
     latexTitle->DrawLatex(0.20, 0.82, "OO, #sqrt{#it{s}_{NN}} = 5.36 TeV, 20#minus60%");
+
+    
+    TCanvas *canvasV2JpsiMidFwdOOVsTheorSemicentral = new TCanvas("canvasV2JpsiMidFwdOOVsTheorSemicentral", "", 800, 600);
+    histGridV2JpsiFwdVsMid->Draw();
+    lineUnity->Draw("SAME");
+    graTheorFwdCentr2060CentrVal->Draw("L SAME");
+    graTheorMid09Centr2060CentrVal->Draw("L SAME");
+    graSystV2JpsiOOMidCentr2060->Draw("E2P SAME");
+    graStatV2JpsiOOMidCentr2060->Draw("P SAME");
+    graSystV2JpsiOOFwdCentr2060->Draw("E2P SAME");
+    graStatV2JpsiOOFwdCentr2060->Draw("P SAME");
+
+    latexTable.SetNDC();
+    latexTable.SetTextSize(0.045);
+
+    latexTable.SetTextAlign(22);
+    //latexTable.DrawLatex(0.66,0.37,"J/#psi #rightarrow #mu^{+}#mu^{-}");
+    //latexTable.DrawLatex(0.82,0.37,"J/#psi #rightarrow e^{+}e^{-}");
+    latexTable.DrawLatex(0.66,0.37,"2.5 < #it{y} < 4");
+    latexTable.DrawLatex(0.82,0.37,"|#it{y}| < 0.9");
+
+    //latexTable.SetTextAlign(12);
+    latexTable.DrawLatex(0.50,0.315,"Data");
+    latexTable.DrawLatex(0.50,0.245,"Tsinghua model");
+
+    legendV2JpsiMidFwdOOVsTheorCentral->Draw();
+
+    latexTitle->DrawLatex(0.20, 0.88, "ALICE Preliminary");
+    latexTitle->DrawLatex(0.20, 0.82, "OO, #sqrt{#it{s}_{NN}} = 5.36 TeV, 20#minus60%");
+    latexTitle->DrawLatex(0.20, 0.76, "J/#psi #rightarrow #mu^{+}#mu^{-}, e^{+}e^{-}");
 
     // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++ //
     // J/psi: all collision systems comparison
@@ -439,13 +546,21 @@ void preliminary_results() {
     graSyst1V2DzeroMidCentr020->Draw("E2P SAME");
     graStatV2JpsiOOFwdCentr020->Draw("P SAME");
     graSystV2JpsiOOFwdCentr020->Draw("E2P SAME");
+    //graStatV2PiMidCentr010->Draw("P SAME");
+
+    TFile *fOut = new TFile("v2Jpsi.root", "RECREATE");
+    graSystV2JpsiOOFwdCentr020->Write("syst_jpsi_v2_centr_0_20");
+    graStatV2JpsiOOFwdCentr020->Write("stat_jpsi_v2_centr_0_20");
+    graSystV2JpsiOOFwdCentr2060_clone->Write("syst_jpsi_v2_centr_20_60");
+    graStatV2JpsiOOFwdCentr2060_clone->Write("stat_jpsi_v2_centr_20_60");
+    fOut->Close();
 
 
 
     ////////////////////////////////////////////////////////////////////////////////////
     canvasV2JpsiOO->SaveAs("ICHEP2026/approved_plots/jpsi_v2_OO.pdf");
     canvasV2JpsiOOCentral->SaveAs("ICHEP2026/approved_plots/jpsi_v2_OO_central.pdf");
-    canvasV2JpsiOOSemientral->SaveAs("ICHEP2026/approved_plots/jpsi_v2_OO_semicentral.pdf");
+    canvasV2JpsiOOSemicentral->SaveAs("ICHEP2026/approved_plots/jpsi_v2_OO_semicentral.pdf");
     canvasV2JpsiAllSystems->SaveAs("ICHEP2026/approved_plots/jpsi_v2_all_systems.pdf");
     canvasV2JpsiOOvsPbPbCentral->SaveAs("ICHEP2026/approved_plots/jpsi_v2_OO_vs_PbPb_central.pdf");
     canvasV2JpsiOOvsPbPbSemicentral->SaveAs("ICHEP2026/approved_plots/jpsi_v2_OO_vs_PbPb_semicentral.pdf");
@@ -454,6 +569,8 @@ void preliminary_results() {
     canvasV2JpsiFwdVsMidCentral->SaveAs("ICHEP2026/approved_plots/jpsi_v2_fwd_vs_mid_central.pdf");
     canvasV2JpsiFwdVsMidSemicentral->SaveAs("ICHEP2026/approved_plots/jpsi_v2_fwd_vs_mid_semicentral.pdf");
     canvasV2JpsiAllSpecies->SaveAs("ICHEP2026/approved_plots/jpsi_v2_all_species.pdf");
+    canvasV2JpsiMidFwdOOVsTheorCentral->SaveAs("ICHEP2026/approved_plots/jpsi_v2_OO_mid_fwd_vs_theory_central.pdf");
+    canvasV2JpsiMidFwdOOVsTheorSemicentral->SaveAs("ICHEP2026/approved_plots/jpsi_v2_OO_mid_fwd_vs_theory_semicentral.pdf");
 
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
