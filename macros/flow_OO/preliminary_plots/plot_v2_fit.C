@@ -145,7 +145,7 @@ void plot_v2_fit(double minPtBin = 0, double maxPtBin = 1, int minCentrBin = 0, 
     latexTitle -> SetTextSize(0.07);
     latexTitle -> SetNDC();
     latexTitle -> SetTextFont(42);
-    latexTitle -> DrawLatex(0.27, 0.85, "ALICE Preliminary");
+    latexTitle -> DrawLatex(0.27, 0.85, "ALICE Performance");
     latexTitle -> DrawLatex(0.27, 0.75, Form("OO, #sqrt{#it{s}_{NN}} = 5.36 TeV, %d#minus%d%%", minCentrBin, maxCentrBin));
     latexTitle -> DrawLatex(0.27, 0.65, Form("J/#psi#rightarrow#mu^{+}#mu^{-}, 2.5 < y < 4, %1.0f < #it{p}_{T} < %1.0f GeV/#it{c}", minPtBin, maxPtBin));
 

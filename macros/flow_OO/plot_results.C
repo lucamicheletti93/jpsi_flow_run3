@@ -42,14 +42,14 @@ void plot_results(TString model = "THU") {
     // ***************************************************************************************** //
     // D-meson results
     // ***************************************************************************************** //
-    TFile *fInDzero = new TFile("preliminary_plots/v2Dzero.root", "READ");
-    TGraphAsymmErrors *graStatV2DzeroMidCentr020 = (TGraphAsymmErrors*) fInDzero -> Get("gvn_prompt_stat");
+    TFile *fInDzeroCentr020 = new TFile("preliminary_plots/v2Dzero_020.root", "READ");
+    TGraphAsymmErrors *graStatV2DzeroMidCentr020 = (TGraphAsymmErrors*) fInDzeroCentr020 -> Get("gvn_prompt_stat");
     graStatV2DzeroMidCentr020 -> SetMarkerColor(kAzure+4);
     graStatV2DzeroMidCentr020 -> SetLineColor(kAzure+4);
     graStatV2DzeroMidCentr020 -> SetMarkerStyle(20);
     graStatV2DzeroMidCentr020 -> SetMarkerSize(1.5);
 
-    TGraphAsymmErrors *graSyst1V2DzeroMidCentr020 = (TGraphAsymmErrors*) fInDzero -> Get("tot_syst");
+    TGraphAsymmErrors *graSyst1V2DzeroMidCentr020 = (TGraphAsymmErrors*) fInDzeroCentr020 -> Get("tot_syst");
     graSyst1V2DzeroMidCentr020 -> SetMarkerColor(kAzure+4);
     graSyst1V2DzeroMidCentr020 -> SetMarkerStyle(20);
     graSyst1V2DzeroMidCentr020 -> SetFillStyle(0);
@@ -61,12 +61,19 @@ void plot_results(TString model = "THU") {
         graSyst1V2DzeroMidCentr020 -> SetPointEXlow(iPoint, 0.15);
     }
 
-    TGraphAsymmErrors *graSyst2V2DzeroMidCentr020 = (TGraphAsymmErrors*) fInDzero -> Get("tot_syst_wnonflow");
+    TGraphAsymmErrors *graSyst2V2DzeroMidCentr020 = (TGraphAsymmErrors*) fInDzeroCentr020 -> Get("tot_syst_wnonflow");
     graSyst2V2DzeroMidCentr020 -> SetMarkerColor(kAzure+1);
     graSyst2V2DzeroMidCentr020 -> SetMarkerStyle(20);
     graSyst2V2DzeroMidCentr020 -> SetFillStyle(0);
     graSyst2V2DzeroMidCentr020 -> SetLineColor(kAzure+1);
     graSyst2V2DzeroMidCentr020 -> SetMarkerSize(1.5);
+
+    TFile *fInDzeroCentr2060 = new TFile("preliminary_plots/v2Dzero_2050.root", "READ");
+    TH1D *histStatV2DzeroMidCentr2050 = (TH1D*) fInDzeroCentr2060 -> Get("hvnSimFit");
+    histStatV2DzeroMidCentr2050 -> SetMarkerColor(kAzure+4);
+    histStatV2DzeroMidCentr2050 -> SetLineColor(kAzure+4);
+    histStatV2DzeroMidCentr2050 -> SetMarkerStyle(20);
+    histStatV2DzeroMidCentr2050 -> SetMarkerSize(1.5);
 
     const int nPtBins = 6;
     double minPtBins[] = {0, 1, 2, 3, 4, 6};
@@ -773,7 +780,7 @@ void plot_results(TString model = "THU") {
     graSystV2JpsiFwdCentr010 -> SetMarkerSize(1.5);
 
     // Jpsi Fwd vs Dzero Mid
-    TCanvas *canvasJpsiFwdVsDzeroMid = new TCanvas("canvasJpsiFwdVsDzeroMid", "", 800, 600);
+    TCanvas *canvasJpsiFwdVsDzeroMidCentr020 = new TCanvas("canvasJpsiFwdVsDzeroMidCentr020", "", 800, 600);
     TH2D *histGridJpsiFwdVsDzeroMid  = new TH2D("histGridJpsiFwdVsDzeroMid", ";#it{p}_{T} (GeV/#it{c});#it{#nu}_{2}^{SP}", 100, 0, 8, 100, -0.30, 0.30);
     histGridJpsiFwdVsDzeroMid -> Draw();
     lineUnity -> Draw("SAME");
@@ -792,15 +799,42 @@ void plot_results(TString model = "THU") {
 
     latexTitle -> DrawLatex(0.20, 0.88, "ALICE Work in Progress, OO, #sqrt{#it{s}_{NN}} = 5.36 TeV");
 
-    TCanvas *canvasJpsiFwdVsDzeroMidLargeBins = new TCanvas("canvasJpsiFwdVsDzeroMidLargeBins", "", 800, 600);
+
+    TCanvas *canvasJpsiFwdVsDzeroMidCentr2060 = new TCanvas("canvasJpsiFwdVsDzeroMidCentr2060", "", 800, 600);
     histGridJpsiFwdVsDzeroMid -> Draw();
     lineUnity -> Draw("SAME");
-    graSystV2JpsiFwdCentr020LargeBins -> Draw("E2P");
-    graStatV2JpsiFwdCentr020LargeBins -> Draw("P");
-    graSyst1V2DzeroMidCentr020 -> Draw("E2P");
+    graSystV2JpsiFwdCentr2060 -> Draw("E2P SAME");
+    graStatV2JpsiFwdCentr2060 -> Draw("P SAME");
+    histStatV2DzeroMidCentr2050 -> Draw("EP SAME");
+
+    TLegend *legend4 = new TLegend(0.18,0.20,0.48,0.35);
+    SetLegend(legend4);
+    legend4 -> SetTextSize(0.045);
+    legend4 -> AddEntry(graSystV2JpsiFwdCentr2060,"J/#psi #rightarrow #mu^{+}#mu^{-}, 2.5 < #it{y} < 4, 20#minus60%","P");
+    legend4 -> AddEntry(histStatV2DzeroMidCentr2050,"D^{0} #rightarrow K^{-}#pi^{+} and charge conj., |#it{y}| < 0.8, 20#minus50%","P");
+    legend4 -> Draw();
+
+    latexTitle -> DrawLatex(0.20, 0.88, "ALICE Work in Progress, OO, #sqrt{#it{s}_{NN}} = 5.36 TeV");
+
+    TCanvas *canvasJpsiFwdVsDzeroMidLargeBinsCentr020 = new TCanvas("canvasJpsiFwdVsDzeroMidLargeBinsCentr020", "", 800, 600);
+    histGridJpsiFwdVsDzeroMid -> Draw();
+    lineUnity -> Draw("SAME");
+    graSystV2JpsiFwdCentr020LargeBins -> Draw("E2P SAME");
+    graStatV2JpsiFwdCentr020LargeBins -> Draw("P SAME");
+    graSyst1V2DzeroMidCentr020 -> Draw("E2P SAME");
     //graSyst2V2DzeroMidCentr020 -> Draw("E2P");
-    graStatV2DzeroMidCentr020 -> Draw("EP");
+    graStatV2DzeroMidCentr020 -> Draw("EP SAME");
     legend3 -> Draw();
+
+    latexTitle -> DrawLatex(0.20, 0.88, "ALICE Work in Progress, OO, #sqrt{#it{s}_{NN}} = 5.36 TeV");
+
+    TCanvas *canvasJpsiFwdVsDzeroMidLargeBinsCentr2060 = new TCanvas("canvasJpsiFwdVsDzeroMidLargeBinsCentr2060", "", 800, 600);
+    histGridJpsiFwdVsDzeroMid -> Draw();
+    lineUnity -> Draw("SAME");
+    graSystV2JpsiFwdCentr2060LargeBins -> Draw("E2P SAME");
+    graStatV2JpsiFwdCentr2060LargeBins -> Draw("P SAME");
+    histStatV2DzeroMidCentr2050 -> Draw("EP SAME");
+    legend4 -> Draw();
 
     latexTitle -> DrawLatex(0.20, 0.88, "ALICE Work in Progress, OO, #sqrt{#it{s}_{NN}} = 5.36 TeV");
     
@@ -825,8 +859,10 @@ void plot_results(TString model = "THU") {
     canvasJpsiFwdVsTheorCentr2060LargeBins -> SaveAs("preliminary_plots/ICHEP2026/jpsiFwd_vs_models_centr_20_60_large_bins.pdf");
     canvasJpsiFwdCentr020LargeEtaGap -> SaveAs("preliminary_plots/ICHEP2026/jpsiFwd_centr_0_20_large_delta_eta.pdf");
     canvasJpsiFwdCentr2060LargeEtaGap -> SaveAs("preliminary_plots/ICHEP2026/jpsiFwd_centr_20_60_large_delta_eta.pdf");
-    canvasJpsiFwdVsDzeroMid -> SaveAs("preliminary_plots/ICHEP2026/jpsiFwd_vs_dzeroMid.pdf");
-    canvasJpsiFwdVsDzeroMidLargeBins -> SaveAs("preliminary_plots/ICHEP2026/jpsiFwd_vs_dzeroMid_large_bins.pdf");
+    canvasJpsiFwdVsDzeroMidCentr020 -> SaveAs("preliminary_plots/ICHEP2026/jpsiFwd_vs_dzeroMid_centr_0_20.pdf");
+    canvasJpsiFwdVsDzeroMidLargeBinsCentr020 -> SaveAs("preliminary_plots/ICHEP2026/jpsiFwd_vs_dzeroMid_large_bins_centr_0_20.pdf");
+    canvasJpsiFwdVsDzeroMidCentr2060 -> SaveAs("preliminary_plots/ICHEP2026/jpsiFwd_vs_dzeroMid_centr_20_60.pdf");
+    canvasJpsiFwdVsDzeroMidLargeBinsCentr2060 -> SaveAs("preliminary_plots/ICHEP2026/jpsiFwd_vs_dzeroMid_large_bins_centr_20_60.pdf");
 
     
 
