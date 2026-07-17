@@ -252,11 +252,11 @@ void preliminary_results() {
     TLatex latexTable;
 
     TH2D *histGridV2JpsiOO = new TH2D("histGridV2JpsiOO", ";#it{p}_{T} (GeV/#it{c});#it{#nu}_{2}^{SP} {|#Delta#it{#eta}| > 1.7}", 100, 0, 8, 100, -0.05, 0.20);
-    TH2D *histGridV2JpsiAllSystems = new TH2D("histGridV2JpsiAllSystems", ";#it{p}_{T} (GeV/#it{c});#it{#nu}_{2}^{J/#psi}", 100, 0, 8, 100, -0.05, 0.30);
+    TH2D *histGridV2JpsiAllSystems = new TH2D("histGridV2JpsiAllSystems", ";#it{p}_{T} (GeV/#it{c});#it{#nu}_{2}^{J/#psi}{SP}", 100, 0, 8, 100, -0.05, 0.30);
     TH2D *histGridV2JpsiAllSpecies = new TH2D("histGridV2JpsiAllSpecies", ";#it{p}_{T} (GeV/#it{c});#it{#nu}_{2}", 100, 0, 8, 100, -0.03, 0.37);
     TH2D *histGridV2JpsiOOvsPbPb = new TH2D("histGridV2JpsiOOvsPbPb", ";#it{p}_{T} (GeV/#it{c});#it{#nu}_{2}^{SP} {|#Delta#it{#eta}| > 1.7}", 100, 0, 8, 100, -0.05, 0.20);
     TH2D *histGridV2JpsiOOVsTheor = new TH2D("histGridV2JpsiOOVsTheor", ";#it{p}_{T} (GeV/#it{c});#it{#nu}_{2}^{J/#psi}", 100, 0, 8, 100, -0.05, 0.20);
-    TH2D *histGridV2JpsiFwdVsMid = new TH2D("histGridV2JpsiFwdVsMid", ";#it{p}_{T} (GeV/#it{c});#it{#nu}_{2}^{J/#psi}", 100, 0, 8, 100, -0.30, 0.30);
+    TH2D *histGridV2JpsiFwdVsMid = new TH2D("histGridV2JpsiFwdVsMid", ";#it{p}_{T} (GeV/#it{c});#it{#nu}_{2}^{J/#psi}{SP}", 100, 0, 8, 100, -0.30, 0.30);
 
     // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++ //
     // J/psi: Oxygen-Oxygen
@@ -440,8 +440,8 @@ void preliminary_results() {
     latexTable.SetTextSize(0.045);
 
     latexTable.SetTextAlign(22);
-    //latexTable.DrawLatex(0.66,0.37,"J/#psi #rightarrow #mu^{+}#mu^{-}");
-    //latexTable.DrawLatex(0.82,0.37,"J/#psi #rightarrow e^{+}e^{-}");
+    latexTable.DrawLatex(0.66,0.43,"J/#psi #rightarrow #mu^{+}#mu^{-}");
+    latexTable.DrawLatex(0.82,0.43,"J/#psi #rightarrow e^{+}e^{-}");
     latexTable.DrawLatex(0.66,0.37,"2.5 < #it{y} < 4");
     latexTable.DrawLatex(0.82,0.37,"|#it{y}| < 0.9");
 
@@ -463,7 +463,7 @@ void preliminary_results() {
 
     latexTitle->DrawLatex(0.20, 0.88, "ALICE Preliminary");
     latexTitle->DrawLatex(0.20, 0.82, "OO, #sqrt{#it{s}_{NN}} = 5.36 TeV, 0#minus20%");
-    latexTitle->DrawLatex(0.20, 0.76, "J/#psi #rightarrow #mu^{+}#mu^{-}, e^{+}e^{-}");
+    //latexTitle->DrawLatex(0.20, 0.76, "J/#psi #rightarrow #mu^{+}#mu^{-}, e^{+}e^{-}");
 
 
     TCanvas *canvasV2JpsiFwdVsMidSemicentral = new TCanvas("canvasV2JpsiFwdVsMidSemicentral", "", 800, 600);
@@ -498,8 +498,8 @@ void preliminary_results() {
     latexTable.SetTextSize(0.045);
 
     latexTable.SetTextAlign(22);
-    //latexTable.DrawLatex(0.66,0.37,"J/#psi #rightarrow #mu^{+}#mu^{-}");
-    //latexTable.DrawLatex(0.82,0.37,"J/#psi #rightarrow e^{+}e^{-}");
+    latexTable.DrawLatex(0.66,0.43,"J/#psi #rightarrow #mu^{+}#mu^{-}");
+    latexTable.DrawLatex(0.82,0.43,"J/#psi #rightarrow e^{+}e^{-}");
     latexTable.DrawLatex(0.66,0.37,"2.5 < #it{y} < 4");
     latexTable.DrawLatex(0.82,0.37,"|#it{y}| < 0.9");
 
@@ -511,7 +511,7 @@ void preliminary_results() {
 
     latexTitle->DrawLatex(0.20, 0.88, "ALICE Preliminary");
     latexTitle->DrawLatex(0.20, 0.82, "OO, #sqrt{#it{s}_{NN}} = 5.36 TeV, 20#minus60%");
-    latexTitle->DrawLatex(0.20, 0.76, "J/#psi #rightarrow #mu^{+}#mu^{-}, e^{+}e^{-}");
+    //latexTitle->DrawLatex(0.20, 0.76, "J/#psi #rightarrow #mu^{+}#mu^{-}, e^{+}e^{-}");
 
     // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++ //
     // J/psi: all collision systems comparison

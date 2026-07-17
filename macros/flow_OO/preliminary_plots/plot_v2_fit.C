@@ -75,7 +75,7 @@ void plot_v2_fit(double minPtBin = 0, double maxPtBin = 1, int minCentrBin = 0, 
     ///////////////////////////
     // Plot the fit
     ///////////////////////////
-    TCanvas *canvasMassFlow = new TCanvas("canvasMassFlow", "", 800, 1800);
+    TCanvas *canvasMassFlow = new TCanvas("canvasMassFlow", "", 800, 1200);
     
     canvasMassFlow -> cd();
     gStyle -> SetOptStat(0);
@@ -267,8 +267,10 @@ void plot_v2_fit(double minPtBin = 0, double maxPtBin = 1, int minCentrBin = 0, 
     canvasMassFlow -> Update();
     if (mixing) {
         canvasMassFlow -> SaveAs(Form("ICHEP2026/approved_plots/signal_extraction_%d_%d/fitFlowVsMassPt_%1.0f_%1.0f_MixedEvent.pdf", minCentrBin, maxCentrBin, minPtBin, maxPtBin));
+        std::cout << Form("ICHEP2026/approved_plots/signal_extraction_%d_%d/fitFlowVsMassPt_%1.0f_%1.0f_MixedEvent.pdf", minCentrBin, maxCentrBin, minPtBin, maxPtBin) << std::endl;
     } else {
         canvasMassFlow -> SaveAs(Form("ICHEP2026/approved_plots/signal_extraction_%d_%d/fitFlowVsMassPt_%1.0f_%1.0f.pdf", minCentrBin, maxCentrBin, minPtBin, maxPtBin));
+        std::cout << Form("ICHEP2026/approved_plots/signal_extraction_%d_%d/fitFlowVsMassPt_%1.0f_%1.0f.pdf", minCentrBin, maxCentrBin, minPtBin, maxPtBin) << std::endl;
     }
 }
 ////////////////////////////////////////////////////////////////////////////////
