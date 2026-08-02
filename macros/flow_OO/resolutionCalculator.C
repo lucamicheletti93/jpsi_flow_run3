@@ -196,7 +196,7 @@ void resolutionCalculator(string train = "698032", string detector = "TPC", bool
         TCanvas *canvasR2RebinSP = new TCanvas("canvasR2RebinSP", "", 800, 600);
         hSumR2RebinSP->GetYaxis()->SetRangeUser(0, 0.7);
         hSumR2RebinSP->Draw("EP");
-        hMeanR2SP->Draw("EP SAME");
+        //hMeanR2SP->Draw("EP SAME");
         hWmeanR2SP->Draw("EP SAME");
         hDimuWmeanR2SP->Draw("EP SAME");
 
@@ -204,7 +204,7 @@ void resolutionCalculator(string train = "698032", string detector = "TPC", bool
         SetLegend(legendR2RebinSP);
         legendR2RebinSP -> SetTextSize(0.035);
         legendR2RebinSP -> AddEntry(hSumR2RebinSP, "Resolution", "PL");
-        legendR2RebinSP -> AddEntry(hMeanR2SP, "Normal average", "PL");
+        //legendR2RebinSP -> AddEntry(hMeanR2SP, "Normal average", "PL");
         legendR2RebinSP -> AddEntry(hWmeanR2SP, "Weighted average", "PL");
         legendR2RebinSP -> AddEntry(hDimuWmeanR2SP, "Weighted average with #mu^{+}#mu^{-}", "PL");
         legendR2RebinSP -> Draw();

@@ -23,23 +23,26 @@ TProfile* projectProfile(THnSparseF *, double , double , double , double , int);
 
 void project_histograms(string train = "687739", bool mixing = true, string sparseName = "Mass_Pt_centrFT0C_V2", string suffix = "") {
     bool integrated = false;
-    string pathToFin = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/LHC25ae/train_701103/564445";
+    //564356          564359          564373          564374          564387          564400          564414          564430          564445
+    string pathToFin = "/Users/lucamicheletti/cernbox/JPSI/Jpsi_flow/LHC25ae/train_698024/564445";
     string muonCut = "muonQualityCutsMUONStandalone"; // matchedMchMid, muonQualityCutsMUONStandalone
     string methodName = "SP";
     int method = methodName == "SP" ? 4 : 5;
 
     int nCentrBins = 1;
-    double minCentrBins[] = {20};
-    double maxCentrBins[] = {60};
+    double minCentrBins[] = {0};
+    double maxCentrBins[] = {20};
 
-    const int nPtBins = 9;
-    double minPtBins[] = {0.0, 1.0, 2.0, 3.0, 4.0, 6.0, 8.0, 0.0, 2.0};
-    double maxPtBins[] = {1.0, 2.0, 3.0, 4.0, 6.0, 8.0, 15.0, 2.0, 4.0};
+    const int nPtBins = 10;
+    double minPtBins[] = {0.0, 1.0, 2.0, 3.0, 4.0, 6.0, 8.0, 0.0, 2.0, 0.0};
+    double maxPtBins[] = {1.0, 2.0, 3.0, 4.0, 6.0, 8.0, 15.0, 2.0, 4.0, 8.0};
 
-    // Train: 687739 -> SE & ME
-    // Train: 689454 -> SE [POS & NEG]
-    // Train: 698032 ==> Default, Eta gap 1.7
-    // Train: 698144 ==> Eta gap 2.0
+    // Train: 687739 -> SE & ME (NOT USED)
+    // Train: 689454 -> SE [POS & NEG] (NOT USED)
+    // Train: 698024 ==> Eta gap 1.7, time association
+    // Train: 698032 ==> Default, Eta gap 1.7, standard association
+    // Train: 698144 ==> Eta gap 2.0 (NOT USED)
+    // Train: 701103 ==> Eta gap 2.5, standard association
 
     TList *listSEPM, *listSEPP, *listSEMM, *listMEPM, *listMEPP, *listMEMM;
     THnSparseF *histSEPM, *histSEPP, *histSEMM, *histMEPM, *histMEPP, *histMEMM;

@@ -255,7 +255,7 @@ void preliminary_results() {
     TH2D *histGridV2JpsiAllSystems = new TH2D("histGridV2JpsiAllSystems", ";#it{p}_{T} (GeV/#it{c});#it{#nu}_{2}^{J/#psi}{SP}", 100, 0, 8, 100, -0.05, 0.30);
     TH2D *histGridV2JpsiAllSpecies = new TH2D("histGridV2JpsiAllSpecies", ";#it{p}_{T} (GeV/#it{c});#it{#nu}_{2}", 100, 0, 8, 100, -0.03, 0.37);
     TH2D *histGridV2JpsiOOvsPbPb = new TH2D("histGridV2JpsiOOvsPbPb", ";#it{p}_{T} (GeV/#it{c});#it{#nu}_{2}^{SP} {|#Delta#it{#eta}| > 1.7}", 100, 0, 8, 100, -0.05, 0.20);
-    TH2D *histGridV2JpsiOOVsTheor = new TH2D("histGridV2JpsiOOVsTheor", ";#it{p}_{T} (GeV/#it{c});#it{#nu}_{2}^{J/#psi}", 100, 0, 8, 100, -0.05, 0.20);
+    TH2D *histGridV2JpsiOOVsTheor = new TH2D("histGridV2JpsiOOVsTheor", ";#it{p}_{T} (GeV/#it{c});#it{#nu}_{2}^{J/#psi}{SP}", 100, 0, 8, 100, -0.05, 0.20);
     TH2D *histGridV2JpsiFwdVsMid = new TH2D("histGridV2JpsiFwdVsMid", ";#it{p}_{T} (GeV/#it{c});#it{#nu}_{2}^{J/#psi}{SP}", 100, 0, 8, 100, -0.30, 0.30);
 
     // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++ //
