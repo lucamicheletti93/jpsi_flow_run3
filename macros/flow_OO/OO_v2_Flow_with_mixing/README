@@ -1,0 +1,5 @@
+Need to keep all the .cxx and .h file in the same directory
+Input ROOT FILE NAME : AnalysisResultsMerged_OO.root
+O2_Load 
+root [0] .L Flow_EP_withEM.C++g
+Flow_EP_withEM(5,0,4,1,0,0); // parameters Descriptions are there in the macro
