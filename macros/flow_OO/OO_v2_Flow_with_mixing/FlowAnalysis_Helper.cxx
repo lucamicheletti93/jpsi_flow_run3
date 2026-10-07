@@ -199,14 +199,12 @@ TH1D *FlowAnalysis_Helper::GetRfactorProfile(double ptmin, double ptmax,
                                              TProfile3D *tp_V2MEPM,
                                              TProfile3D *tp_V2MEPP,
                                              TProfile3D *tp_V2MEMM) {
- std::cout<<" Get R factor from profile ::::::::::::::::; "<<endl;
- tp_V2MEPM->Draw();
- //std::cout<<" Get entries "<<tp_V2MEPM->GetEntries()<<std::endl;
+std::cout<<" Get R factor from profile ::::::::::::::::; "<<endl;
+std::cout<<" Get entries "<<tp_V2MEPM->GetEntries()<<std::endl;
   // Copy original profiles for projections
   TProfile3D *tp_V2MEPM_cp = dynamic_cast<TProfile3D *>(
       tp_V2MEPM->Clone(Form("MEPM_Mass_Pt_centrFT0C_V2_Copy_%g_%g_%g_%g_%g_%g",
                             massmin, massmax, ptmin, ptmax, centmin, centmax)));
-                            
   TProfile3D *tp_V2MEPP_cp = dynamic_cast<TProfile3D *>(
       tp_V2MEPP->Clone(Form("MEPP_Mass_Pt_centrFT0C_V2_Copy_%g_%g_%g_%g_%g_%g",
                             massmin, massmax, ptmin, ptmax, centmin, centmax)));
@@ -243,7 +241,6 @@ TH1D *FlowAnalysis_Helper::GetRfactorProfile(double ptmin, double ptmax,
   tp_V2MEMM_cp_projxyz->GetZaxis()->SetRangeUser(centmin + 1E-5, centmax);
   TH1D *tp_V2MEMM_cp_proj =
       dynamic_cast<TH1D *>(tp_V2MEMM_cp_projxyz->Project3D("x"));
-    
 
   // Define resulting histogram
   double *Bin_mass_new = CreateBinsFromAxis(tp_V2MEPM_cp_proj->GetXaxis());
@@ -271,7 +268,7 @@ TH1D *FlowAnalysis_Helper::GetRfactorProfile(double ptmin, double ptmax,
   delete tp_V2MEPM_cp_proj;
   delete tp_V2MEPP_cp_proj;
   delete tp_V2MEMM_cp_proj;
-  std::cout<<" End of calculating R factor"<<std::endl;
+
   return hist_rfactor;
 }
 
@@ -1340,7 +1337,7 @@ void FlowAnalysis_Helper::PlotFinalResults(
   text_yield->SetTextSize(0.04);
   text_yield->SetTextFont(42);
   text_yield->DrawLatexNDC(.3, .82,
-                           "ALICE Preliminary, OO #sqrt{#it{s}_{NN}} "
+                           "ALICE Preliminary, Pb-Pb #sqrt{#it{s}_{NN}} "
                            "= 5.36 TeV");
   pad_yield_final->ModifiedUpdate();
   text_yield->DrawLatexNDC(.3, .77,
@@ -1494,7 +1491,7 @@ void FlowAnalysis_Helper::PlotFinalResults(
   text_pt->SetTextSize(0.04);
   text_pt->SetTextFont(42);
   text_pt->DrawLatexNDC(.12, .85,
-                        "ALICE Preliminary, OO #sqrt{#it{s}_{NN}} "
+                        "ALICE Preliminary, Pb-Pb #sqrt{#it{s}_{NN}} "
                         "= 5.36 TeV");
   pad_pt_final->ModifiedUpdate();
   text_pt->DrawLatexNDC(.12, .80,
@@ -1584,7 +1581,7 @@ void FlowAnalysis_Helper::PlotFinalResultsCent(
   text_yield->SetTextSize(0.04);
   text_yield->SetTextFont(42);
   text_yield->DrawLatexNDC(.3, .82,
-                           "ALICE Preliminary, OO #sqrt{#it{s}_{NN}} "
+                           "ALICE Preliminary, Pb-Pb #sqrt{#it{s}_{NN}} "
                            "= 5.36 TeV");
   pad_yield_final->ModifiedUpdate();
   text_yield->DrawLatexNDC(.3, .77,
@@ -1648,7 +1645,7 @@ void FlowAnalysis_Helper::PlotFinalResultsCent(
   text_cent->SetTextSize(0.04);
   text_cent->SetTextFont(42);
   text_cent->DrawLatexNDC(.12, .85,
-                          "ALICE Preliminary, OO #sqrt{#it{s}_{NN}} "
+                          "ALICE Preliminary, Pb-Pb #sqrt{#it{s}_{NN}} "
                           "= 5.36 TeV");
   pad_cent_final->ModifiedUpdate();
   text_cent->DrawLatexNDC(.12, .80,
@@ -1771,29 +1768,21 @@ void FlowAnalysis_Helper::PlotSEME(std::string flag, std::string type,
 void FlowAnalysis_Helper::LoadReso(std::string FileName, TH2F *&hs_R2SPAB,
                                    TH2F *&hs_R2SPAC, TH2F *&hs_R2SPBC) {
   // Load input data for analysis
-  cout<<" I am inside FlowAnalysis Helper LoadReso "<<endl;
   filesystem::path filePath = FileName;
   THashList *list_hist_r2;
   TList *sublist_r2;
   if (filePath.extension() == ".root") {
-  cout<< "Load data from AnalysisResults.root "<<endl;
+    // Load data from AnalysisResults.root
     TFile *Input_File = TFile::Open(FileName.c_str());
-    Input_File->ls();
     list_hist_r2 =
         (THashList *)Input_File->Get("analysis-event-selection/output");
-        sublist_r2 = (TList *)list_hist_r2->FindObject("Event_AfterCuts");
-        sublist_r2->ls();
-        //(THashList *)Input_File->Get("analysis-event-selection/output");
-        //sublist_r2 = (TList *)list_hist_r2->FindObject("Event_AfterCuts");
+    sublist_r2 = (TList *)list_hist_r2->FindObject("Event_AfterCuts");
 
     // Get histograms of correlations and resolution factors
     hs_R2SPAB = (TH2F *)sublist_r2->FindObject("R2SP_TPCFT0A_CentFT0C");
     hs_R2SPAC = (TH2F *)sublist_r2->FindObject("R2SP_TPCFT0C_CentFT0C");
     hs_R2SPBC = (TH2F *)sublist_r2->FindObject("R2SP_FT0AFT0C_CentFT0C");
-    cout<<" Draw the correlation plot BC "<<endl;
-    //hs_R2SPBC->Draw();
     Input_File->Close();
-    cout<<" Close Input file (Helper) "<<endl;
   } else {
     // Load data from a list of AnalysisResults.root
     fstream InputFiles;
@@ -2354,56 +2343,27 @@ void FlowAnalysis_Helper::LoadDataMEProfile(
   if (filePath.extension() == ".root") {
     // Load data from AnalysisResults.root
     TFile *Input_File = TFile::Open(FileName.c_str());
-    list_hist_v2se =
-        (THashList *)Input_File->Get("analysis-same-event-pairing/output");
-        //list_hist_v2se->ls();
-    list_hist_v2me =
-        (THashList *)Input_File->Get("analysis-same-event-pairing/output");
-        //"analysis-event-mixing/output"
+    list_hist_v2se = (THashList *)Input_File->Get("analysis-same-event-pairing/output");
+    list_hist_v2me = (THashList *)Input_File->Get("analysis-event-mixing/output");
 
-    sublist_v2sepm = (TList *)list_hist_v2se->FindObject(
-        dimuonCut == ""
-            ? Form("PairsMuonSEPM_%s", muonCut.c_str())
-            : Form("PairsMuonSEPM_%s_%s", muonCut.c_str(), dimuonCut.c_str()));
-            //sublist_v2sepm->ls();
-    sublist_v2sepp = (TList *)list_hist_v2se->FindObject(
-        dimuonCut == ""
-            ? Form("PairsMuonSEPP_%s", muonCut.c_str())
-            : Form("PairsMuonSEPP_%s_%s", muonCut.c_str(), dimuonCut.c_str()));
-    sublist_v2semm = (TList *)list_hist_v2se->FindObject(
-        dimuonCut == ""
-            ? Form("PairsMuonSEMM_%s", muonCut.c_str())
-            : Form("PairsMuonSEMM_%s_%s", muonCut.c_str(), dimuonCut.c_str()));
+    sublist_v2sepm = (TList *)list_hist_v2se->FindObject(dimuonCut == "" ? Form("PairsMuonSEPM_%s", muonCut.c_str()) : Form("PairsMuonSEPM_%s_%s", muonCut.c_str(), dimuonCut.c_str()));
+    sublist_v2sepp = (TList *)list_hist_v2se->FindObject(dimuonCut == "" ? Form("PairsMuonSEPP_%s", muonCut.c_str()) : Form("PairsMuonSEPP_%s_%s", muonCut.c_str(), dimuonCut.c_str()));
+    sublist_v2semm = (TList *)list_hist_v2se->FindObject(dimuonCut == "" ? Form("PairsMuonSEMM_%s", muonCut.c_str()) : Form("PairsMuonSEMM_%s_%s", muonCut.c_str(), dimuonCut.c_str()));
 
-    sublist_v2mepm = (TList *)list_hist_v2me->FindObject(
-        dimuonCut == ""
-            ? Form("PairsMuonMEPM_%s", muonCut.c_str())
-            : Form("PairsMuonMEPM_%s_%s", muonCut.c_str(), dimuonCut.c_str()));
-            sublist_v2mepm->ls();
-    sublist_v2mepp = (TList *)list_hist_v2me->FindObject(
-        dimuonCut == ""
-            ? Form("PairsMuonMEPP_%s", muonCut.c_str())
-            : Form("PairsMuonMEPP_%s_%s", muonCut.c_str(), dimuonCut.c_str()));
-    sublist_v2memm = (TList *)list_hist_v2me->FindObject(
-        dimuonCut == ""
-            ? Form("PairsMuonMEMM_%s", muonCut.c_str())
-            : Form("PairsMuonMEMM_%s_%s", muonCut.c_str(), dimuonCut.c_str()));
-
+    sublist_v2mepm = (TList *)list_hist_v2se->FindObject(dimuonCut == "" ? Form("PairsMuonMEPM_%s", muonCut.c_str()) : Form("PairsMuonMEPM_%s_%s", muonCut.c_str(), dimuonCut.c_str()));
+    sublist_v2mepp = (TList *)list_hist_v2se->FindObject(dimuonCut == "" ? Form("PairsMuonMEPP_%s", muonCut.c_str()) : Form("PairsMuonMEPP_%s_%s", muonCut.c_str(), dimuonCut.c_str()));
+    sublist_v2memm = (TList *)list_hist_v2se->FindObject(dimuonCut == "" ? Form("PairsMuonMEMM_%s", muonCut.c_str()) : Form("PairsMuonMEMM_%s_%s", muonCut.c_str(), dimuonCut.c_str()));
+    sublist_v2mepm->ls();
+    
     // Get histograms of v2
-    tp_V2SEPM =
-        (TProfile3D *)sublist_v2sepm->FindObject("Mass_Pt_CentFT0C_V2EPwR");
-    tp_V2SEPP =
-        (TProfile3D *)sublist_v2sepp->FindObject("Mass_Pt_CentFT0C_V2EPwR");
-    tp_V2SEMM =
-        (TProfile3D *)sublist_v2semm->FindObject("Mass_Pt_CentFT0C_V2EPwR");
+    tp_V2SEPM = (TProfile3D *)sublist_v2sepm->FindObject("Mass_Pt_CentFT0C_V2EPwR");
+    tp_V2SEPP = (TProfile3D *)sublist_v2sepp->FindObject("Mass_Pt_CentFT0C_V2EPwR");
+    tp_V2SEMM = (TProfile3D *)sublist_v2semm->FindObject("Mass_Pt_CentFT0C_V2EPwR");
 
-    tp_V2MEPM =
-        (TProfile3D *)sublist_v2mepm->FindObject("Mass_Pt_CentFT0C_V2EPwR");
-    tp_V2MEPP =
-        (TProfile3D *)sublist_v2mepp->FindObject("Mass_Pt_CentFT0C_V2EPwR");
-    tp_V2MEMM =
-        (TProfile3D *)sublist_v2memm->FindObject("Mass_Pt_CentFT0C_V2EPwR");
-        //Mass_Pt_CentFT0C_V2ME_EP
+    tp_V2MEPM = (TProfile3D *)sublist_v2mepm->FindObject("Mass_Pt_CentFT0C_V2ME_EP");
+    tp_V2MEPP = (TProfile3D *)sublist_v2mepp->FindObject("Mass_Pt_CentFT0C_V2ME_EP");
+    tp_V2MEMM = (TProfile3D *)sublist_v2memm->FindObject("Mass_Pt_CentFT0C_V2ME_EP");
+    
     Input_File->Close();
   } else {
     // Load data from a list of AnalysisResults.root
@@ -2416,68 +2376,35 @@ void FlowAnalysis_Helper::LoadDataMEProfile(
       while (getline(InputFiles, File)) {
         cout << "Loading input from: " << File << endl;
         TFile *inFile = TFile::Open(File.c_str());
-        list_hist_v2se =
-            (THashList *)inFile->Get("analysis-same-event-pairing/output");
-        list_hist_v2me =
-            (THashList *)inFile->Get("analysis-same-event-pairing/output");
-            //analysis-event-mixing/output
+        list_hist_v2se = (THashList *)inFile->Get("analysis-same-event-pairing/output");
+        list_hist_v2me = (THashList *)inFile->Get("analysis-event-mixing/output");
 
-        sublist_v2sepm = (TList *)list_hist_v2se->FindObject(
-            dimuonCut == "" ? Form("PairsMuonSEPM_%s", muonCut.c_str())
-                            : Form("PairsMuonSEPM_%s_%s", muonCut.c_str(),
-                                   dimuonCut.c_str()));
-        sublist_v2sepp = (TList *)list_hist_v2se->FindObject(
-            dimuonCut == "" ? Form("PairsMuonSEPP_%s", muonCut.c_str())
-                            : Form("PairsMuonSEPP_%s_%s", muonCut.c_str(),
-                                   dimuonCut.c_str()));
-        sublist_v2semm = (TList *)list_hist_v2se->FindObject(
-            dimuonCut == "" ? Form("PairsMuonSEMM_%s", muonCut.c_str())
-                            : Form("PairsMuonSEMM_%s_%s", muonCut.c_str(),
-                                   dimuonCut.c_str()));
+        sublist_v2sepm = (TList *)list_hist_v2se->FindObject(dimuonCut == "" ? Form("PairsMuonSEPM_%s", muonCut.c_str()) : Form("PairsMuonSEPM_%s_%s", muonCut.c_str(), dimuonCut.c_str()));
+        sublist_v2sepp = (TList *)list_hist_v2se->FindObject(dimuonCut == "" ? Form("PairsMuonSEPP_%s", muonCut.c_str()) : Form("PairsMuonSEPP_%s_%s", muonCut.c_str(), dimuonCut.c_str()));
+        sublist_v2semm = (TList *)list_hist_v2se->FindObject(dimuonCut == "" ? Form("PairsMuonSEMM_%s", muonCut.c_str()) : Form("PairsMuonSEMM_%s_%s", muonCut.c_str(), dimuonCut.c_str()));
 
-        sublist_v2mepm = (TList *)list_hist_v2me->FindObject(
-            dimuonCut == "" ? Form("PairsMuonMEPM_%s", muonCut.c_str())
-                            : Form("PairsMuonMEPM_%s_%s", muonCut.c_str(),
-                                   dimuonCut.c_str()));
-        sublist_v2mepp = (TList *)list_hist_v2me->FindObject(
-            dimuonCut == "" ? Form("PairsMuonMEPP_%s", muonCut.c_str())
-                            : Form("PairsMuonMEPP_%s_%s", muonCut.c_str(),
-                                   dimuonCut.c_str()));
-        sublist_v2memm = (TList *)list_hist_v2me->FindObject(
-            dimuonCut == "" ? Form("PairsMuonMEMM_%s", muonCut.c_str())
-                            : Form("PairsMuonMEMM_%s_%s", muonCut.c_str(),
-                                   dimuonCut.c_str()));
+        sublist_v2mepm = (TList *)list_hist_v2me->FindObject(dimuonCut == "" ? Form("PairsMuonMEPM_%s", muonCut.c_str()) : Form("PairsMuonMEPM_%s_%s", muonCut.c_str(), dimuonCut.c_str()));
+        sublist_v2mepp = (TList *)list_hist_v2me->FindObject(dimuonCut == "" ? Form("PairsMuonMEPP_%s", muonCut.c_str()) : Form("PairsMuonMEPP_%s_%s", muonCut.c_str(), dimuonCut.c_str()));
+        sublist_v2memm = (TList *)list_hist_v2me->FindObject(dimuonCut == "" ? Form("PairsMuonMEMM_%s", muonCut.c_str()) : Form("PairsMuonMEMM_%s_%s", muonCut.c_str(), dimuonCut.c_str()));
 
         if (first) {
           // Get histograms of v2
-          tp_V2SEPM = (TProfile3D *)sublist_v2sepm->FindObject(
-              "Mass_Pt_CentFT0C_V2EPwR");
-          tp_V2SEPP = (TProfile3D *)sublist_v2sepp->FindObject(
-              "Mass_Pt_CentFT0C_V2EPwR");
-          tp_V2SEMM = (TProfile3D *)sublist_v2semm->FindObject(
-              "Mass_Pt_CentFT0C_V2EPwR");
+          tp_V2SEPM = (TProfile3D *)sublist_v2sepm->FindObject("Mass_Pt_CentFT0C_V2EPwR");
+          tp_V2SEPP = (TProfile3D *)sublist_v2sepp->FindObject("Mass_Pt_CentFT0C_V2EPwR");
+          tp_V2SEMM = (TProfile3D *)sublist_v2semm->FindObject("Mass_Pt_CentFT0C_V2EPwR");
 
-          tp_V2MEPM = (TProfile3D *)sublist_v2mepm->FindObject(
-              "Mass_Pt_CentFT0C_V2ME_EP");
-          tp_V2MEPP = (TProfile3D *)sublist_v2mepp->FindObject(
-              "Mass_Pt_CentFT0C_V2ME_EP");
-          tp_V2MEMM = (TProfile3D *)sublist_v2memm->FindObject(
-              "Mass_Pt_CentFT0C_V2ME_EP");
+          tp_V2MEPM = (TProfile3D *)sublist_v2mepm->FindObject("Mass_Pt_CentFT0C_V2ME_EP");
+          tp_V2MEPP = (TProfile3D *)sublist_v2mepp->FindObject("Mass_Pt_CentFT0C_V2ME_EP");
+          tp_V2MEMM = (TProfile3D *)sublist_v2memm->FindObject("Mass_Pt_CentFT0C_V2ME_EP");
         } else {
           // Get histograms of v2
-          tp_V2SEPM->Add((TProfile3D *)sublist_v2sepm->FindObject(
-              "Mass_Pt_CentFT0C_V2EPwR"));
-          tp_V2SEPP->Add((TProfile3D *)sublist_v2sepp->FindObject(
-              "Mass_Pt_CentFT0C_V2EPwR"));
-          tp_V2SEMM->Add((TProfile3D *)sublist_v2semm->FindObject(
-              "Mass_Pt_CentFT0C_V2EPwR"));
+          tp_V2SEPM->Add((TProfile3D *)sublist_v2sepm->FindObject("Mass_Pt_CentFT0C_V2EPwR"));
+          tp_V2SEPP->Add((TProfile3D *)sublist_v2sepp->FindObject("Mass_Pt_CentFT0C_V2EPwR"));
+          tp_V2SEMM->Add((TProfile3D *)sublist_v2semm->FindObject("Mass_Pt_CentFT0C_V2EPwR"));
 
-          tp_V2MEPM->Add((TProfile3D *)sublist_v2mepm->FindObject(
-              "Mass_Pt_CentFT0C_V2ME_EP"));
-          tp_V2MEPP->Add((TProfile3D *)sublist_v2mepp->FindObject(
-              "Mass_Pt_CentFT0C_V2ME_EP"));
-          tp_V2MEMM->Add((TProfile3D *)sublist_v2memm->FindObject(
-              "Mass_Pt_CentFT0C_V2ME_EP"));
+          tp_V2MEPM->Add((TProfile3D *)sublist_v2mepm->FindObject("Mass_Pt_CentFT0C_V2ME_EP"));
+          tp_V2MEPP->Add((TProfile3D *)sublist_v2mepp->FindObject("Mass_Pt_CentFT0C_V2ME_EP"));
+          tp_V2MEMM->Add((TProfile3D *)sublist_v2memm->FindObject("Mass_Pt_CentFT0C_V2ME_EP"));
         }
 
         inFile->Close();
