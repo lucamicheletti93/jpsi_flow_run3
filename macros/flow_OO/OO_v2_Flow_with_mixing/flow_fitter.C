@@ -45,22 +45,22 @@ namespace fs = std::filesystem;
 
 #include "FlowAnalysis_Fitting.h"
 #include "FlowAnalysis_Helper.h"
-//#include "/Users/lucamicheletti/GITHUB/jpsi_flow_run3/macros/flow_OO/OO_v2_Flow_with_mixing/Logger.h"
 
 vector<double> Bin_pt_mass = {0, 2, 4, 6, 8};
 vector<double> Bin_PoolEM = {0., 5., 10., 20., 30., 40., 50., 60., 70., 80., 90.};
 
 using namespace std;
 
-void flow_fitter(int flag_binning, int flag_sig, int flag_bkg, int flag_v2, int flag_run2, int flag_run2yield, 
+//string FlowAnalysis_Fitting::v2bkg_string[2] = {"EventMixing(beta fix)", "EventMixing(beta free)"};
+
+void flow_fitter(int flag_sig, int flag_bkg, int flag_v2, 
     std::string FileName = "AnalysisResults_OO_merged.root",
-    double mass_min = 2., double mass_max = 5, 
+    double mass_min = 2.5, double mass_max = 5., 
     double cent_min = 0., double cent_max = 20., 
     double chi2max_mass = 2., double chi2max_v2 = 2.,
-    double fmin = 1., double fmax = 5., 
-    bool sys = true, bool meanPt = false,
+    double fmin = 1., double fmax = 5., bool meanPt = false,
     std::string muonCut = "muonQualityCutsMUONStandalone", std::string dimuonCut = "") {
-    // muonLowPt210SigmaPDCA, muonQualityCutsMUONStandalone
+    // other cuts: muonLowPt210SigmaPDCA, muonQualityCutsMUONStandalone
     
     //gSystem->CompileMacro("FlowAnalysis_Fitting.cxx");
     gSystem->Load("FlowAnalysis_Fitting_cxx.so"); // Linux
@@ -68,31 +68,24 @@ void flow_fitter(int flag_binning, int flag_sig, int flag_bkg, int flag_v2, int 
     //gSystem->CompileMacro("FlowAnalysis_Helper.cxx");
     gSystem->Load("FlowAnalysis_Helper_cxx.so");
 
-    //LOG(info) << "Start flow analysis...";
     // Init Helper class
     FlowAnalysis_Helper *helper = new FlowAnalysis_Helper();
-    //LOG(info) << "Define Profiles...";
-    // Load input data for analysis
 
+    // Load input data for analysis
     TProfile3D *tp_V2SEPM;
     TProfile3D *tp_V2SEPP;
     TProfile3D *tp_V2SEMM;
     TProfile3D *tp_V2MEPM;
     TProfile3D *tp_V2MEPP;
     TProfile3D *tp_V2MEMM;
-    //LOG(info) << "Load ME Profile...";
     helper->LoadDataMEProfile(FileName, tp_V2SEPM, tp_V2SEPP, tp_V2SEMM, tp_V2MEPM, tp_V2MEPP, tp_V2MEMM, muonCut, dimuonCut);
-    tp_V2MEPM->Draw();
 
-    cout << tp_V2MEPM->GetEntries() << " " << tp_V2MEPP->GetEntries() << " " << tp_V2MEMM->GetEntries() << endl;
-    //return;
-
-    THnSparse *hs_V2;
-    TH2F *hs_R2SPAB, *hs_R2SPAC, *hs_R2SPBC;
-    //LOG(info) << "Load THnSparse...";
-    helper->LoadData(FileName, hs_V2, hs_R2SPAB, hs_R2SPAC, hs_R2SPBC, muonCut, dimuonCut);
-    TH1D *hns_v2_sepm_proj = helper->GetV2(Bin_pt_mass[0], Bin_pt_mass[1], mass_min, mass_max, cent_min, cent_max, hs_V2, 0.4);
-
+    /*tp_V2SEPM->RebinX(2);
+    tp_V2SEPP->RebinX(2);
+    tp_V2SEMM->RebinX(2);
+    tp_V2MEPM->RebinX(2);
+    tp_V2MEPP->RebinX(2);
+    tp_V2MEMM->RebinX(2);*/
 
     TAxis *massAxis = new TAxis();
     TAxis *ptAxis = new TAxis();
@@ -103,8 +96,6 @@ void flow_fitter(int flag_binning, int flag_sig, int flag_bkg, int flag_v2, int 
     int Nbins_mass = massAxis->GetNbins();
     int Nbins_pt = ptAxis->GetNbins();
     int Nbins_cent = centAxis->GetNbins();
-
-    //LOG(info) << Nbins_mass << " " << Nbins_pt << " " << Nbins_cent;
 
     // Initialize fitter
     FlowAnalysis_Fitting *fitter = new FlowAnalysis_Fitting();
@@ -125,7 +116,7 @@ void flow_fitter(int flag_binning, int flag_sig, int flag_bkg, int flag_v2, int 
     int nb_trials = int(size(sig_mass)) * int(size(bkg_mass)) *int(size(bkg_v2)) * int(size(mass_min_sys));
 
     // Create output file
-    TFile *f = new TFile("outout_test.root", "RECREATE");
+    TFile *fOut = new TFile("outout_test.root", "RECREATE");
 
     ///////////////////////////////////////////////////
     ///                                             ///
@@ -133,29 +124,24 @@ void flow_fitter(int flag_binning, int flag_sig, int flag_bkg, int flag_v2, int 
     ///                                             ///
     ///////////////////////////////////////////////////
 
-    //LOG(info) << "Processing analysis for differential flow ...";
-    //tp_V2MEPM->Draw();
     // Get index of interested centrality bin
     int itmin = std::find(Bin_PoolEM.begin(), Bin_PoolEM.end(), cent_min) - Bin_PoolEM.begin();
     int itmax = std::find(Bin_PoolEM.begin(), Bin_PoolEM.end(), cent_max) - Bin_PoolEM.begin();
 
     // Calculate pT-integrated R factors and F factors
-    //LOG(info) << "Processing analysis for pT-integrated R and F factors ...";
     vector<double> ffactor;
     for (int i = 0; i < int(Bin_PoolEM.size()) - 1; i++) {
         TH1D *hist_rfactor = helper->GetRfactorProfile(0., 20., 0., 5., Bin_PoolEM[i], Bin_PoolEM[i + 1], tp_V2MEPM, tp_V2MEPP, tp_V2MEMM);
         double F_value = helper->GetFfactorProfile(0., 20., fmin, fmax, Bin_PoolEM[i], Bin_PoolEM[i + 1], tp_V2SEPP, tp_V2SEMM, tp_V2MEPM, hist_rfactor);
-        //LOG(info) << Form("F factor for [%g - %g] (%%): %g", Bin_PoolEM[i], Bin_PoolEM[i + 1], F_value);
         ffactor.emplace_back(F_value);
         TList *l_rfactor = new TList();
         l_rfactor->Add(hist_rfactor);
-        f->cd();
+        fOut->cd();
         l_rfactor->Write(Form("RNormalizationFactor_%g_%g", Bin_PoolEM[i], Bin_PoolEM[i + 1]), TObject::kSingleKey);
         //delete hist_rfactor;
         //delete l_rfactor;
     }
 
-    //LOG(info) << "Processing analysis for pT-differential R and F factors ...";
     vector<double *> ffactor_ptDiff;
     for (int i = 0; i < int(Bin_pt_mass.size()) - 1; i++) {
         ffactor_ptDiff.emplace_back(new double[itmax - itmin]);
@@ -164,7 +150,6 @@ void flow_fitter(int flag_binning, int flag_sig, int flag_bkg, int flag_v2, int 
         for (int j = itmin; j < itmax; j++) {
             TH1D *hist_rfactor = helper->GetRfactorProfile(Bin_pt_mass[i], Bin_pt_mass[i + 1], 0., 5., Bin_PoolEM[j], Bin_PoolEM[j + 1], tp_V2MEPM, tp_V2MEPP, tp_V2MEMM);
             double F_value = helper->GetFfactorProfile(Bin_pt_mass[i], Bin_pt_mass[i + 1], fmin, fmax, Bin_PoolEM[j], Bin_PoolEM[j + 1], tp_V2SEPP, tp_V2SEMM, tp_V2MEPM, hist_rfactor);
-            //LOG(info) << Form("F factor for [%g - %g] (%%) [%g - %g] (GeV/c): %g", Bin_PoolEM[j], Bin_PoolEM[j + 1], Bin_pt_mass[i], Bin_pt_mass[i + 1], F_value);
             ffactor_ptDiff[i][j - itmin] = F_value;
             cout << "F-value: " << F_value << endl;
             delete hist_rfactor;
@@ -185,192 +170,132 @@ void flow_fitter(int flag_binning, int flag_sig, int flag_bkg, int flag_v2, int 
     double *eysys_v2pt = new double[int(Bin_pt_mass.size()) - 1];
 
     // Initialize arrays for each trial of systematic study
-  const int nbCombo_v2 = int(size(sig_mass)) * int(size(bkg_mass)) * int(size(bkg_v2)) * int(size(mass_max_sys));
-  const int nbCombo_yield = int(size(sig_mass)) * int(size(bkg_mass)) * int(size(mass_max_sys));
+    const int nbCombo_v2 = int(size(sig_mass)) * int(size(bkg_mass)) * int(size(bkg_v2)) * int(size(mass_max_sys));
+    const int nbCombo_yield = int(size(sig_mass)) * int(size(bkg_mass)) * int(size(mass_max_sys));
 
-  vector<double *> x_sys_pt, ex_sys_pt, y_sys_yield, ey_sys_yield, y_sys_v2, ey_sys_v2, chi2_yield, chi2_v2, chi2_meanPt;
-  double *bins_sys_v2 = new double[nbCombo_v2 + 1];
-  double *bins_sys_yield = new double[nbCombo_yield + 1];
-  for (int i = 0; i < nbCombo_v2 + 1; i++) {
-    bins_sys_v2[i] = i;
-  }
-  for (int i = 0; i < nbCombo_yield + 1; i++) {
-    bins_sys_yield[i] = i;
-  }
+    vector<double *> x_sys_pt, ex_sys_pt, y_sys_yield, ey_sys_yield, y_sys_v2, ey_sys_v2, chi2_yield, chi2_v2, chi2_meanPt;
+    double *bins_sys_v2 = new double[nbCombo_v2 + 1];
+    double *bins_sys_yield = new double[nbCombo_yield + 1];
+    for (int i = 0; i < nbCombo_v2 + 1; i++) {bins_sys_v2[i] = i;}
+    for (int i = 0; i < nbCombo_yield + 1; i++) {bins_sys_yield[i] = i;}
 
-  vector<TH1D *> hist_sys_yield, hist_sys_v2, hist_sys_meanPt;
-  for (int i = 0; i < int(Bin_pt_mass.size()) - 1; i++) {
-    y_sys_yield.emplace_back(new double[nbCombo_yield]);
-    ey_sys_yield.emplace_back(new double[nbCombo_yield]);
+    vector<TH1D *> hist_sys_yield, hist_sys_v2, hist_sys_meanPt;
+    for (int i = 0; i < int(Bin_pt_mass.size()) - 1; i++) {
+        y_sys_yield.emplace_back(new double[nbCombo_yield]);
+        ey_sys_yield.emplace_back(new double[nbCombo_yield]);
 
-    y_sys_v2.emplace_back(new double[nbCombo_v2]);
-    ey_sys_v2.emplace_back(new double[nbCombo_v2]);
+        y_sys_v2.emplace_back(new double[nbCombo_v2]);
+        ey_sys_v2.emplace_back(new double[nbCombo_v2]);
 
-    chi2_yield.emplace_back(new double[nbCombo_yield]);
-    chi2_v2.emplace_back(new double[nbCombo_v2]);
+        chi2_yield.emplace_back(new double[nbCombo_yield]);
+        chi2_v2.emplace_back(new double[nbCombo_v2]);
 
-    hist_sys_yield.emplace_back(new TH1D(Form("hist_sys_yield_%g_%g", Bin_pt_mass[i], Bin_pt_mass[i + 1]), Form("hist_sys_yield_%g_%g", Bin_pt_mass[i], Bin_pt_mass[i + 1]), nbCombo_yield, bins_sys_yield));
-    hist_sys_v2.emplace_back( new TH1D(Form("hist_sys_v2_%g_%g", Bin_pt_mass[i], Bin_pt_mass[i + 1]), Form("hist_sys_v2_%g_%g", Bin_pt_mass[i], Bin_pt_mass[i + 1]), nbCombo_v2, bins_sys_v2));
+        hist_sys_yield.emplace_back(new TH1D(Form("hist_sys_yield_%g_%g", Bin_pt_mass[i], Bin_pt_mass[i + 1]), Form("hist_sys_yield_%g_%g", Bin_pt_mass[i], Bin_pt_mass[i + 1]), nbCombo_yield, bins_sys_yield));
+        hist_sys_v2.emplace_back( new TH1D(Form("hist_sys_v2_%g_%g", Bin_pt_mass[i], Bin_pt_mass[i + 1]), Form("hist_sys_v2_%g_%g", Bin_pt_mass[i], Bin_pt_mass[i + 1]), nbCombo_v2, bins_sys_v2));
 
-    if (meanPt) {
-      x_sys_pt.emplace_back(new double[nbCombo_yield]);
-      ex_sys_pt.emplace_back(new double[nbCombo_yield]);
-      chi2_meanPt.emplace_back(new double[nbCombo_yield]);
-      hist_sys_meanPt.emplace_back(new TH1D(Form("hist_sys_meanPt_%g_%g", Bin_pt_mass[i], Bin_pt_mass[i + 1]), Form("hist_sys_meanPt_%g_%g", Bin_pt_mass[i], Bin_pt_mass[i + 1]), nbCombo_yield, bins_sys_yield));
-    }
-  }
-
-  for (int i = 0; i < int(Bin_pt_mass.size()) - 1; i++) {
-    // Normalisation for mixed-event spectra
-    TH1D *hs_mass_mepm_proj = new TH1D();
-    TH1D *hs_mass_mepp_proj = new TH1D();
-    TH1D *hs_mass_memm_proj = new TH1D();
-    for (int j = itmin; j < itmax; j++) {
-      if (j == itmin) {
-        hs_mass_mepm_proj = helper->GetMassProfile(Bin_pt_mass[i], Bin_pt_mass[i + 1], mass_min, mass_max, Bin_PoolEM[j], Bin_PoolEM[j + 1], tp_V2MEPM, "MEPM");
-        hs_mass_mepm_proj->Scale(ffactor_ptDiff[i][j - itmin]);
-
-        hs_mass_mepp_proj = helper->GetMassProfile(Bin_pt_mass[i], Bin_pt_mass[i + 1], mass_min, mass_max, Bin_PoolEM[j], Bin_PoolEM[j + 1], tp_V2MEPP, "MEPP");
-        hs_mass_mepp_proj->Scale(ffactor_ptDiff[i][j - itmin]);
-
-        hs_mass_memm_proj = helper->GetMassProfile(Bin_pt_mass[i], Bin_pt_mass[i + 1], mass_min, mass_max, Bin_PoolEM[j], Bin_PoolEM[j + 1], tp_V2MEMM, "MEMM");
-        hs_mass_memm_proj->Scale(ffactor_ptDiff[i][j - itmin]);
-      } else {
-        hs_mass_mepm_proj->Add(helper->GetMassProfile(Bin_pt_mass[i], Bin_pt_mass[i + 1], mass_min, mass_max, Bin_PoolEM[j], Bin_PoolEM[j + 1], tp_V2MEPM, "MEPM"), ffactor_ptDiff[i][j - itmin]);
-        hs_mass_mepp_proj->Add(helper->GetMassProfile(Bin_pt_mass[i], Bin_pt_mass[i + 1], mass_min, mass_max, Bin_PoolEM[j], Bin_PoolEM[j + 1], tp_V2MEPP, "MEPP"), ffactor_ptDiff[i][j - itmin]);
-        hs_mass_memm_proj->Add(helper->GetMassProfile(Bin_pt_mass[i], Bin_pt_mass[i + 1], mass_min, mass_max, Bin_PoolEM[j], Bin_PoolEM[j + 1], tp_V2MEMM, "MEMM"), ffactor_ptDiff[i][j - itmin]);
-      }
+        if (meanPt) {
+            x_sys_pt.emplace_back(new double[nbCombo_yield]);
+            ex_sys_pt.emplace_back(new double[nbCombo_yield]);
+            chi2_meanPt.emplace_back(new double[nbCombo_yield]);
+            hist_sys_meanPt.emplace_back(new TH1D(Form("hist_sys_meanPt_%g_%g", Bin_pt_mass[i], Bin_pt_mass[i + 1]), Form("hist_sys_meanPt_%g_%g", Bin_pt_mass[i], Bin_pt_mass[i + 1]), nbCombo_yield, bins_sys_yield));
+        }
     }
 
-    // Same-event profiles: mass
-    TH1D *hs_mass_sepm_proj = helper->GetMassProfile(Bin_pt_mass[i], Bin_pt_mass[i + 1], mass_min, mass_max, cent_min, cent_max, tp_V2SEPM, "SEPM");
-    TH1D *hs_mass_sepp_proj = helper->GetMassProfile(Bin_pt_mass[i], Bin_pt_mass[i + 1], mass_min, mass_max, cent_min, cent_max, tp_V2SEPP, "SEPP");
-    TH1D *hs_mass_semm_proj = helper->GetMassProfile(Bin_pt_mass[i], Bin_pt_mass[i + 1], mass_min, mass_max, cent_min, cent_max, tp_V2SEMM, "SEMM");
+    for (int i = 0; i < int(Bin_pt_mass.size()) - 1; i++) {
+        // Normalisation for mixed-event spectra
+        TH1D *hs_mass_mepm_proj = new TH1D();
+        TH1D *hs_mass_mepp_proj = new TH1D();
+        TH1D *hs_mass_memm_proj = new TH1D();
+        for (int j = itmin; j < itmax; j++) {
+            if (j == itmin) {
+                hs_mass_mepm_proj = helper->GetMassProfile(Bin_pt_mass[i], Bin_pt_mass[i + 1], mass_min, mass_max, Bin_PoolEM[j], Bin_PoolEM[j + 1], tp_V2MEPM, "MEPM");
+                hs_mass_mepm_proj->Scale(ffactor_ptDiff[i][j - itmin]);
 
-    // Same-event profiles: v2
-    TH1D *hs_v2_sepm_proj = helper->GetV2Profile(Bin_pt_mass[i], Bin_pt_mass[i + 1], mass_min, mass_max, cent_min, cent_max, tp_V2SEPM, "SEPM");
-    TH1D *hs_v2_sepp_proj = helper->GetV2Profile(Bin_pt_mass[i], Bin_pt_mass[i + 1], mass_min, mass_max, cent_min, cent_max, tp_V2SEPP, "SEPP");
-    TH1D *hs_v2_semm_proj = helper->GetV2Profile(Bin_pt_mass[i], Bin_pt_mass[i + 1], mass_min, mass_max, cent_min, cent_max, tp_V2SEMM, "SEMM");
+                hs_mass_mepp_proj = helper->GetMassProfile(Bin_pt_mass[i], Bin_pt_mass[i + 1], mass_min, mass_max, Bin_PoolEM[j], Bin_PoolEM[j + 1], tp_V2MEPP, "MEPP");
+                hs_mass_mepp_proj->Scale(ffactor_ptDiff[i][j - itmin]);
 
-    // Mixed-event profiles: v2
-    TH1D *hs_v2_mepm_proj = helper->GetV2Profile(Bin_pt_mass[i], Bin_pt_mass[i + 1], mass_min, mass_max, cent_min, cent_max, tp_V2MEPM, "MEPM");
-    TH1D *hs_v2_mepp_proj = helper->GetV2Profile(Bin_pt_mass[i], Bin_pt_mass[i + 1], mass_min, mass_max, cent_min, cent_max, tp_V2MEPP, "MEPP");
-    TH1D *hs_v2_memm_proj = helper->GetV2Profile(Bin_pt_mass[i], Bin_pt_mass[i + 1], mass_min, mass_max, cent_min, cent_max, tp_V2MEMM, "MEMM");
+                hs_mass_memm_proj = helper->GetMassProfile(Bin_pt_mass[i], Bin_pt_mass[i + 1], mass_min, mass_max, Bin_PoolEM[j], Bin_PoolEM[j + 1], tp_V2MEMM, "MEMM");
+                hs_mass_memm_proj->Scale(ffactor_ptDiff[i][j - itmin]);
+            } else {
+                hs_mass_mepm_proj->Add(helper->GetMassProfile(Bin_pt_mass[i], Bin_pt_mass[i + 1], mass_min, mass_max, Bin_PoolEM[j], Bin_PoolEM[j + 1], tp_V2MEPM, "MEPM"), ffactor_ptDiff[i][j - itmin]);
+                hs_mass_mepp_proj->Add(helper->GetMassProfile(Bin_pt_mass[i], Bin_pt_mass[i + 1], mass_min, mass_max, Bin_PoolEM[j], Bin_PoolEM[j + 1], tp_V2MEPP, "MEPP"), ffactor_ptDiff[i][j - itmin]);
+                hs_mass_memm_proj->Add(helper->GetMassProfile(Bin_pt_mass[i], Bin_pt_mass[i + 1], mass_min, mass_max, Bin_PoolEM[j], Bin_PoolEM[j + 1], tp_V2MEMM, "MEMM"), ffactor_ptDiff[i][j - itmin]);
+            }
+        }
 
-    
-    /*hns_v2_sepm_proj->Draw();
-    hs_v2_sepm_proj->SetLineColor(kRed);
-    hs_v2_sepm_proj->Draw("SAME");
-    hs_v2_mepm_proj->SetLineColor(kGreen);
-    hs_v2_mepm_proj->Draw("SAME");
-    hs_v2_mepp_proj->SetLineColor(kOrange+7);
-    hs_v2_mepp_proj->Draw("SAME");*/
+        // Same-event profiles: mass
+        TH1D *hs_mass_sepm_proj = helper->GetMassProfile(Bin_pt_mass[i], Bin_pt_mass[i + 1], mass_min, mass_max, cent_min, cent_max, tp_V2SEPM, "SEPM");
+        TH1D *hs_mass_sepp_proj = helper->GetMassProfile(Bin_pt_mass[i], Bin_pt_mass[i + 1], mass_min, mass_max, cent_min, cent_max, tp_V2SEPP, "SEPP");
+        TH1D *hs_mass_semm_proj = helper->GetMassProfile(Bin_pt_mass[i], Bin_pt_mass[i + 1], mass_min, mass_max, cent_min, cent_max, tp_V2SEMM, "SEMM");
 
-    /*TFile *fOutTest = new TFile("ME_output.root", "RECREATE");
-    hs_v2_sepm_proj->Write();
-    hs_v2_mepm_proj->Write();
-    hs_v2_mepp_proj->Write();
-    hs_v2_memm_proj->Write();
-    fOutTest->Close();
-    return;*/
+        // Same-event profiles: v2
+        TH1D *hs_v2_sepm_proj = helper->GetV2Profile(Bin_pt_mass[i], Bin_pt_mass[i + 1], mass_min, mass_max, cent_min, cent_max, tp_V2SEPM, "SEPM");
+        TH1D *hs_v2_sepp_proj = helper->GetV2Profile(Bin_pt_mass[i], Bin_pt_mass[i + 1], mass_min, mass_max, cent_min, cent_max, tp_V2SEPP, "SEPP");
+        TH1D *hs_v2_semm_proj = helper->GetV2Profile(Bin_pt_mass[i], Bin_pt_mass[i + 1], mass_min, mass_max, cent_min, cent_max, tp_V2SEMM, "SEMM");
 
+        // Mixed-event profiles: v2
+        TH1D *hs_v2_mepm_proj = helper->GetV2Profile(Bin_pt_mass[i], Bin_pt_mass[i + 1], mass_min, mass_max, cent_min, cent_max, tp_V2MEPM, "MEPM");
+        TH1D *hs_v2_mepp_proj = helper->GetV2Profile(Bin_pt_mass[i], Bin_pt_mass[i + 1], mass_min, mass_max, cent_min, cent_max, tp_V2MEPP, "MEPP");
+        TH1D *hs_v2_memm_proj = helper->GetV2Profile(Bin_pt_mass[i], Bin_pt_mass[i + 1], mass_min, mass_max, cent_min, cent_max, tp_V2MEMM, "MEMM");
 
-    // Mean pT profile
-    TH1D *hs_mass_sepm_proj_meanPt = new TH1D();
-    if (meanPt) {
-      hs_mass_sepm_proj_meanPt =
-          helper->GetMeanPt(Bin_pt_mass[i], Bin_pt_mass[i + 1], mass_min,
-                            mass_max, cent_min, cent_max, tp_V2SEPM, "SEPM");
+        // Mean pT profile
+        TH1D *hs_mass_sepm_proj_meanPt = new TH1D();
+        if (meanPt) {hs_mass_sepm_proj_meanPt = helper->GetMeanPt(Bin_pt_mass[i], Bin_pt_mass[i + 1], mass_min, mass_max, cent_min, cent_max, tp_V2SEPM, "SEPM");}
+
+        // Save plots for invariant mass
+        TList *l_SE_ME = new TList();
+        helper->PlotSEME("PM", "Mass", Bin_pt_mass[i], Bin_pt_mass[i + 1], mass_min, mass_max, cent_min, cent_max, hs_mass_sepm_proj, hs_mass_mepm_proj, l_SE_ME);
+        helper->PlotSEME("PP", "Mass", Bin_pt_mass[i], Bin_pt_mass[i + 1], mass_min, mass_max, cent_min, cent_max, hs_mass_sepp_proj, hs_mass_mepp_proj, l_SE_ME);
+        helper->PlotSEME("MM", "Mass", Bin_pt_mass[i], Bin_pt_mass[i + 1], mass_min, mass_max, cent_min, cent_max, hs_mass_semm_proj, hs_mass_memm_proj, l_SE_ME);
+
+        TList *l_SE_ME_V2 = new TList();
+        helper->PlotSEME("PM", "V2", Bin_pt_mass[i], Bin_pt_mass[i + 1], mass_min, mass_max, cent_min, cent_max, hs_v2_sepm_proj, hs_v2_mepm_proj, l_SE_ME_V2);
+        helper->PlotSEME("PP", "V2", Bin_pt_mass[i], Bin_pt_mass[i + 1], mass_min, mass_max, cent_min, cent_max, hs_v2_sepp_proj, hs_v2_mepp_proj, l_SE_ME_V2);
+        helper->PlotSEME("MM", "V2", Bin_pt_mass[i], Bin_pt_mass[i + 1], mass_min, mass_max, cent_min, cent_max, hs_v2_semm_proj, hs_v2_memm_proj, l_SE_ME_V2);
+
+        /// Do fitting
+        // Configuration for fitting
+        fitter->setModel(flag_sig, flag_bkg);
+        fitter->setModelV2(flag_v2);
+        fitter->setMassRange(mass_min, mass_max);
+        fitter->setPtRange(Bin_pt_mass[i], Bin_pt_mass[i + 1]);
+        fitter->setOrder(2);
+        //fitter->setMode(0); // standard mode, no systematics
+
+        // Fit invariant mass + v2
+        TList *l_diff_fit = new TList();
+        vector<double> results_v2 =
+            meanPt ? fitter->runFittingEM(hs_mass_sepm_proj, hs_mass_mepm_proj, hs_v2_sepm_proj, hs_v2_mepm_proj, hs_mass_sepm_proj_meanPt, l_diff_fit)
+                : fitter->runFittingEM(hs_mass_sepm_proj, hs_mass_mepm_proj, hs_v2_sepm_proj, hs_v2_mepm_proj, nullptr, l_diff_fit);
+
+        SNR[i] = results_v2[4];
+        fOut->cd();
+        l_SE_ME->SetOwner();
+        l_SE_ME->Write(Form("Mass_SEME_%g_%g", Bin_pt_mass[i], Bin_pt_mass[i + 1]), TObject::kSingleKey);
+        delete l_SE_ME;
+
+        fOut->cd();
+        l_SE_ME_V2->SetOwner();
+        l_SE_ME_V2->Write(Form("V2_SEME_%g_%g", Bin_pt_mass[i], Bin_pt_mass[i + 1]), TObject::kSingleKey);
+        delete l_SE_ME_V2;
+
+        fOut->cd();
+        l_diff_fit->SetOwner();
+        l_diff_fit->Write( Form("DifferentialFlow_Fit_%g_%g", Bin_pt_mass[i], Bin_pt_mass[i + 1]), TObject::kSingleKey);
+        delete l_diff_fit;
+
+        delete hs_mass_sepm_proj;
+        delete hs_mass_sepp_proj;
+        delete hs_mass_semm_proj;
+        delete hs_mass_mepm_proj;
+        delete hs_mass_mepp_proj;
+        delete hs_mass_memm_proj;
+        delete hs_v2_sepm_proj;
+        delete hs_v2_sepp_proj;
+        delete hs_v2_semm_proj;
+        if (hs_v2_mepm_proj) {delete hs_v2_mepm_proj;}
+        if (hs_v2_mepp_proj) {delete hs_v2_mepp_proj;}
+        if (hs_v2_memm_proj) {delete hs_v2_memm_proj;}
+        if (hs_mass_sepm_proj_meanPt) {delete hs_mass_sepm_proj_meanPt;}
     }
-
-    // Save plots for invariant mass
-    TList *l_SE_ME = new TList();
-    helper->PlotSEME("PM", "Mass", Bin_pt_mass[i], Bin_pt_mass[i + 1], mass_min,
-                     mass_max, cent_min, cent_max, hs_mass_sepm_proj,
-                     hs_mass_mepm_proj, l_SE_ME);
-    helper->PlotSEME("PP", "Mass", Bin_pt_mass[i], Bin_pt_mass[i + 1], mass_min,
-                     mass_max, cent_min, cent_max, hs_mass_sepp_proj,
-                     hs_mass_mepp_proj, l_SE_ME);
-    helper->PlotSEME("MM", "Mass", Bin_pt_mass[i], Bin_pt_mass[i + 1], mass_min,
-                     mass_max, cent_min, cent_max, hs_mass_semm_proj,
-                     hs_mass_memm_proj, l_SE_ME);
-
-    TList *l_SE_ME_V2 = new TList();
-    helper->PlotSEME("PM", "V2", Bin_pt_mass[i], Bin_pt_mass[i + 1], mass_min,
-                     mass_max, cent_min, cent_max, hs_v2_sepm_proj,
-                     hs_v2_mepm_proj, l_SE_ME_V2);
-    helper->PlotSEME("PP", "V2", Bin_pt_mass[i], Bin_pt_mass[i + 1], mass_min,
-                     mass_max, cent_min, cent_max, hs_v2_sepp_proj,
-                     hs_v2_mepp_proj, l_SE_ME_V2);
-    helper->PlotSEME("MM", "V2", Bin_pt_mass[i], Bin_pt_mass[i + 1], mass_min,
-                     mass_max, cent_min, cent_max, hs_v2_semm_proj,
-                     hs_v2_memm_proj, l_SE_ME_V2);
-
-    /// Do fitting
-    // Configuration for fitting
-    fitter->setModel(flag_sig, flag_bkg);
-    fitter->setModelV2(flag_v2);
-    fitter->setMassRange(mass_min, mass_max);
-    fitter->setPtRange(Bin_pt_mass[i], Bin_pt_mass[i + 1]);
-    fitter->setOrder(2);
-    //fitter->setMode(0); // standard mode, no systematics
-
-    // Fit invariant mass + v2
-    TList *l_diff_fit = new TList();
-    vector<double> results_v2 =
-        meanPt ? fitter->runFittingEM(hs_mass_sepm_proj, hs_mass_mepm_proj,
-                                      hs_v2_sepm_proj, hs_v2_mepm_proj,
-                                      hs_mass_sepm_proj_meanPt, l_diff_fit)
-               : fitter->runFittingEM(hs_mass_sepm_proj, hs_mass_mepm_proj,
-                                      hs_v2_sepm_proj, hs_v2_mepm_proj, nullptr,
-                                      l_diff_fit);
-
-    
-
-   SNR[i] = results_v2[4];
-
-    f->cd();
-    l_SE_ME->SetOwner();
-    l_SE_ME->Write(Form("Mass_SEME_%g_%g", Bin_pt_mass[i], Bin_pt_mass[i + 1]),
-                   TObject::kSingleKey);
-    delete l_SE_ME;
-
-    f->cd();
-    l_SE_ME_V2->SetOwner();
-    l_SE_ME_V2->Write(Form("V2_SEME_%g_%g", Bin_pt_mass[i], Bin_pt_mass[i + 1]),
-                      TObject::kSingleKey);
-    delete l_SE_ME_V2;
-
-    f->cd();
-    l_diff_fit->SetOwner();
-    l_diff_fit->Write(
-        Form("DifferentialFlow_Fit_%g_%g", Bin_pt_mass[i], Bin_pt_mass[i + 1]),
-        TObject::kSingleKey);
-    delete l_diff_fit;
-
-    delete hs_mass_sepm_proj;
-    delete hs_mass_sepp_proj;
-    delete hs_mass_semm_proj;
-    delete hs_mass_mepm_proj;
-    delete hs_mass_mepp_proj;
-    delete hs_mass_memm_proj;
-    delete hs_v2_sepm_proj;
-    delete hs_v2_sepp_proj;
-    delete hs_v2_semm_proj;
-    if (hs_v2_mepm_proj) {
-      delete hs_v2_mepm_proj;
-    }
-    if (hs_v2_mepp_proj) {
-      delete hs_v2_mepp_proj;
-    }
-    if (hs_v2_memm_proj) {
-      delete hs_v2_memm_proj;
-    }
-    if (hs_mass_sepm_proj_meanPt) {
-      delete hs_mass_sepm_proj_meanPt;
-    }
-
-  }
-
-
 }
