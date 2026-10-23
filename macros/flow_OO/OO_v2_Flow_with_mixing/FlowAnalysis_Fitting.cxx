@@ -1,5 +1,7 @@
 #include "FlowAnalysis_Fitting.h"
 
+void LoadStyle();
+
 double FlowAnalysis_Fitting::massmin = 0.;
 double FlowAnalysis_Fitting::massmax = 10.;
 double FlowAnalysis_Fitting::centmin = 0.;
@@ -16,8 +18,7 @@ string FlowAnalysis_Fitting::mode_string[2] = {"Std", "Sys"};
 string FlowAnalysis_Fitting::model_string[8] = {
     "CB2(data)",   "CB2(MC)", "NA60", "Cheby",
     "EventMixing", "VWG",     "Exp2", "PolExp"};
-string FlowAnalysis_Fitting::v2bkg_string[2] = {"EventMixing(beta fix)",
-                                                "EventMixing(beta free)"};
+string FlowAnalysis_Fitting::v2bkg_string[2] = {"EventMixing(beta fix)", "EventMixing(beta free)"};
 
 //______________________________________________________________________________
 void FlowAnalysis_Fitting::init() {
@@ -793,16 +794,12 @@ void FlowAnalysis_Fitting::InitFullModel(TF1 *&model) {
 }
 
 //______________________________________________________________________________
-vector<double> FlowAnalysis_Fitting::runFitting(TH1D *hs_input,
-                                                TH1D *hs_v2_input, TList *ls) {
+vector<double> FlowAnalysis_Fitting::runFitting(TH1D *hs_input, TH1D *hs_v2_input, TList *ls) {
+  LoadStyle();
   vector<double> results;
   // Fitting for dimuon invariant mass + v2 signal
-  cout << ">>>>>>>>>>>>>> Start processing Pt range: "
-       << FlowAnalysis_Fitting::ptmin << " " << FlowAnalysis_Fitting::ptmax
-       << endl;
-  cout << ">>>>>>>>>>>>>> Start processing centrality range: "
-       << FlowAnalysis_Fitting::centmin << " " << FlowAnalysis_Fitting::centmax
-       << endl;
+  cout << ">>>>>>>>>>>>>> Start processing Pt range: " << FlowAnalysis_Fitting::ptmin << " " << FlowAnalysis_Fitting::ptmax << endl;
+  cout << ">>>>>>>>>>>>>> Start processing centrality range: " << FlowAnalysis_Fitting::centmin << " " << FlowAnalysis_Fitting::centmax << endl;
   // Make copies for input histograms for safety
   TH1D *hs = dynamic_cast<TH1D *>(hs_input->Clone(Form(
       "Proj_Mass_%s_v%d%d_%g_%g_%g_%g_%g_%g_%s_%s_%s",
@@ -811,12 +808,9 @@ vector<double> FlowAnalysis_Fitting::runFitting(TH1D *hs_input,
       FlowAnalysis_Fitting::ptmin, FlowAnalysis_Fitting::ptmax,
       FlowAnalysis_Fitting::massmin, FlowAnalysis_Fitting::massmax,
       FlowAnalysis_Fitting::centmin, FlowAnalysis_Fitting::centmax,
-      FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_sig]
-          .c_str(),
-      FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg]
-          .c_str(),
-      FlowAnalysis_Fitting::v2bkg_string[FlowAnalysis_Fitting::mflag_bkg_v2]
-          .c_str())));
+      FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_sig].c_str(),
+      FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg].c_str(),
+      FlowAnalysis_Fitting::v2bkg_string[FlowAnalysis_Fitting::mflag_bkg_v2].c_str())));
   TH1D *hs_v2 = dynamic_cast<TH1D *>(hs_v2_input->Clone(Form(
       "Proj_v2_%s_v%d%d_%g_%g_%g_%g_%g_%g_%s_%s_%s",
       FlowAnalysis_Fitting::mode_string[FlowAnalysis_Fitting::mode].c_str(),
@@ -824,19 +818,15 @@ vector<double> FlowAnalysis_Fitting::runFitting(TH1D *hs_input,
       FlowAnalysis_Fitting::ptmin, FlowAnalysis_Fitting::ptmax,
       FlowAnalysis_Fitting::massmin, FlowAnalysis_Fitting::massmax,
       FlowAnalysis_Fitting::centmin, FlowAnalysis_Fitting::centmax,
-      FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_sig]
-          .c_str(),
-      FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg]
-          .c_str(),
-      FlowAnalysis_Fitting::v2bkg_string[FlowAnalysis_Fitting::mflag_bkg_v2]
-          .c_str())));
+      FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_sig].c_str(),
+      FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg].c_str(),
+      FlowAnalysis_Fitting::v2bkg_string[FlowAnalysis_Fitting::mflag_bkg_v2].c_str())));
 
   //////////////////////////////////////////////////////////////////////////////
   ///      INVARIANT MASS FIT
   //////////////////////////////////////////////////////////////////////////////
   // Setting up fit model for invariant mass fit
-  cout << ">>>>>>>>>>>>>> Start processing dimuon invariant mass fit..."
-       << endl;
+  cout << ">>>>>>>>>>>>>> Start processing dimuon invariant mass fit..." << endl;
   // Construct a combined signal+background model
   TF1 *sig, *bkg;
   CreateModel(sig, ModelType(FlowAnalysis_Fitting::mflag_sig));
@@ -844,8 +834,7 @@ vector<double> FlowAnalysis_Fitting::runFitting(TH1D *hs_input,
   int nsig = 5.E2;
   int nbkg = 5.E5;
   TF1NormSum *sum_model = new TF1NormSum(sig, bkg, nsig, nbkg);
-  TF1 *model = new TF1("model", *sum_model, FlowAnalysis_Fitting::massmin,
-                       FlowAnalysis_Fitting::massmax, sum_model->GetNpar());
+  TF1 *model = new TF1("model", *sum_model, FlowAnalysis_Fitting::massmin,FlowAnalysis_Fitting::massmax, sum_model->GetNpar());
   model->SetParameters(sum_model->GetParameters().data());
   model->SetParName(0, "N_{J/#psi}");
   model->SetParName(1, "N_{bkg}");
@@ -1017,17 +1006,17 @@ vector<double> FlowAnalysis_Fitting::runFitting(TH1D *hs_input,
   hs->GetYaxis()->SetTitle(Form("Counts per %g GeV/c^{2}", hs->GetBinWidth(1)));
   hs->Draw("HIST EP");
   pad1_yield->ModifiedUpdate();
-  model->SetLineWidth(3.0);
-  model->SetLineColor(kBlue);
+  model->SetLineWidth(2.0);
+  model->SetLineColor(kAzure+2);
   model->Draw("same");
   pad1_yield->ModifiedUpdate();
-  bkg_fitted->SetLineWidth(3.0);
-  bkg_fitted->SetLineColor(kBlue);
+  bkg_fitted->SetLineWidth(2.0);
+  bkg_fitted->SetLineColor(kAzure+2);
   bkg_fitted->SetLineStyle(kDashed);
   bkg_fitted->Draw("same");
   pad1_yield->ModifiedUpdate();
-  sig_fitted->SetLineWidth(3.0);
-  sig_fitted->SetLineColor(kRed);
+  sig_fitted->SetLineWidth(2.0);
+  sig_fitted->SetLineColor(kRed+1);
   sig_fitted->Draw("same");
   pad1_yield->ModifiedUpdate();
 
@@ -1134,21 +1123,21 @@ vector<double> FlowAnalysis_Fitting::runFitting(TH1D *hs_input,
   TF1 *lyield1 = new TF1("lyield1", "[0]", FlowAnalysis_Fitting::massmin,
                          FlowAnalysis_Fitting::massmax);
   lyield1->SetParameter(0, 0.);
-  lyield1->SetLineColor(kBlue);
+  lyield1->SetLineColor(kAzure+2);
   lyield1->SetLineWidth(3);
   lyield1->SetLineStyle(1);
   lyield1->Draw("same");
   TF1 *lyield2 = new TF1("lyield2", "[0]", FlowAnalysis_Fitting::massmin,
                          FlowAnalysis_Fitting::massmax);
   lyield2->SetParameter(0, 1.);
-  lyield2->SetLineColor(kBlue);
+  lyield2->SetLineColor(kAzure+2);
   lyield2->SetLineWidth(3);
   lyield2->SetLineStyle(9);
   lyield2->Draw("same");
   TF1 *lyield3 = new TF1("lyield3", "[0]", FlowAnalysis_Fitting::massmin,
                          FlowAnalysis_Fitting::massmax);
   lyield3->SetParameter(0, -1.);
-  lyield3->SetLineColor(kBlue);
+  lyield3->SetLineColor(kAzure+2);
   lyield3->SetLineWidth(3);
   lyield3->SetLineStyle(9);
   lyield3->Draw("same");
@@ -1192,8 +1181,8 @@ vector<double> FlowAnalysis_Fitting::runFitting(TH1D *hs_input,
   model_v2->SetParameter(0, 0.01);
   model_v2->SetParLimits(0, -0.1, 0.5);
   model_v2->SetParName(0, "v^{J/#psi}_{2}");
-  hs_v2->Rebin();
-  hs_v2->Scale(0.5);
+  //hs_v2->Rebin();
+  //hs_v2->Scale(0.5);
   double chi2ndf_v2;
   if (FlowAnalysis_Fitting::mflag_bkg_v2 == 0) {
     model_v2->SetParameter(1, 0.);
@@ -1304,7 +1293,7 @@ vector<double> FlowAnalysis_Fitting::runFitting(TH1D *hs_input,
   gStyle->SetOptFit(1111);
   gStyle->SetOptTitle(0);
   gROOT->ForceStyle();
-  TCanvas *c_v2 = new TCanvas(
+  TCanvas *canvasFitV2 = new TCanvas(
       Form(
           "Fitted_%s_v%d%d_%g_%g_%g_%g_%g_%g_%s_%s_%s",
           FlowAnalysis_Fitting::mode_string[FlowAnalysis_Fitting::mode].c_str(),
@@ -1331,8 +1320,8 @@ vector<double> FlowAnalysis_Fitting::runFitting(TH1D *hs_input,
               .c_str(),
           FlowAnalysis_Fitting::v2bkg_string[FlowAnalysis_Fitting::mflag_bkg_v2]
               .c_str()));
-  c_v2->cd();
-  c_v2->SetBottomMargin(0);
+  canvasFitV2->cd();
+  canvasFitV2->SetBottomMargin(0);
   TPad *pad1_v2 = new TPad(
       Form(
           "Pad1_%s_v%d%d_%g_%g_%g_%g_%g_%g_%s_%s_%s",
@@ -1362,12 +1351,12 @@ vector<double> FlowAnalysis_Fitting::runFitting(TH1D *hs_input,
   hs_v2->GetYaxis()->SetTitle("#it{v}^{#mu#mu}_{2}");
   hs_v2->Draw("HIST EP");
   pad1_v2->ModifiedUpdate();
-  model_v2->SetLineWidth(3.0);
-  model_v2->SetLineColor(kBlue);
+  model_v2->SetLineWidth(2.0);
+  model_v2->SetLineColor(kAzure+2);
   model_v2->Draw("same");
   pad1_v2->ModifiedUpdate();
-  v2bkg_fitted->SetLineWidth(3.0);
-  v2bkg_fitted->SetLineColor(kBlue);
+  v2bkg_fitted->SetLineWidth(2.0);
+  v2bkg_fitted->SetLineColor(kAzure+2);
   v2bkg_fitted->SetLineStyle(kDashed);
   v2bkg_fitted->Draw("same");
   pad1_v2->ModifiedUpdate();
@@ -1380,7 +1369,7 @@ vector<double> FlowAnalysis_Fitting::runFitting(TH1D *hs_input,
   hs_v2->SetStats(0);
   sb_v2->Draw();
   pad1_v2->ModifiedUpdate();
-  c_v2->cd();
+  canvasFitV2->cd();
   TPad *pad2_v2 = new TPad(
       Form(
           "Pad2_%s_v%d%d_%g_%g_%g_%g_%g_%g_%s_%s_%s",
@@ -1419,26 +1408,26 @@ vector<double> FlowAnalysis_Fitting::runFitting(TH1D *hs_input,
   TF1 *lv21 = new TF1("lv21", "[0]", FlowAnalysis_Fitting::massmin,
                       FlowAnalysis_Fitting::massmax);
   lv21->SetParameter(0, 0.);
-  lv21->SetLineColor(kBlue);
+  lv21->SetLineColor(kAzure+2);
   lv21->SetLineWidth(3);
   lv21->SetLineStyle(1);
   lv21->Draw("same");
   TF1 *lv22 = new TF1("lv22", "[0]", FlowAnalysis_Fitting::massmin,
                       FlowAnalysis_Fitting::massmax);
   lv22->SetParameter(0, 1.);
-  lv22->SetLineColor(kBlue);
+  lv22->SetLineColor(kAzure+2);
   lv22->SetLineWidth(3);
   lv22->SetLineStyle(9);
   lv22->Draw("same");
   TF1 *lv23 = new TF1("lv23", "[0]", FlowAnalysis_Fitting::massmin,
                       FlowAnalysis_Fitting::massmax);
   lv23->SetParameter(0, -1.);
-  lv23->SetLineColor(kBlue);
+  lv23->SetLineColor(kAzure+2);
   lv23->SetLineWidth(3);
   lv23->SetLineStyle(9);
   lv23->Draw("same");
 
-  ls->Add(c_v2);
+  ls->Add(canvasFitV2);
 
   cout << endl;
   cout << endl;
@@ -1455,17 +1444,11 @@ vector<double> FlowAnalysis_Fitting::runFitting(TH1D *hs_input,
 
 //______________________________________________________________________________
 vector<double>
-FlowAnalysis_Fitting::runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input,
-                                   TH1D *hs_v2se_input, TH1D *hs_v2me_input,
-                                   TH1D *hs_meanPt_input, TList *ls) {
+FlowAnalysis_Fitting::runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input, TH1D *hs_v2se_input, TH1D *hs_v2me_input, TH1D *hs_meanPt_input, TList *ls, bool saveCanvas) {
   vector<double> results;
   // Fitting for dimuon invariant mass + v2 signal
-  cout << ">>>>>>>>>>>>>> Start processing Pt range: "
-       << FlowAnalysis_Fitting::ptmin << " " << FlowAnalysis_Fitting::ptmax
-       << endl;
-  cout << ">>>>>>>>>>>>>> Start processing centrality range: "
-       << FlowAnalysis_Fitting::centmin << " " << FlowAnalysis_Fitting::centmax
-       << endl;
+  cout << ">>>>>>>>>>>>>> Start processing Pt range: " << FlowAnalysis_Fitting::ptmin << " " << FlowAnalysis_Fitting::ptmax << endl;
+  cout << ">>>>>>>>>>>>>> Start processing centrality range: " << FlowAnalysis_Fitting::centmin << " " << FlowAnalysis_Fitting::centmax << endl;
   // Make copies for input histograms for safety
   TH1D *hs_se = dynamic_cast<TH1D *>(hs_mse_input->Clone(Form(
       "Proj_MassSE_%s_v%d%d_%g_%g_%g_%g_%g_%g_%s_%s_%s",
@@ -1474,12 +1457,9 @@ FlowAnalysis_Fitting::runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input,
       FlowAnalysis_Fitting::ptmin, FlowAnalysis_Fitting::ptmax,
       FlowAnalysis_Fitting::massmin, FlowAnalysis_Fitting::massmax,
       FlowAnalysis_Fitting::centmin, FlowAnalysis_Fitting::centmax,
-      FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_sig]
-          .c_str(),
-      FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg]
-          .c_str(),
-      FlowAnalysis_Fitting::v2bkg_string[FlowAnalysis_Fitting::mflag_bkg_v2]
-          .c_str())));
+      FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_sig].c_str(),
+      FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg].c_str(),
+      FlowAnalysis_Fitting::v2bkg_string[FlowAnalysis_Fitting::mflag_bkg_v2].c_str())));
   TH1D *hs_me = dynamic_cast<TH1D *>(hs_mme_input->Clone(Form(
       "Proj_MassME_%s_v%d%d_%g_%g_%g_%g_%g_%g_%s_%s_%s",
       FlowAnalysis_Fitting::mode_string[FlowAnalysis_Fitting::mode].c_str(),
@@ -1487,12 +1467,9 @@ FlowAnalysis_Fitting::runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input,
       FlowAnalysis_Fitting::ptmin, FlowAnalysis_Fitting::ptmax,
       FlowAnalysis_Fitting::massmin, FlowAnalysis_Fitting::massmax,
       FlowAnalysis_Fitting::centmin, FlowAnalysis_Fitting::centmax,
-      FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_sig]
-          .c_str(),
-      FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg]
-          .c_str(),
-      FlowAnalysis_Fitting::v2bkg_string[FlowAnalysis_Fitting::mflag_bkg_v2]
-          .c_str())));
+      FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_sig].c_str(),
+      FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg].c_str(),
+      FlowAnalysis_Fitting::v2bkg_string[FlowAnalysis_Fitting::mflag_bkg_v2].c_str())));
   TH1D *hs_v2se = dynamic_cast<TH1D *>(hs_v2se_input->Clone(Form(
       "Proj_v2SE_%s_v%d%d_%g_%g_%g_%g_%g_%g_%s_%s_%s",
       FlowAnalysis_Fitting::mode_string[FlowAnalysis_Fitting::mode].c_str(),
@@ -1500,12 +1477,9 @@ FlowAnalysis_Fitting::runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input,
       FlowAnalysis_Fitting::ptmin, FlowAnalysis_Fitting::ptmax,
       FlowAnalysis_Fitting::massmin, FlowAnalysis_Fitting::massmax,
       FlowAnalysis_Fitting::centmin, FlowAnalysis_Fitting::centmax,
-      FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_sig]
-          .c_str(),
-      FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg]
-          .c_str(),
-      FlowAnalysis_Fitting::v2bkg_string[FlowAnalysis_Fitting::mflag_bkg_v2]
-          .c_str())));
+      FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_sig].c_str(),
+      FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg].c_str(),
+      FlowAnalysis_Fitting::v2bkg_string[FlowAnalysis_Fitting::mflag_bkg_v2].c_str())));
   TH1D *hs_v2me = dynamic_cast<TH1D *>(hs_v2me_input->Clone(Form(
       "Proj_v2ME_%s_v%d%d_%g_%g_%g_%g_%g_%g_%s_%s_%s",
       FlowAnalysis_Fitting::mode_string[FlowAnalysis_Fitting::mode].c_str(),
@@ -1513,12 +1487,9 @@ FlowAnalysis_Fitting::runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input,
       FlowAnalysis_Fitting::ptmin, FlowAnalysis_Fitting::ptmax,
       FlowAnalysis_Fitting::massmin, FlowAnalysis_Fitting::massmax,
       FlowAnalysis_Fitting::centmin, FlowAnalysis_Fitting::centmax,
-      FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_sig]
-          .c_str(),
-      FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg]
-          .c_str(),
-      FlowAnalysis_Fitting::v2bkg_string[FlowAnalysis_Fitting::mflag_bkg_v2]
-          .c_str())));
+      FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_sig].c_str(),
+      FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg].c_str(),
+      FlowAnalysis_Fitting::v2bkg_string[FlowAnalysis_Fitting::mflag_bkg_v2].c_str())));
   TH1D *hs_meanPt = new TH1D();
   if (hs_meanPt_input) {
     hs_meanPt = dynamic_cast<TH1D *>(hs_meanPt_input->Clone(Form(
@@ -1528,12 +1499,9 @@ FlowAnalysis_Fitting::runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input,
         FlowAnalysis_Fitting::ptmin, FlowAnalysis_Fitting::ptmax,
         FlowAnalysis_Fitting::massmin, FlowAnalysis_Fitting::massmax,
         FlowAnalysis_Fitting::centmin, FlowAnalysis_Fitting::centmax,
-        FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_sig]
-            .c_str(),
-        FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg]
-            .c_str(),
-        FlowAnalysis_Fitting::v2bkg_string[FlowAnalysis_Fitting::mflag_bkg_v2]
-            .c_str())));
+        FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_sig].c_str(),
+        FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg].c_str(),
+        FlowAnalysis_Fitting::v2bkg_string[FlowAnalysis_Fitting::mflag_bkg_v2].c_str())));
   }
   TH1D *hs_se_res = dynamic_cast<TH1D *>(hs_mse_input->Clone(Form(
       "Proj_MassSEResidual_%s_v%d%d_%g_%g_%g_%g_%g_%g_%s_%s_%s",
@@ -1542,20 +1510,16 @@ FlowAnalysis_Fitting::runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input,
       FlowAnalysis_Fitting::ptmin, FlowAnalysis_Fitting::ptmax,
       FlowAnalysis_Fitting::massmin, FlowAnalysis_Fitting::massmax,
       FlowAnalysis_Fitting::centmin, FlowAnalysis_Fitting::centmax,
-      FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_sig]
-          .c_str(),
-      FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg]
-          .c_str(),
-      FlowAnalysis_Fitting::v2bkg_string[FlowAnalysis_Fitting::mflag_bkg_v2]
-          .c_str())));
+      FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_sig].c_str(),
+      FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg].c_str(),
+      FlowAnalysis_Fitting::v2bkg_string[FlowAnalysis_Fitting::mflag_bkg_v2].c_str())));
   hs_se_res->Add(hs_me, -1.0);
 
   //////////////////////////////////////////////////////////////////////////////
   ///      INVARIANT MASS FIT
   //////////////////////////////////////////////////////////////////////////////
   // Setting up fit model for invariant mass fit
-  cout << ">>>>>>>>>>>>>> Start processing dimuon invariant mass fit..."
-       << endl;
+  cout << ">>>>>>>>>>>>>> Start processing dimuon invariant mass fit..." << endl;
   // Construct a combined signal+background model
   // TF1 *sig = new TF1();
   // TF1 *sig_bis = new TF1();
@@ -1600,9 +1564,7 @@ FlowAnalysis_Fitting::runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input,
   int nPar_sig, nPar_bkg;
   FlowAnalysis_Fitting::GetNparFullModel(nPar_sig, nPar_bkg);
   int nPar_model = nPar_sig + nPar_bkg + 3;
-  TF1 *model = new TF1("model", FlowAnalysis_Fitting::FullModelWithPsi2s,
-                       FlowAnalysis_Fitting::massmin,
-                       FlowAnalysis_Fitting::massmax, nPar_model);
+  TF1 *model = new TF1("model", FlowAnalysis_Fitting::FullModelWithPsi2s, FlowAnalysis_Fitting::massmin, FlowAnalysis_Fitting::massmax, nPar_model);
 
   // model->SetParameters(sum_model->GetParameters().data());
   // model->SetParName(0, "N_{J/#psi}");
@@ -1620,8 +1582,7 @@ FlowAnalysis_Fitting::runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input,
       model->GetParLimits(i, min, max);
       ParLimitsBkg[i - 4 - nPar_sig][0] = min;
       ParLimitsBkg[i - 4 - nPar_sig][1] = max;
-      if (!(FlowAnalysis_Fitting::model_string
-                [FlowAnalysis_Fitting::mflag_bkg] == "EventMixing")) {
+      if (!(FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg] == "EventMixing")) {
         model->FixParameter(i, model->GetParameter(i));
       }
     }
@@ -1671,17 +1632,13 @@ FlowAnalysis_Fitting::runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input,
 
   // Iterative fitting
   double chi2ndf_mass;
-  if (FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg] ==
-      "EventMixing") {
+  if (FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg] == "EventMixing") {
     auto result = hs_se_res->Fit("model", "S Q B 0");
     int fitStatus = result;
     int bit_improve = int(fitStatus / 1000);
     int bit_minos = int((fitStatus - 1000 * bit_improve) / 100);
-    int bit_hesse =
-        int((fitStatus - 1000 * bit_improve - 100 * bit_minos) / 10);
-    int bit_migrad = int(
-        (fitStatus - 1000 * bit_improve - 100 * bit_minos - 10 * bit_hesse) /
-        1);
+    int bit_hesse = int((fitStatus - 1000 * bit_improve - 100 * bit_minos) / 10);
+    int bit_migrad = int((fitStatus - 1000 * bit_improve - 100 * bit_minos - 10 * bit_hesse) / 1);
     result->Print();
     cout << "Fit result = " << fitStatus << endl;
     chi2ndf_mass = model->GetChisquare() / model->GetNDF();
@@ -1689,8 +1646,7 @@ FlowAnalysis_Fitting::runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input,
     if ((chi2ndf_mass > mchi2max_mass || (bit_migrad != 0 && bit_migrad != 1) ||
          bit_minos != 0 || bit_hesse != 0)) {
       cout << "Fixing exponential function to a straight line..." << endl;
-      if (FlowAnalysis_Fitting::mflag_sig == CB2Data ||
-          FlowAnalysis_Fitting::mflag_sig == CB2MC) {
+      if (FlowAnalysis_Fitting::mflag_sig == CB2Data || FlowAnalysis_Fitting::mflag_sig == CB2MC) {
         model->FixParameter(9, model->GetParameter(9));
       }
       if (FlowAnalysis_Fitting::mflag_sig == NA60) {
@@ -1712,26 +1668,19 @@ FlowAnalysis_Fitting::runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input,
       int fitStatus = result;
       int bit_improve = int(fitStatus / 1000);
       int bit_minos = int((fitStatus - 1000 * bit_improve) / 100);
-      int bit_hesse =
-          int((fitStatus - 1000 * bit_improve - 100 * bit_minos) / 10);
-      int bit_migrad = int(
-          (fitStatus - 1000 * bit_improve - 100 * bit_minos - 10 * bit_hesse) /
-          1);
+      int bit_hesse = int((fitStatus - 1000 * bit_improve - 100 * bit_minos) / 10);
+      int bit_migrad = int((fitStatus - 1000 * bit_improve - 100 * bit_minos - 10 * bit_hesse) / 1);
       result->Print();
       cout << "Fit result = " << fitStatus << endl;
       chi2ndf_mass = model->GetChisquare() / model->GetNDF();
       cout << "chi2/ndf: " << chi2ndf_mass << endl;
       if ((chi2ndf_mass > mchi2max_mass ||
-           (bit_migrad != 0 && bit_migrad != 1) || bit_minos != 0 ||
-           bit_hesse != 0) &&
-          i < nPar_bkg - 1) {
+           (bit_migrad != 0 && bit_migrad != 1) || bit_minos != 0 || bit_hesse != 0) && i < nPar_bkg - 1) {
         // double min, max;
         // bkg->GetParLimits(i + 1, min, max);
         model->ReleaseParameter(i + 4 + nPar_sig);
         // model->SetParLimits(i + 4 + nPar_sig, min, max);
-        model->SetParLimits(i + 4 + nPar_sig,
-                            ParLimitsBkg[i - nfree_bkg + 1][0],
-                            ParLimitsBkg[i - nfree_bkg + 1][1]);
+        model->SetParLimits(i + 4 + nPar_sig, ParLimitsBkg[i - nfree_bkg + 1][0], ParLimitsBkg[i - nfree_bkg + 1][1]);
       } else {
         break;
       }
@@ -1744,9 +1693,7 @@ FlowAnalysis_Fitting::runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input,
   int nsig_bis_fitted = model->GetParameter(2);
 
   // Fitted signal function
-  TF1 *sig_fitted = new TF1("sig_fitted", FlowAnalysis_Fitting::FittedSignal,
-                            FlowAnalysis_Fitting::massmin,
-                            FlowAnalysis_Fitting::massmax, nPar_sig + 2);
+  TF1 *sig_fitted = new TF1("sig_fitted", FlowAnalysis_Fitting::FittedSignal, FlowAnalysis_Fitting::massmin, FlowAnalysis_Fitting::massmax, nPar_sig + 2);
   for (int i = 0; i < nPar_sig + 2; i++) {
     if (i == 0) {
       sig_fitted->SetParameter(i, 1.);
@@ -1756,7 +1703,7 @@ FlowAnalysis_Fitting::runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input,
       sig_fitted->SetParameter(i, model->GetParameter(i + 1));
     }
   }
-  double int_sig = sig_fitted->Integral(FlowAnalysis_Fitting::massmin,
+  double int_sig = sig_fitted->Integral(FlowAnalysis_Fitting::massmin,  
                                         FlowAnalysis_Fitting::massmax);
   sig_fitted->SetParameter(0, model->GetParameter(0) * int_sig);
   sig_fitted->SetParError(0, model->GetParError(0) * int_sig);
@@ -1834,7 +1781,7 @@ FlowAnalysis_Fitting::runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input,
   gStyle->SetOptFit(1111);
   gStyle->SetOptTitle(0);
   gROOT->ForceStyle();
-  TCanvas *c = new TCanvas(
+  TCanvas *canvasFitMass = new TCanvas(
       Form(
           "Fitted_%s_Mass_v%d%d_%g_%g_%g_%g_%g_%g_%s_%s_%s",
           FlowAnalysis_Fitting::mode_string[FlowAnalysis_Fitting::mode].c_str(),
@@ -1842,12 +1789,9 @@ FlowAnalysis_Fitting::runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input,
           FlowAnalysis_Fitting::ptmin, FlowAnalysis_Fitting::ptmax,
           FlowAnalysis_Fitting::massmin, FlowAnalysis_Fitting::massmax,
           FlowAnalysis_Fitting::centmin, FlowAnalysis_Fitting::centmax,
-          FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_sig]
-              .c_str(),
-          FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg]
-              .c_str(),
-          FlowAnalysis_Fitting::v2bkg_string[FlowAnalysis_Fitting::mflag_bkg_v2]
-              .c_str()),
+          FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_sig].c_str(),
+          FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg].c_str(),
+          FlowAnalysis_Fitting::v2bkg_string[FlowAnalysis_Fitting::mflag_bkg_v2].c_str()),
       Form(
           "Fitted_%s_Mass_v%d%d_%g_%g_%g_%g_%g_%g_%s_%s_%s",
           FlowAnalysis_Fitting::mode_string[FlowAnalysis_Fitting::mode].c_str(),
@@ -1855,14 +1799,11 @@ FlowAnalysis_Fitting::runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input,
           FlowAnalysis_Fitting::ptmin, FlowAnalysis_Fitting::ptmax,
           FlowAnalysis_Fitting::massmin, FlowAnalysis_Fitting::massmax,
           FlowAnalysis_Fitting::centmin, FlowAnalysis_Fitting::centmax,
-          FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_sig]
-              .c_str(),
-          FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg]
-              .c_str(),
-          FlowAnalysis_Fitting::v2bkg_string[FlowAnalysis_Fitting::mflag_bkg_v2]
-              .c_str()));
-  c->cd();
-  c->SetBottomMargin(0);
+          FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_sig].c_str(),
+          FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg].c_str(),
+          FlowAnalysis_Fitting::v2bkg_string[FlowAnalysis_Fitting::mflag_bkg_v2].c_str()), 800, 600);
+  canvasFitMass->cd();
+  canvasFitMass->SetBottomMargin(0);
   TPad *pad1_yield = new TPad(
       Form(
           "Pad1_%s_Mass_v%d%d_%g_%g_%g_%g_%g_%g_%s_%s_%s",
@@ -1871,38 +1812,32 @@ FlowAnalysis_Fitting::runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input,
           FlowAnalysis_Fitting::ptmin, FlowAnalysis_Fitting::ptmax,
           FlowAnalysis_Fitting::massmin, FlowAnalysis_Fitting::massmax,
           FlowAnalysis_Fitting::centmin, FlowAnalysis_Fitting::centmax,
-          FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_sig]
-              .c_str(),
-          FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg]
-              .c_str(),
-          FlowAnalysis_Fitting::v2bkg_string[FlowAnalysis_Fitting::mflag_bkg_v2]
-              .c_str()),
-      "", 0, 0.3, 1, 1.0);
+          FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_sig].c_str(),
+          FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg].c_str(),
+          FlowAnalysis_Fitting::v2bkg_string[FlowAnalysis_Fitting::mflag_bkg_v2].c_str()),
+          "", 0, 0.3, 1, 1.0);
   pad1_yield->SetBottomMargin(0);
   pad1_yield->Draw();
   pad1_yield->cd();
-  if (FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg] ==
-      "EventMixing") {
+  if (FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg] == "EventMixing") {
     hs_se_res->SetStats(1);
     hs_se_res->SetTitle("");
     hs_se_res->SetMarkerStyle(4);
     hs_se_res->SetMarkerSize(0.6);
-    hs_se_res->SetMarkerColor(kBlue);
+    hs_se_res->SetMarkerColor(kAzure+2);
     hs_se_res->GetXaxis()->SetTitle("m_{#mu#mu} (GeV/c^{2})");
-    hs_se_res->GetYaxis()->SetTitle(
-        Form("Counts per %g GeV/c^{2}", hs_se->GetBinWidth(1)));
+    hs_se_res->GetYaxis()->SetTitle(Form("Counts per %g GeV/c^{2}", hs_se->GetBinWidth(1)));
     hs_se_res->Draw("HIST EP");
-    hs_se_res->GetYaxis()->SetRangeUser(
-        0.1, 1.2 * hs_se->GetBinContent(hs_se->GetMaximumBin()));
+    hs_se_res->GetYaxis()->SetRangeUser(0.1, 1.2 * hs_se->GetBinContent(hs_se->GetMaximumBin()));
     pad1_yield->ModifiedUpdate();
     hs_se->SetStats(0);
     hs_se->SetMarkerStyle(20);
     hs_se->SetMarkerSize(0.6);
     hs_se->SetMarkerColor(kBlack);
+    hs_se->SetLineColor(kBlack);
     hs_se->SetTitle("");
     hs_se->GetXaxis()->SetTitle("m_{#mu#mu} (GeV/c^{2})");
-    hs_se->GetYaxis()->SetTitle(
-        Form("Counts per %g GeV/c^{2}", hs_se->GetBinWidth(1)));
+    hs_se->GetYaxis()->SetTitle(Form("Counts per %g GeV/c^{2}", hs_se->GetBinWidth(1)));
     hs_se->Draw("HIST EP same");
     pad1_yield->ModifiedUpdate();
   } else {
@@ -1910,12 +1845,11 @@ FlowAnalysis_Fitting::runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input,
     hs_se->SetMarkerStyle(20);
     hs_se->SetMarkerSize(0.6);
     hs_se->SetMarkerColor(kBlack);
+    hs_se->SetLineColor(kBlack);
     hs_se->SetTitle("");
     hs_se->GetXaxis()->SetTitle("m_{#mu#mu} (GeV/c^{2})");
-    hs_se->GetYaxis()->SetTitle(
-        Form("Counts per %g GeV/c^{2}", hs_se->GetBinWidth(1)));
-    hs_se->GetYaxis()->SetRangeUser(
-        0.1, 1.2 * hs_se->GetBinContent(hs_se->GetMaximumBin()));
+    hs_se->GetYaxis()->SetTitle(Form("Counts per %g GeV/c^{2}", hs_se->GetBinWidth(1)));
+    hs_se->GetYaxis()->SetRangeUser(0.1, 1.2 * hs_se->GetBinContent(hs_se->GetMaximumBin()));
     hs_se->Draw("HIST EP");
     pad1_yield->ModifiedUpdate();
   }
@@ -1924,29 +1858,29 @@ FlowAnalysis_Fitting::runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input,
   hs_me->SetMarkerStyle(4);
   hs_me->SetMarkerSize(0.6);
   hs_me->SetMarkerColor(kBlack);
+  hs_me->SetLineColor(kBlack);
   hs_me->GetXaxis()->SetTitle("m_{#mu#mu} (GeV/c^{2})");
-  hs_me->GetYaxis()->SetTitle(
-      Form("Counts per %g GeV/c^{2}", hs_se->GetBinWidth(1)));
+  hs_me->GetYaxis()->SetTitle(Form("Counts per %g GeV/c^{2}", hs_se->GetBinWidth(1)));
   hs_me->Draw("HIST EP same");
   pad1_yield->ModifiedUpdate();
   model->SetLineWidth(2.0);
-  model->SetLineColor(kBlue);
+  model->SetLineColor(kAzure+2);
   model->SetTitle("");
   model->Draw("same");
   pad1_yield->ModifiedUpdate();
   bkg_fitted->SetLineWidth(2.0);
-  bkg_fitted->SetLineColor(kBlue);
+  bkg_fitted->SetLineColor(kGray+2);
   bkg_fitted->SetLineStyle(kDashed);
   bkg_fitted->SetTitle("");
   bkg_fitted->Draw("same");
   pad1_yield->ModifiedUpdate();
   sig_fitted->SetLineWidth(2.0);
-  sig_fitted->SetLineColor(kRed);
+  sig_fitted->SetLineColor(kRed+1);
   sig_fitted->SetTitle("");
   sig_fitted->Draw("same");
   pad1_yield->ModifiedUpdate();
   sig_bis_fitted->SetLineWidth(2.0);
-  sig_bis_fitted->SetLineColor(kGreen);
+  sig_bis_fitted->SetLineColor(kGreen+1);
   sig_bis_fitted->SetTitle("");
   sig_bis_fitted->Draw("same");
   pad1_yield->ModifiedUpdate();
@@ -1977,12 +1911,9 @@ FlowAnalysis_Fitting::runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input,
       FlowAnalysis_Fitting::ptmin, FlowAnalysis_Fitting::ptmax,
       FlowAnalysis_Fitting::massmin, FlowAnalysis_Fitting::massmax,
       FlowAnalysis_Fitting::centmin, FlowAnalysis_Fitting::centmax,
-      FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_sig]
-          .c_str(),
-      FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg]
-          .c_str(),
-      FlowAnalysis_Fitting::v2bkg_string[FlowAnalysis_Fitting::mflag_bkg_v2]
-          .c_str()));
+      FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_sig].c_str(),
+      FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg].c_str(),
+      FlowAnalysis_Fitting::v2bkg_string[FlowAnalysis_Fitting::mflag_bkg_v2].c_str()));
   sb->SetX1NDC(0.64);
   sb->SetX2NDC(0.89);
   sb->SetY1NDC(0.88);
@@ -2013,10 +1944,8 @@ FlowAnalysis_Fitting::runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input,
       int(bkg_fitted->GetParError(0) / hs_se->GetBinWidth(1))));
   sb->AddText(
       TString::Format("%s = %f", "(S/B)_{3#sigma}", S_3sigma / B_3sigma));
-  sb->AddText(TString::Format("%s = %f", "(S / #sqrt{S+B})_{3#sigma}",
-                              S_3sigma / pow(S_3sigma + B_3sigma, 0.5)));
-  if (FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg] ==
-      "EventMixing") {
+  sb->AddText(TString::Format("%s = %f", "(S / #sqrt{S+B})_{3#sigma}", S_3sigma / pow(S_3sigma + B_3sigma, 0.5)));
+  if (FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg] == "EventMixing") {
     hs_se_res->SetStats(0);
   } else {
     hs_se->SetStats(0);
@@ -2026,30 +1955,25 @@ FlowAnalysis_Fitting::runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input,
 
   TLatex *text_info_yield = new TLatex();
   text_info_yield->SetTextSize(0.05);
-  text_info_yield->SetTextFont(62);
-  text_info_yield->DrawLatexNDC(
-      .12, .82,
-      Form("%g < #it{p}_{T} < %g GeV/c    %g-%g%%", FlowAnalysis_Fitting::ptmin,
-           FlowAnalysis_Fitting::ptmax, FlowAnalysis_Fitting::centmin,
-           FlowAnalysis_Fitting::centmax));
+  text_info_yield->SetTextFont(42);
+  text_info_yield->DrawLatexNDC(.12, .82, Form("%g < #it{p}_{T} < %g GeV/c    %g-%g%%", FlowAnalysis_Fitting::ptmin, FlowAnalysis_Fitting::ptmax, FlowAnalysis_Fitting::centmin, FlowAnalysis_Fitting::centmax));
   pad1_yield->ModifiedUpdate();
-  TLegend *legend_yield = new TLegend(0.13, 0.05, 0.35, 0.45);
+  TLegend *legend_yield = new TLegend(0.45, 0.55, 0.65, 0.85);
   legend_yield->SetBorderSize(0);
   legend_yield->SetFillStyle(0);
   legend_yield->AddEntry(hs_se, "Data", "P");
   legend_yield->AddEntry(hs_me, "Event mixing", "P");
-  if (FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg] ==
-      "EventMixing") {
+  if (FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg] == "EventMixing") {
     legend_yield->AddEntry(hs_se_res, "Residual", "P");
   }
-  legend_yield->AddEntry(model, "Total");
-  legend_yield->AddEntry(sig_fitted, "Signal J/#psi");
-  legend_yield->AddEntry(sig_bis_fitted, "Signal #psi(2s)");
-  legend_yield->AddEntry(bkg_fitted, "Background");
+  legend_yield->AddEntry(model, "Total", "L");
+  legend_yield->AddEntry(sig_fitted, "Signal J/#psi", "L");
+  legend_yield->AddEntry(sig_bis_fitted, "Signal #psi(2s)", "L");
+  legend_yield->AddEntry(bkg_fitted, "Background", "L");
   legend_yield->Draw("same");
   pad1_yield->ModifiedUpdate();
 
-  c->cd();
+  canvasFitMass->cd();
   TPad *pad2_yield = new TPad(
       Form(
           "Pad2_%s_Mass_v%d%d_%g_%g_%g_%g_%g_%g_%"
@@ -2059,20 +1983,16 @@ FlowAnalysis_Fitting::runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input,
           FlowAnalysis_Fitting::ptmin, FlowAnalysis_Fitting::ptmax,
           FlowAnalysis_Fitting::massmin, FlowAnalysis_Fitting::massmax,
           FlowAnalysis_Fitting::centmin, FlowAnalysis_Fitting::centmax,
-          FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_sig]
-              .c_str(),
-          FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg]
-              .c_str(),
-          FlowAnalysis_Fitting::v2bkg_string[FlowAnalysis_Fitting::mflag_bkg_v2]
-              .c_str()),
-      "", 0, 0., 1, 0.3);
+          FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_sig].c_str(),
+          FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg].c_str(),
+          FlowAnalysis_Fitting::v2bkg_string[FlowAnalysis_Fitting::mflag_bkg_v2].c_str()),
+          "", 0, 0., 1, 0.3);
   pad2_yield->SetTopMargin(0);
   pad2_yield->SetBottomMargin(0.22);
   pad2_yield->Draw();
   pad2_yield->cd();
   TH1D *hs_pull_yield =
-      FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg] ==
-              "EventMixing"
+      FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg] == "EventMixing"
           ? dynamic_cast<TH1D *>(
                 FlowAnalysis_Fitting::GetPull(hs_se_res, model, "yield"))
           : dynamic_cast<TH1D *>(
@@ -2092,36 +2012,35 @@ FlowAnalysis_Fitting::runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input,
   hs_pull_yield->GetXaxis()->SetTitleSize(0.1);
   hs_pull_yield->GetXaxis()->SetTitle("m_{#mu#mu} (GeV/c^{2})");
   hs_pull_yield->Draw("HIST P");
-  TF1 *lyield1 = new TF1("lyield1", "[0]", FlowAnalysis_Fitting::massmin,
-                         FlowAnalysis_Fitting::massmax);
+  TF1 *lyield1 = new TF1("lyield1", "[0]", FlowAnalysis_Fitting::massmin, FlowAnalysis_Fitting::massmax);
   lyield1->SetParameter(0, 0.);
-  lyield1->SetLineColor(kBlue);
+  lyield1->SetLineColor(kAzure+2);
   lyield1->SetLineWidth(2);
   lyield1->SetLineStyle(1);
   lyield1->Draw("same");
-  TF1 *lyield2 = new TF1("lyield2", "[0]", FlowAnalysis_Fitting::massmin,
-                         FlowAnalysis_Fitting::massmax);
+  TF1 *lyield2 = new TF1("lyield2", "[0]", FlowAnalysis_Fitting::massmin, FlowAnalysis_Fitting::massmax);
   lyield2->SetParameter(0, 1.);
-  lyield2->SetLineColor(kBlue);
+  lyield2->SetLineColor(kAzure+2);
   lyield2->SetLineWidth(2);
   lyield2->SetLineStyle(9);
   lyield2->Draw("same");
-  TF1 *lyield3 = new TF1("lyield3", "[0]", FlowAnalysis_Fitting::massmin,
-                         FlowAnalysis_Fitting::massmax);
+  TF1 *lyield3 = new TF1("lyield3", "[0]", FlowAnalysis_Fitting::massmin, FlowAnalysis_Fitting::massmax);
   lyield3->SetParameter(0, -1.);
-  lyield3->SetLineColor(kBlue);
+  lyield3->SetLineColor(kAzure+2);
   lyield3->SetLineWidth(2);
   lyield3->SetLineStyle(9);
   lyield3->Draw("same");
   pad2_yield->ModifiedUpdate();
 
-  ls->Add(c);
+  ls->Add(canvasFitMass);
+  if (saveCanvas) {
+    canvasFitMass->SaveAs(Form("figures/centrality_%1.0f_%1.0f/mass_fit__pt_%1.0f_%1.0f.pdf", FlowAnalysis_Fitting::centmin, FlowAnalysis_Fitting::centmax, FlowAnalysis_Fitting::ptmin, FlowAnalysis_Fitting::ptmax));
+  }
   // Constructing alpha function
   auto fct_alpha = [sig_fitted, bkg_fitted, hs_me](double *x, double *) {
     double S = sig_fitted->Eval(x[0]);
     double B = 0.;
-    if (FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg] ==
-        "EventMixing") {
+    if (FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg] == "EventMixing") {
       double B_res = bkg_fitted->Eval(x[0]);
       double B_em = hs_me->GetBinContent(hs_me->FindBin(x[0]));
       B = B_res + B_em;
@@ -2130,8 +2049,7 @@ FlowAnalysis_Fitting::runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input,
     }
     return S / (S + B);
   };
-  TF1 *alpha = new TF1("alpha", fct_alpha, FlowAnalysis_Fitting::massmin,
-                       FlowAnalysis_Fitting::massmax, 0);
+  TF1 *alpha = new TF1("alpha", fct_alpha, FlowAnalysis_Fitting::massmin, FlowAnalysis_Fitting::massmax, 0);
 
   //////////////////////////////////////////////////////////////////////////////
   ///      Mean pT FIT
@@ -2195,8 +2113,8 @@ FlowAnalysis_Fitting::runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input,
     model_meanPt->SetParName(7, "a6");
     model_meanPt->FixParameter(7, 0.0);
 
-    hs_meanPt->Rebin();
-    hs_meanPt->Scale(0.5);
+    //hs_meanPt->Rebin();
+    //hs_meanPt->Scale(0.5);
 
     for (int i = 1; i <= 7; i++) {
       auto result_meanPt = FlowAnalysis_Fitting::ptmax <= 3
@@ -2299,8 +2217,8 @@ FlowAnalysis_Fitting::runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input,
         hs_meanPt, model_meanPt, "ModelMeanPt"));
     */
     hs_model_meanPt = new TGraph(model_meanPt);
-    hs_model_meanPt->SetLineWidth(3.0);
-    hs_model_meanPt->SetLineColor(kBlue);
+    hs_model_meanPt->SetLineWidth(2.0);
+    hs_model_meanPt->SetLineColor(kAzure+2);
     hs_model_meanPt->SetTitle("");
     hs_model_meanPt->Draw("C same");
     pad1_meanPt->ModifiedUpdate();
@@ -2371,21 +2289,21 @@ FlowAnalysis_Fitting::runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input,
     TF1 *lmeanPt1 = new TF1("lmeanPt1", "[0]", FlowAnalysis_Fitting::massmin,
                             FlowAnalysis_Fitting::massmax);
     lmeanPt1->SetParameter(0, 0.);
-    lmeanPt1->SetLineColor(kBlue);
+    lmeanPt1->SetLineColor(kAzure+2);
     lmeanPt1->SetLineWidth(2);
     lmeanPt1->SetLineStyle(1);
     lmeanPt1->Draw("same");
     TF1 *lmeanPt2 = new TF1("lmeanPt2", "[0]", FlowAnalysis_Fitting::massmin,
                             FlowAnalysis_Fitting::massmax);
     lmeanPt2->SetParameter(0, 1.);
-    lmeanPt2->SetLineColor(kBlue);
+    lmeanPt2->SetLineColor(kAzure+2);
     lmeanPt2->SetLineWidth(2);
     lmeanPt2->SetLineStyle(9);
     lmeanPt2->Draw("same");
     TF1 *lmeanPt3 = new TF1("lmeanPt3", "[0]", FlowAnalysis_Fitting::massmin,
                             FlowAnalysis_Fitting::massmax);
     lmeanPt3->SetParameter(0, -1.);
-    lmeanPt3->SetLineColor(kBlue);
+    lmeanPt3->SetLineColor(kAzure+2);
     lmeanPt3->SetLineWidth(2);
     lmeanPt3->SetLineStyle(9);
     lmeanPt3->Draw("same");
@@ -2399,27 +2317,23 @@ FlowAnalysis_Fitting::runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input,
   // Setting up fit model for v2 signal fit
   cout << ">>>>>>>>>>>>>> Start processing v2 fit..." << endl;
   TH1D *hs_v2bkg = new TH1D();
-  if (FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg] ==
-      "EventMixing") {
+  if (FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg] == "EventMixing") {
     auto fct_bkgSum = [bkg_fitted, hs_me](double *x, double *) {
       int idx = hs_me->FindBin(x[0]);
       double val_me = hs_me->GetBinContent(idx);
       double val_fitted = bkg_fitted->Eval(x[0]);
       return val_me + val_fitted;
     };
-    TF1 *bkg_sum =
-        new TF1("fct_bkgSum", fct_bkgSum, FlowAnalysis_Fitting::massmin,
-                FlowAnalysis_Fitting::massmax, 0);
+    TF1 *bkg_sum = new TF1("fct_bkgSum", fct_bkgSum, FlowAnalysis_Fitting::massmin, FlowAnalysis_Fitting::massmax, 0);
     hs_v2bkg = FlowAnalysis_Fitting::GetV2BkgCorrected(hs_v2me, hs_me, bkg_sum);
   } else {
-    hs_v2bkg =
-        FlowAnalysis_Fitting::GetV2BkgCorrected(hs_v2me, hs_me, bkg_fitted);
+    hs_v2bkg = FlowAnalysis_Fitting::GetV2BkgCorrected(hs_v2me, hs_me, bkg_fitted);
   }
 
-  hs_v2bkg->Rebin();
-  hs_v2bkg->Scale(0.5);
-  hs_v2me->Rebin();
-  hs_v2me->Scale(0.5);
+  //hs_v2bkg->Rebin(2);
+  //hs_v2bkg->Scale(0.5);
+  //hs_v2me->Rebin(2);
+  //hs_v2me->Scale(0.5);
 
   auto fct_v2 = [alpha, hs_v2bkg, hs_v2me](double *x, double *par) {
     double val_fct = 0.0;
@@ -2428,23 +2342,18 @@ FlowAnalysis_Fitting::runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input,
     double val_bkg = hs_v2bkg->GetBinContent(idx);
     double val_v2me = hs_v2me->GetBinContent(idx);
 
-    if (FlowAnalysis_Fitting::v2bkg_string
-            [FlowAnalysis_Fitting::mflag_bkg_v2] == "EventMixing(beta free)") {
-      val_fct = (par[0] * val_alpha +
-                 (1. - val_alpha) * (val_bkg + par[1] * (val_v2me - val_bkg)));
+    if (FlowAnalysis_Fitting::v2bkg_string[FlowAnalysis_Fitting::mflag_bkg_v2] == "EventMixing(beta free)") {
+      val_fct = (par[0] * val_alpha + (1. - val_alpha) * (val_bkg + par[1] * (val_v2me - val_bkg)));
     } else {
       val_fct = (par[0] * val_alpha + (1. - val_alpha) * val_bkg);
     }
-
     return val_fct;
   };
 
   // Setup for model
   TF1 *model_v2 = new TF1();
-  if (FlowAnalysis_Fitting::v2bkg_string[FlowAnalysis_Fitting::mflag_bkg_v2] ==
-      "EventMixing(beta free)") {
-    model_v2 = new TF1("model_v2", fct_v2, FlowAnalysis_Fitting::massmin,
-                       FlowAnalysis_Fitting::massmax, 2);
+  if (FlowAnalysis_Fitting::v2bkg_string[FlowAnalysis_Fitting::mflag_bkg_v2] == "EventMixing(beta free)") {
+    model_v2 = new TF1("model_v2", fct_v2, FlowAnalysis_Fitting::massmin, FlowAnalysis_Fitting::massmax, 2);
     model_v2->SetParameter(0, 0.01);
     model_v2->SetParLimits(0, -0.1, 0.5);
     model_v2->SetParName(0, "v^{J/#psi}_{2}");
@@ -2452,39 +2361,32 @@ FlowAnalysis_Fitting::runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input,
     model_v2->SetParLimits(1, 0., 2.);
     model_v2->SetParName(1, "#beta");
   } else {
-    model_v2 = new TF1("model_v2", fct_v2, FlowAnalysis_Fitting::massmin,
-                       FlowAnalysis_Fitting::massmax, 1);
+    model_v2 = new TF1("model_v2", fct_v2, FlowAnalysis_Fitting::massmin, FlowAnalysis_Fitting::massmax, 1);
     model_v2->SetParameter(0, 0.01);
     model_v2->SetParLimits(0, -0.1, 0.5);
     model_v2->SetParName(0, "v^{J/#psi}_{2}");
   }
 
-  hs_v2se->Rebin();
-  hs_v2se->Scale(0.5);
+  //hs_v2se->Rebin(2);
+  //hs_v2se->Scale(0.5);
 
   // Do fitting
   double chi2ndf_v2;
-  if (FlowAnalysis_Fitting::v2bkg_string[FlowAnalysis_Fitting::mflag_bkg_v2] ==
-      "EventMixing(beta free)") {
+  if (FlowAnalysis_Fitting::v2bkg_string[FlowAnalysis_Fitting::mflag_bkg_v2] == "EventMixing(beta free)") {
     cout << "First fit to determine beta value..." << endl;
     auto result_v2 = hs_v2se->Fit("model_v2", "S Q B 0");
     int fitStatus_v2 = result_v2;
     int bit_improve_v2 = int(fitStatus_v2 / 1000);
     int bit_minos_v2 = int((fitStatus_v2 - 1000 * bit_improve_v2) / 100);
-    int bit_hesse_v2 =
-        int((fitStatus_v2 - 1000 * bit_improve_v2 - 100 * bit_minos_v2) / 10);
-    int bit_migrad_v2 = int((fitStatus_v2 - 1000 * bit_improve_v2 -
-                             100 * bit_minos_v2 - 10 * bit_hesse_v2) /
-                            1);
+    int bit_hesse_v2 = int((fitStatus_v2 - 1000 * bit_improve_v2 - 100 * bit_minos_v2) / 10);
+    int bit_migrad_v2 = int((fitStatus_v2 - 1000 * bit_improve_v2 - 100 * bit_minos_v2 - 10 * bit_hesse_v2) / 1);
     result_v2->Print();
     cout << "Fit result = " << fitStatus_v2 << endl;
     chi2ndf_v2 = model_v2->GetChisquare() / model_v2->GetNDF();
     cout << "chi2/ndf: " << chi2ndf_v2 << endl;
 
     if (fitStatus_v2 == 0) {
-      cout << "First fit converged, now proceeding a second tour with beta "
-              "fixed..."
-           << endl;
+      cout << "First fit converged, now proceeding a second tour with beta fixed..." << endl;
       model_v2->FixParameter(1, model_v2->GetParameter(1));
       result_v2 = hs_v2se->Fit("model_v2", "S Q B 0");
       fitStatus_v2 = result_v2;
@@ -2501,11 +2403,8 @@ FlowAnalysis_Fitting::runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input,
     int fitStatus_v2 = result_v2;
     int bit_improve_v2 = int(fitStatus_v2 / 1000);
     int bit_minos_v2 = int((fitStatus_v2 - 1000 * bit_improve_v2) / 100);
-    int bit_hesse_v2 =
-        int((fitStatus_v2 - 1000 * bit_improve_v2 - 100 * bit_minos_v2) / 10);
-    int bit_migrad_v2 = int((fitStatus_v2 - 1000 * bit_improve_v2 -
-                             100 * bit_minos_v2 - 10 * bit_hesse_v2) /
-                            1);
+    int bit_hesse_v2 = int((fitStatus_v2 - 1000 * bit_improve_v2 - 100 * bit_minos_v2) / 10);
+    int bit_migrad_v2 = int((fitStatus_v2 - 1000 * bit_improve_v2 - 100 * bit_minos_v2 - 10 * bit_hesse_v2) / 1);
     result_v2->Print();
     cout << "Fit result = " << fitStatus_v2 << endl;
     chi2ndf_v2 = model_v2->GetChisquare() / model_v2->GetNDF();
@@ -2517,7 +2416,7 @@ FlowAnalysis_Fitting::runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input,
   gStyle->SetOptFit(1111);
   gStyle->SetOptTitle(0);
   gROOT->ForceStyle();
-  TCanvas *c_v2 = new TCanvas(
+  TCanvas *canvasFitV2 = new TCanvas(
       Form(
           "Fitted_%s_v%d%d_%g_%g_%g_%g_%g_%g_%s_%s_%s",
           FlowAnalysis_Fitting::mode_string[FlowAnalysis_Fitting::mode].c_str(),
@@ -2525,12 +2424,9 @@ FlowAnalysis_Fitting::runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input,
           FlowAnalysis_Fitting::ptmin, FlowAnalysis_Fitting::ptmax,
           FlowAnalysis_Fitting::massmin, FlowAnalysis_Fitting::massmax,
           FlowAnalysis_Fitting::centmin, FlowAnalysis_Fitting::centmax,
-          FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_sig]
-              .c_str(),
-          FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg]
-              .c_str(),
-          FlowAnalysis_Fitting::v2bkg_string[FlowAnalysis_Fitting::mflag_bkg_v2]
-              .c_str()),
+          FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_sig].c_str(),
+          FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg].c_str(),
+          FlowAnalysis_Fitting::v2bkg_string[FlowAnalysis_Fitting::mflag_bkg_v2].c_str()),
       Form(
           "Fitted_%s_v%d%d_%g_%g_%g_%g_%g_%g_%s_%s_%s",
           FlowAnalysis_Fitting::mode_string[FlowAnalysis_Fitting::mode].c_str(),
@@ -2538,14 +2434,11 @@ FlowAnalysis_Fitting::runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input,
           FlowAnalysis_Fitting::ptmin, FlowAnalysis_Fitting::ptmax,
           FlowAnalysis_Fitting::massmin, FlowAnalysis_Fitting::massmax,
           FlowAnalysis_Fitting::centmin, FlowAnalysis_Fitting::centmax,
-          FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_sig]
-              .c_str(),
-          FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg]
-              .c_str(),
-          FlowAnalysis_Fitting::v2bkg_string[FlowAnalysis_Fitting::mflag_bkg_v2]
-              .c_str()));
-  c_v2->cd();
-  c_v2->SetBottomMargin(0);
+          FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_sig].c_str(),
+          FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg].c_str(),
+          FlowAnalysis_Fitting::v2bkg_string[FlowAnalysis_Fitting::mflag_bkg_v2].c_str()), 800, 600);
+  canvasFitV2->cd();
+  canvasFitV2->SetBottomMargin(0);
   TPad *pad1_v2 = new TPad(
       Form(
           "Pad1_%s_v%d%d_%g_%g_%g_%g_%g_%g_%s_%s_%s",
@@ -2554,77 +2447,71 @@ FlowAnalysis_Fitting::runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input,
           FlowAnalysis_Fitting::ptmin, FlowAnalysis_Fitting::ptmax,
           FlowAnalysis_Fitting::massmin, FlowAnalysis_Fitting::massmax,
           FlowAnalysis_Fitting::centmin, FlowAnalysis_Fitting::centmax,
-          FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_sig]
-              .c_str(),
-          FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg]
-              .c_str(),
-          FlowAnalysis_Fitting::v2bkg_string[FlowAnalysis_Fitting::mflag_bkg_v2]
-              .c_str()),
-      "", 0, 0.3, 1, 1.0);
+          FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_sig].c_str(),
+          FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg].c_str(),
+          FlowAnalysis_Fitting::v2bkg_string[FlowAnalysis_Fitting::mflag_bkg_v2].c_str()), "", 0, 0.3, 1, 1.0);
   pad1_v2->SetBottomMargin(0);
   pad1_v2->Draw();
   pad1_v2->cd();
   hs_v2se->SetStats(1);
   hs_v2se->SetMarkerStyle(20);
   hs_v2se->SetMarkerSize(0.8);
+  hs_v2se->SetMarkerColor(kBlack);
+  hs_v2se->SetLineColor(kBlack);
   hs_v2se->SetTitle("");
   hs_v2se->GetXaxis()->SetTitle("m_{#mu#mu} (GeV/c^{2})");
-  hs_v2se->GetYaxis()->SetTitle("#it{v}^{#mu#mu}_{2}{EP}");
+  hs_v2se->GetYaxis()->SetTitle("#it{v}^{#mu#mu}_{2}{SP}");
+  hs_v2se->GetYaxis()->SetRangeUser(-1.52, 1.52);
   hs_v2se->Draw("HIST EP");
   pad1_v2->ModifiedUpdate();
-  TF1 *lv2 = new TF1("lv2", "[0]", FlowAnalysis_Fitting::massmin,
-                     FlowAnalysis_Fitting::massmax);
+  TF1 *lv2 = new TF1("lv2", "[0]", FlowAnalysis_Fitting::massmin, FlowAnalysis_Fitting::massmax);
   lv2->SetParameter(0, 0.);
-  lv2->SetLineColor(18);
-  lv2->SetLineWidth(3);
-  lv2->SetLineStyle(9);
-  lv2->Draw("same");
+  lv2->SetLineColor(kGray+2);
+  lv2->SetLineWidth(2);
+  lv2->SetLineStyle(kDashed);
+  lv2->Draw("SAME");
+  hs_v2se->Draw("HIST EP SAME");
   pad1_v2->ModifiedUpdate();
   hs_v2bkg->SetStats(0);
   hs_v2bkg->SetTitle("");
   hs_v2bkg->SetMarkerStyle(4);
   hs_v2bkg->SetMarkerSize(0.8);
-  hs_v2bkg->SetMarkerColor(kBlue);
+  hs_v2bkg->SetMarkerColor(kAzure+2);
   hs_v2bkg->GetXaxis()->SetTitle("m_{#mu#mu} (GeV/c^{2})");
   hs_v2bkg->GetYaxis()->SetTitle("#it{v}^{#mu#mu}_{2}");
   hs_v2bkg->Draw("HIST EP same");
   pad1_v2->ModifiedUpdate();
-  TH1D *hs_model_v2 = dynamic_cast<TH1D *>(
-      FlowAnalysis_Fitting::GetHistFromTF(hs_v2se, model_v2, "ModelV2"));
-  hs_model_v2->SetLineWidth(3.0);
-  hs_model_v2->SetLineColor(kBlue);
+  TH1D *hs_model_v2 = dynamic_cast<TH1D *>(FlowAnalysis_Fitting::GetHistFromTF(hs_v2se, model_v2, "ModelV2"));
+  hs_model_v2->SetLineWidth(2.0);
+  hs_model_v2->SetLineColor(kAzure+2);
   hs_model_v2->SetTitle("");
   hs_model_v2->Draw("HIST same");
   pad1_v2->ModifiedUpdate();
   TPaveStats *sb_v2 = new TPaveStats();
   sb_v2 = (TPaveStats *)pad1_v2->GetPrimitive("stats");
   sb_v2->SetName("J/#psi v2 fit");
-  sb_v2->SetX1NDC(0.64);
-  sb_v2->SetX2NDC(0.89);
-  sb_v2->SetY1NDC(0.88);
-  sb_v2->SetY2NDC(0.38);
+  sb_v2->SetX1NDC(0.15);
+  sb_v2->SetX2NDC(0.35);
+  sb_v2->SetY1NDC(0.05);
+  sb_v2->SetY2NDC(0.30);
   hs_v2se->SetStats(0);
   sb_v2->Draw();
   pad1_v2->ModifiedUpdate();
   TLatex *text_info_v2 = new TLatex();
   text_info_v2->SetTextSize(0.05);
-  text_info_v2->SetTextFont(62);
-  text_info_v2->DrawLatexNDC(
-      .12, .82,
-      Form("%g < #it{p}_{T} < %g GeV/c    %g-%g%%", FlowAnalysis_Fitting::ptmin,
-           FlowAnalysis_Fitting::ptmax, FlowAnalysis_Fitting::centmin,
-           FlowAnalysis_Fitting::centmax));
+  text_info_v2->SetTextFont(42);
+  text_info_v2->DrawLatexNDC(.15, .82, Form("%g < #it{p}_{T} < %g GeV/c    %g#minus%g%%", FlowAnalysis_Fitting::ptmin, FlowAnalysis_Fitting::ptmax, FlowAnalysis_Fitting::centmin, FlowAnalysis_Fitting::centmax));
   pad1_v2->ModifiedUpdate();
-  TLegend *legend_v2 = new TLegend(0.13, 0.45, 0.35, 0.7);
+  TLegend *legend_v2 = new TLegend(0.15, 0.60, 0.35, 0.77);
   legend_v2->SetBorderSize(0);
   legend_v2->SetFillStyle(0);
   legend_v2->AddEntry(hs_v2se, "Data", "P");
   legend_v2->AddEntry(hs_v2bkg, "Event mixing", "P");
-  legend_v2->AddEntry(hs_model_v2, "Fit");
+  legend_v2->AddEntry(hs_model_v2, "Fit", "L");
   legend_v2->Draw("same");
   pad1_v2->ModifiedUpdate();
 
-  c_v2->cd();
+  canvasFitV2->cd();
   TPad *pad2_v2 = new TPad(
       Form(
           "Pad2_%s_v%d%d_%g_%g_%g_%g_%g_%g_%s_%s_%s",
@@ -2633,19 +2520,14 @@ FlowAnalysis_Fitting::runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input,
           FlowAnalysis_Fitting::ptmin, FlowAnalysis_Fitting::ptmax,
           FlowAnalysis_Fitting::massmin, FlowAnalysis_Fitting::massmax,
           FlowAnalysis_Fitting::centmin, FlowAnalysis_Fitting::centmax,
-          FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_sig]
-              .c_str(),
-          FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg]
-              .c_str(),
-          FlowAnalysis_Fitting::v2bkg_string[FlowAnalysis_Fitting::mflag_bkg_v2]
-              .c_str()),
-      "", 0, 0., 1, 0.3);
+          FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_sig].c_str(),
+          FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg].c_str(),
+          FlowAnalysis_Fitting::v2bkg_string[FlowAnalysis_Fitting::mflag_bkg_v2].c_str()), "", 0, 0., 1, 0.3);
   pad2_v2->SetTopMargin(0);
   pad2_v2->SetBottomMargin(0.22);
   pad2_v2->Draw();
   pad2_v2->cd();
-  TH1D *hs_pull_v2 = dynamic_cast<TH1D *>(
-      FlowAnalysis_Fitting::GetPull(hs_v2se, model_v2, "v2"));
+  TH1D *hs_pull_v2 = dynamic_cast<TH1D *>(FlowAnalysis_Fitting::GetPull(hs_v2se, model_v2, "v2"));
   hs_pull_v2->SetStats(0);
   hs_pull_v2->SetTitle("");
   hs_pull_v2->SetMarkerStyle(20);
@@ -2661,29 +2543,29 @@ FlowAnalysis_Fitting::runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input,
   hs_pull_v2->GetXaxis()->SetTitleSize(0.1);
   hs_pull_v2->GetXaxis()->SetTitle("m_{#mu#mu} (GeV/c^{2})");
   hs_pull_v2->Draw("HIST P");
-  TF1 *lv21 = new TF1("lv21", "[0]", FlowAnalysis_Fitting::massmin,
-                      FlowAnalysis_Fitting::massmax);
+  TF1 *lv21 = new TF1("lv21", "[0]", FlowAnalysis_Fitting::massmin, FlowAnalysis_Fitting::massmax);
   lv21->SetParameter(0, 0.);
-  lv21->SetLineColor(kBlue);
+  lv21->SetLineColor(kAzure+2);
   lv21->SetLineWidth(2);
   lv21->SetLineStyle(1);
   lv21->Draw("same");
-  TF1 *lv22 = new TF1("lv22", "[0]", FlowAnalysis_Fitting::massmin,
-                      FlowAnalysis_Fitting::massmax);
+  TF1 *lv22 = new TF1("lv22", "[0]", FlowAnalysis_Fitting::massmin, FlowAnalysis_Fitting::massmax);
   lv22->SetParameter(0, 1.);
-  lv22->SetLineColor(kBlue);
+  lv22->SetLineColor(kAzure+2);
   lv22->SetLineWidth(2);
   lv22->SetLineStyle(9);
   lv22->Draw("same");
-  TF1 *lv23 = new TF1("lv23", "[0]", FlowAnalysis_Fitting::massmin,
-                      FlowAnalysis_Fitting::massmax);
+  TF1 *lv23 = new TF1("lv23", "[0]", FlowAnalysis_Fitting::massmin, FlowAnalysis_Fitting::massmax);
   lv23->SetParameter(0, -1.);
-  lv23->SetLineColor(kBlue);
+  lv23->SetLineColor(kAzure+2);
   lv23->SetLineWidth(2);
   lv23->SetLineStyle(9);
   lv23->Draw("same");
   pad2_v2->ModifiedUpdate();
-  ls->Add(c_v2);
+  ls->Add(canvasFitV2);
+  if (saveCanvas) {
+    canvasFitV2->SaveAs(Form("figures/centrality_%1.0f_%1.0f/v2_fit__pt_%1.0f_%1.0f.pdf", FlowAnalysis_Fitting::centmin, FlowAnalysis_Fitting::centmax, FlowAnalysis_Fitting::ptmin, FlowAnalysis_Fitting::ptmax));
+  }
 
   //////////////////////////////////////////////////////////////////////////////
   ///      Combined plot
@@ -2692,7 +2574,7 @@ FlowAnalysis_Fitting::runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input,
   gStyle->SetOptFit(1111);
   gStyle->SetOptTitle(0);
   gROOT->ForceStyle();
-  TCanvas *c_all = new TCanvas(
+  TCanvas *canvasFitMassV2 = new TCanvas(
       Form(
           "Fitted_%s_Total_v%d%d_%g_%g_%g_%g_%g_%g_%s_%s_%s",
           FlowAnalysis_Fitting::mode_string[FlowAnalysis_Fitting::mode].c_str(),
@@ -2700,12 +2582,9 @@ FlowAnalysis_Fitting::runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input,
           FlowAnalysis_Fitting::ptmin, FlowAnalysis_Fitting::ptmax,
           FlowAnalysis_Fitting::massmin, FlowAnalysis_Fitting::massmax,
           FlowAnalysis_Fitting::centmin, FlowAnalysis_Fitting::centmax,
-          FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_sig]
-              .c_str(),
-          FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg]
-              .c_str(),
-          FlowAnalysis_Fitting::v2bkg_string[FlowAnalysis_Fitting::mflag_bkg_v2]
-              .c_str()),
+          FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_sig].c_str(),
+          FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg].c_str(),
+          FlowAnalysis_Fitting::v2bkg_string[FlowAnalysis_Fitting::mflag_bkg_v2].c_str()),
       Form(
           "Fitted_%s_Total_v%d%d_%g_%g_%g_%g_%g_%g_%s_%s_%s",
           FlowAnalysis_Fitting::mode_string[FlowAnalysis_Fitting::mode].c_str(),
@@ -2713,21 +2592,17 @@ FlowAnalysis_Fitting::runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input,
           FlowAnalysis_Fitting::ptmin, FlowAnalysis_Fitting::ptmax,
           FlowAnalysis_Fitting::massmin, FlowAnalysis_Fitting::massmax,
           FlowAnalysis_Fitting::centmin, FlowAnalysis_Fitting::centmax,
-          FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_sig]
-              .c_str(),
-          FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg]
-              .c_str(),
-          FlowAnalysis_Fitting::v2bkg_string[FlowAnalysis_Fitting::mflag_bkg_v2]
-              .c_str()));
+          FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_sig].c_str(),
+          FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg].c_str(),
+          FlowAnalysis_Fitting::v2bkg_string[FlowAnalysis_Fitting::mflag_bkg_v2].c_str()));
   if (hs_meanPt_input) {
-    c_all->SetCanvasSize(600, 800);
-    c_all->cd();
-    c_all->Divide(1, 3, 0, 0);
-    c_all->cd(1);
+    canvasFitMassV2->SetCanvasSize(600, 800);
+    canvasFitMassV2->cd();
+    canvasFitMassV2->Divide(1, 3, 0, 0);
+    canvasFitMassV2->cd(1);
     TH1D *hs_se_res_cp = new TH1D();
     TH1D *hs_se_cp = new TH1D();
-    if (FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg] ==
-        "EventMixing") {
+    if (FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg] == "EventMixing") {
       hs_se_res->Copy(*hs_se_res_cp);
       hs_se_cp = dynamic_cast<TH1D *>(hs_se->Clone());
       hs_se_res_cp->SetStats(0);
@@ -2749,16 +2624,16 @@ FlowAnalysis_Fitting::runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input,
     TH1D *hs_me_cp = dynamic_cast<TH1D *>(hs_me->Clone());
     TGraph *gr_model = new TGraph(model);
     gr_model->SetLineWidth(2.0);
-    gr_model->SetLineColor(kBlue);
+    gr_model->SetLineColor(kAzure+2);
     gr_model->SetTitle("");
     TGraph *gr_bkg_fitted = new TGraph(bkg_fitted);
     gr_bkg_fitted->SetLineWidth(2.0);
-    gr_bkg_fitted->SetLineColor(kBlue);
+    gr_bkg_fitted->SetLineColor(kGray+2);
     gr_bkg_fitted->SetLineStyle(kDashed);
     gr_bkg_fitted->SetTitle("");
     TGraph *gr_sig_fitted = new TGraph(bkg_fitted);
     gr_sig_fitted->SetLineWidth(2.0);
-    gr_sig_fitted->SetLineColor(kRed);
+    gr_sig_fitted->SetLineColor(kRed+1);
     gr_sig_fitted->SetTitle("");
     hs_me_cp->Draw("HIST EP same");
     gr_model->Draw("C same");
@@ -2767,36 +2642,20 @@ FlowAnalysis_Fitting::runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input,
     TLatex *text_info_yield_all = new TLatex();
     text_info_yield_all->SetTextSize(0.06);
     text_info_yield_all->SetTextFont(42);
-    text_info_yield_all->DrawLatexNDC(
-        .55, .90,
-        "ALICE Preliminary, OO #sqrt{#it{s}_{NN}} "
-        "= 5.36 TeV");
-    text_info_yield_all->DrawLatexNDC(
-        .55, .83,
-        "J/#psi #rightarrow #mu^{+}#mu^{-}, 2.5 < y < "
-        "4");
+    text_info_yield_all->DrawLatexNDC(.55, .90, "ALICE Preliminary, OO #sqrt{#it{s}_{NN}} = 5.36 TeV");
+    text_info_yield_all->DrawLatexNDC(.55, .83, "J/#psi #rightarrow #mu^{+}#mu^{-}, 2.5 < y < 4");
     text_info_yield_all->SetTextSize(0.07);
     text_info_yield_all->SetTextFont(62);
-    text_info_yield_all->DrawLatexNDC(
-        .15, .9,
-        Form("%g < #it{p}_{T} < %g GeV/c    %g-%g%%",
-             FlowAnalysis_Fitting::ptmin, FlowAnalysis_Fitting::ptmax,
-             FlowAnalysis_Fitting::centmin, FlowAnalysis_Fitting::centmax));
-    text_info_yield_all->DrawLatexNDC(
-        .65, .70,
-        Form("%s = %d #pm %d", "N_{J/#psi}",
-             int(sig_fitted->GetParameter(0) / hs_se->GetBinWidth(1)),
-             int(sig_fitted->GetParError(0) / hs_se->GetBinWidth(1))));
-    text_info_yield_all->DrawLatexNDC(
-        .65, .60, Form("%s = %.2f", "(S/B)_{3#sigma}", S_3sigma / B_3sigma));
+    text_info_yield_all->DrawLatexNDC(.15, .9, Form("%g < #it{p}_{T} < %g GeV/c    %g-%g%%", FlowAnalysis_Fitting::ptmin, FlowAnalysis_Fitting::ptmax, FlowAnalysis_Fitting::centmin, FlowAnalysis_Fitting::centmax));
+    text_info_yield_all->DrawLatexNDC(.65, .70, Form("%s = %d #pm %d", "N_{J/#psi}", int(sig_fitted->GetParameter(0) / hs_se->GetBinWidth(1)), int(sig_fitted->GetParError(0) / hs_se->GetBinWidth(1))));
+    text_info_yield_all->DrawLatexNDC(.65, .60, Form("%s = %.2f", "(S/B)_{3#sigma}", S_3sigma / B_3sigma));
 
     TLegend *legend_yield_all = new TLegend(0.13, 0.05, 0.35, 0.45);
     legend_yield_all->SetBorderSize(0);
     legend_yield_all->SetFillStyle(0);
     legend_yield_all->AddEntry(hs_se_cp, "Data", "P");
     legend_yield_all->AddEntry(hs_me_cp, "Event mixing", "P");
-    if (FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg] ==
-        "EventMixing") {
+    if (FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg] == "EventMixing") {
       legend_yield_all->AddEntry(hs_se_res_cp, "Residual", "P");
     }
     legend_yield_all->AddEntry(gr_model, "Total");
@@ -2804,7 +2663,7 @@ FlowAnalysis_Fitting::runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input,
     legend_yield_all->AddEntry(gr_bkg_fitted, "Background");
     legend_yield_all->Draw("same");
 
-    c_all->cd(2);
+    canvasFitMassV2->cd(2);
     TH1D *hs_v2se_cp = new TH1D();
     hs_v2se->Copy(*hs_v2se_cp);
     TH1D *hs_v2bkg_cp = dynamic_cast<TH1D *>(hs_v2bkg->Clone());
@@ -2826,11 +2685,10 @@ FlowAnalysis_Fitting::runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input,
     legend_v2_all->AddEntry(hs_model_v2_cp, "Fit");
     legend_v2_all->Draw("same");
 
-    c_all->cd(3);
+    canvasFitMassV2->cd(3);
     TH1D *hs_meanPt_cp = new TH1D();
     hs_meanPt->Copy(*hs_meanPt_cp);
-    TGraph *hs_model_meanPt_cp =
-        dynamic_cast<TGraph *>(hs_model_meanPt->Clone());
+    TGraph *hs_model_meanPt_cp = dynamic_cast<TGraph *>(hs_model_meanPt->Clone());
     hs_meanPt_cp->SetStats(0);
     hs_meanPt_cp->GetYaxis()->SetTitleSize(0.06);
     hs_meanPt_cp->GetYaxis()->SetLabelSize(0.05);
@@ -2847,14 +2705,13 @@ FlowAnalysis_Fitting::runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input,
     legend_meanPt_all->AddEntry(hs_model_meanPt_cp, "Fit");
     legend_meanPt_all->Draw("same");
   } else {
-    c_all->SetCanvasSize(600, 600);
-    c_all->cd();
-    c_all->Divide(1, 2, 0, 0);
-    c_all->cd(1);
+    canvasFitMassV2->SetCanvasSize(600, 600);
+    canvasFitMassV2->cd();
+    canvasFitMassV2->Divide(1, 2, 0, 0);
+    canvasFitMassV2->cd(1);
     TH1D *hs_se_res_cp = new TH1D();
     TH1D *hs_se_cp = new TH1D();
-    if (FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg] ==
-        "EventMixing") {
+    if (FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg] == "EventMixing") {
       hs_se_res->Copy(*hs_se_res_cp);
       hs_se_cp = dynamic_cast<TH1D *>(hs_se->Clone());
       hs_se_res_cp->SetStats(0);
@@ -2874,16 +2731,16 @@ FlowAnalysis_Fitting::runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input,
     TH1D *hs_me_cp = dynamic_cast<TH1D *>(hs_me->Clone());
     TGraph *gr_model = new TGraph(model);
     gr_model->SetLineWidth(2.0);
-    gr_model->SetLineColor(kBlue);
+    gr_model->SetLineColor(kAzure+2);
     gr_model->SetTitle("");
     TGraph *gr_bkg_fitted = new TGraph(bkg_fitted);
     gr_bkg_fitted->SetLineWidth(2.0);
-    gr_bkg_fitted->SetLineColor(kBlue);
+    gr_bkg_fitted->SetLineColor(kAzure+2);
     gr_bkg_fitted->SetLineStyle(kDashed);
     gr_bkg_fitted->SetTitle("");
     TGraph *gr_sig_fitted = new TGraph(sig_fitted);
     gr_sig_fitted->SetLineWidth(2.0);
-    gr_sig_fitted->SetLineColor(kRed);
+    gr_sig_fitted->SetLineColor(kRed+1);
     gr_sig_fitted->SetTitle("");
     hs_me_cp->Draw("HIST EP same");
     gr_model->Draw("C same");
@@ -2892,35 +2749,19 @@ FlowAnalysis_Fitting::runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input,
     TLatex *text_info_yield_all = new TLatex();
     text_info_yield_all->SetTextSize(0.06);
     text_info_yield_all->SetTextFont(42);
-    text_info_yield_all->DrawLatexNDC(
-        .55, .9,
-        "ALICE Preliminary, OO #sqrt{#it{s}_{NN}} "
-        "= 5.36 TeV");
-    text_info_yield_all->DrawLatexNDC(
-        .55, .83,
-        "J/#psi #rightarrow #mu^{+}#mu^{-}, 2.5 < y < "
-        "4");
+    text_info_yield_all->DrawLatexNDC(.55, .9, "ALICE Preliminary, OO #sqrt{#it{s}_{NN}} = 5.36 TeV");
+    text_info_yield_all->DrawLatexNDC(.55, .83, "J/#psi #rightarrow #mu^{+}#mu^{-}, 2.5 < y < 4");
     text_info_yield_all->SetTextSize(0.07);
     text_info_yield_all->SetTextFont(62);
-    text_info_yield_all->DrawLatexNDC(
-        .15, .9,
-        Form("%g < #it{p}_{T} < %g GeV/c    %g-%g%%",
-             FlowAnalysis_Fitting::ptmin, FlowAnalysis_Fitting::ptmax,
-             FlowAnalysis_Fitting::centmin, FlowAnalysis_Fitting::centmax));
-    text_info_yield_all->DrawLatexNDC(
-        .65, .70,
-        Form("%s = %d #pm %d", "N_{J/#psi}",
-             int(sig_fitted->GetParameter(0) / hs_se->GetBinWidth(1)),
-             int(sig_fitted->GetParError(0) / hs_se->GetBinWidth(1))));
-    text_info_yield_all->DrawLatexNDC(
-        .65, .60, Form("%s = %.2f", "(S/B)_{3#sigma}", S_3sigma / B_3sigma));
+    text_info_yield_all->DrawLatexNDC(.15, .9, Form("%g < #it{p}_{T} < %g GeV/c    %g-%g%%", FlowAnalysis_Fitting::ptmin, FlowAnalysis_Fitting::ptmax, FlowAnalysis_Fitting::centmin, FlowAnalysis_Fitting::centmax));
+    text_info_yield_all->DrawLatexNDC(.65, .70, Form("%s = %d #pm %d", "N_{J/#psi}", int(sig_fitted->GetParameter(0) / hs_se->GetBinWidth(1)), int(sig_fitted->GetParError(0) / hs_se->GetBinWidth(1))));
+    text_info_yield_all->DrawLatexNDC(.65, .60, Form("%s = %.2f", "(S/B)_{3#sigma}", S_3sigma / B_3sigma));
     TLegend *legend_yield_all = new TLegend(0.13, 0.05, 0.35, 0.45);
     legend_yield_all->SetBorderSize(0);
     legend_yield_all->SetFillStyle(0);
     legend_yield_all->AddEntry(hs_se_cp, "Data", "P");
     legend_yield_all->AddEntry(hs_me_cp, "Event mixing", "P");
-    if (FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg] ==
-        "EventMixing") {
+    if (FlowAnalysis_Fitting::model_string[FlowAnalysis_Fitting::mflag_bkg] == "EventMixing") {
       legend_yield_all->AddEntry(hs_se_res_cp, "Residual", "P");
     }
     legend_yield_all->AddEntry(gr_model, "Total");
@@ -2928,7 +2769,7 @@ FlowAnalysis_Fitting::runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input,
     legend_yield_all->AddEntry(gr_bkg_fitted, "Background");
     legend_yield_all->Draw("same");
 
-    c_all->cd(2);
+    canvasFitMassV2->cd(2);
     TH1D *hs_v2se_cp = new TH1D();
     hs_v2se->Copy(*hs_v2se_cp);
     TH1D *hs_v2bkg_cp = dynamic_cast<TH1D *>(hs_v2bkg->Clone());
@@ -2950,7 +2791,7 @@ FlowAnalysis_Fitting::runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input,
     legend_v2_all->AddEntry(hs_model_v2_cp, "Fit");
     legend_v2_all->Draw("same");
   }
-  ls->Add(c_all);
+  ls->Add(canvasFitMassV2);
 
   cout << endl;
   results.emplace_back(model_v2->GetParameter(0));
@@ -3169,17 +3010,17 @@ vector<double> FlowAnalysis_Fitting::runFittingMassOnly(TH1D *hs_input,
   hs->GetYaxis()->SetTitle(Form("Counts per %g GeV/c^{2}", hs->GetBinWidth(1)));
   hs->Draw("HIST EP");
   pad1_yield->ModifiedUpdate();
-  model->SetLineWidth(3.0);
-  model->SetLineColor(kBlue);
+  model->SetLineWidth(2.0);
+  model->SetLineColor(kAzure+2);
   model->Draw("same");
   pad1_yield->ModifiedUpdate();
-  bkg_fitted->SetLineWidth(3.0);
-  bkg_fitted->SetLineColor(kBlue);
+  bkg_fitted->SetLineWidth(2.0);
+  bkg_fitted->SetLineColor(kAzure+2);
   bkg_fitted->SetLineStyle(kDashed);
   bkg_fitted->Draw("same");
   pad1_yield->ModifiedUpdate();
-  sig_fitted->SetLineWidth(3.0);
-  sig_fitted->SetLineColor(kRed);
+  sig_fitted->SetLineWidth(2.0);
+  sig_fitted->SetLineColor(kRed+1);
   sig_fitted->Draw("same");
   pad1_yield->ModifiedUpdate();
 
@@ -3279,21 +3120,21 @@ vector<double> FlowAnalysis_Fitting::runFittingMassOnly(TH1D *hs_input,
   TF1 *lyield1 = new TF1("lyield1", "[0]", FlowAnalysis_Fitting::massmin,
                          FlowAnalysis_Fitting::massmax);
   lyield1->SetParameter(0, 0.);
-  lyield1->SetLineColor(kBlue);
+  lyield1->SetLineColor(kAzure+2);
   lyield1->SetLineWidth(3);
   lyield1->SetLineStyle(1);
   lyield1->Draw("same");
   TF1 *lyield2 = new TF1("lyield2", "[0]", FlowAnalysis_Fitting::massmin,
                          FlowAnalysis_Fitting::massmax);
   lyield2->SetParameter(0, 1.);
-  lyield2->SetLineColor(kBlue);
+  lyield2->SetLineColor(kAzure+2);
   lyield2->SetLineWidth(3);
   lyield2->SetLineStyle(9);
   lyield2->Draw("same");
   TF1 *lyield3 = new TF1("lyield3", "[0]", FlowAnalysis_Fitting::massmin,
                          FlowAnalysis_Fitting::massmax);
   lyield3->SetParameter(0, -1.);
-  lyield3->SetLineColor(kBlue);
+  lyield3->SetLineColor(kAzure+2);
   lyield3->SetLineWidth(3);
   lyield3->SetLineStyle(9);
   lyield3->Draw("same");
@@ -3423,4 +3264,51 @@ void FlowAnalysis_Fitting::Print() {
   cout << "Background model flag: " << FlowAnalysis_Fitting::mflag_bkg << endl;
   cout << "Chi2 threshold for mass fit: " << mchi2max_mass << endl;
   cout << "Chi2 threshold for v2 fit: " << mchi2max_v2 << endl;
+}
+
+void LoadStyle(){
+    int font = 42;
+    gStyle -> SetFrameBorderMode(0);
+    gStyle -> SetFrameFillColor(0);
+    gStyle -> SetCanvasBorderMode(0);
+    gStyle -> SetPadBorderMode(0);
+    gStyle -> SetPadColor(10);
+    gStyle -> SetCanvasColor(10);
+    gStyle -> SetTitleFillColor(10);
+    gStyle -> SetTitleBorderSize(1);
+    gStyle -> SetStatColor(10);
+    gStyle -> SetStatBorderSize(1);
+    gStyle -> SetLegendBorderSize(1);
+    gStyle -> SetDrawBorder(0);
+    gStyle -> SetTextFont(font);
+    gStyle -> SetStatFontSize(0.05);
+    gStyle -> SetStatX(0.97);
+    gStyle -> SetStatY(0.98);
+    gStyle -> SetStatH(0.03);
+    gStyle -> SetStatW(0.3);
+    gStyle -> SetTickLength(0.02,"y");
+    gStyle -> SetEndErrorSize(3);
+    gStyle -> SetLabelSize(0.05,"xyz");
+    gStyle -> SetLabelFont(font,"xyz");
+    gStyle -> SetLabelOffset(0.01,"xyz");
+    gStyle -> SetTitleFont(font,"xyz");
+    gStyle -> SetTitleOffset(0.9,"x");
+    gStyle -> SetTitleOffset(1.02,"y");
+    gStyle -> SetTitleSize(0.05,"xyz");
+    gStyle -> SetMarkerSize(1.3);
+    gStyle -> SetOptStat(0);
+    gStyle -> SetEndErrorSize(0);
+    gStyle -> SetCanvasPreferGL(kTRUE);
+    gStyle -> SetHatchesSpacing(0.5);
+    gStyle -> SetPadLeftMargin(0.15);
+    gStyle -> SetPadBottomMargin(0.15);
+    gStyle -> SetPadTopMargin(0.05);
+    gStyle -> SetPadRightMargin(0.05);
+    gStyle -> SetEndErrorSize(0.0);
+    gStyle -> SetTitleSize(0.05,"X");
+    gStyle -> SetTitleSize(0.045,"Y");
+    gStyle -> SetLabelSize(0.045,"X");
+    gStyle -> SetLabelSize(0.045,"Y");
+    gStyle -> SetTitleOffset(1.2,"X");
+    gStyle -> SetTitleOffset(1.35,"Y");
 }

@@ -102,7 +102,7 @@ public:
                 std::string flag = "SEPM");
   TH1D *GetMassProfile(double ptmin, double ptmax, double massmin,
                        double massmax, double centmin, double centmax,
-                       TProfile3D *tp_V2, std::string flag = "SEPM");
+                       TProfile3D *tp_V2, std::string flag = "SEPM", int rebin = 1);
   TH1D *GetMeanPt(double ptmin, double ptmax, double massmin, double massmax,
                   double centmin, double centmax, TProfile3D *tp_V2,
                   std::string flag = "SEPM");
@@ -111,7 +111,7 @@ public:
               std::string flag = "SEPM");
   TH1D *GetV2Profile(double ptmin, double ptmax, double massmin, double massmax,
                      double centmin, double centmax, TProfile3D *tp_V2,
-                     std::string flag = "SEPM");
+                     std::string flag = "SEPM", int rebin = 1);
   TH1D *GetV2EM(double ptmin, double ptmax, double massmin, double massmax,
                 double centmin, double centmax,
                 THnSparse *hs_u2q2_cosDeltaPhi_MEPM1,

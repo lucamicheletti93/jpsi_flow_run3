@@ -58,7 +58,7 @@ public:
   vector<double> runFitting(TH1D *hs_input, TH1D *hs_v2_input, TList *ls);
   vector<double> runFittingEM(TH1D *hs_mse_input, TH1D *hs_mme_input,
                               TH1D *hs_v2se_input, TH1D *hs_v2me_input,
-                              TH1D *hs_meanPt_input, TList *ls);
+                              TH1D *hs_meanPt_input, TList *ls, bool saveCanvas = false);
   vector<double> runFittingMassOnly(TH1D *hs_input, TList *ls);
   void Print();
 

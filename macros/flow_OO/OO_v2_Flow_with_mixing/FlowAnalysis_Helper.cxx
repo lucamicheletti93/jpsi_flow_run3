@@ -59,26 +59,22 @@ TH1D *FlowAnalysis_Helper::GetMass(double ptmin, double ptmax, double massmin,
 TH1D *FlowAnalysis_Helper::GetMassProfile(double ptmin, double ptmax,
                                           double massmin, double massmax,
                                           double centmin, double centmax,
-                                          TProfile3D *tp_V2, std::string flag) {
+                                          TProfile3D *tp_V2, std::string flag, int rebin) {
 
   // Copy original profiles for projections
-  TProfile3D *tp_V2_cp = dynamic_cast<TProfile3D *>(tp_V2->Clone(
-      Form("Mass_Pt_centrFT0C_V2_%s_Copy_%g_%g_%g_%g_%g_%g", flag.c_str(),
-           massmin, massmax, ptmin, ptmax, centmin, centmax)));
+  TProfile3D *tp_V2_cp = dynamic_cast<TProfile3D *>(tp_V2->Clone(Form("Mass_Pt_centrFT0C_V2_%s_Copy_%g_%g_%g_%g_%g_%g", flag.c_str(), massmin, massmax, ptmin, ptmax, centmin, centmax)));
 
-  TH3D *tp_V2_cp_projxyz = tp_V2_cp->ProjectionXYZ(
-      Form("Mass_Pt_centrFT0C_V2_%s_Pxyz_%g_%g_%g_%g_%g_%g", flag.c_str(),
-           massmin, massmax, ptmin, ptmax, centmin, centmax),
-      "B");
-  tp_V2_cp_projxyz->GetXaxis()->SetRangeUser(massmin + 1E-5, massmax);
-  tp_V2_cp_projxyz->GetYaxis()->SetRangeUser(ptmin + 1E-5, ptmax);
-  tp_V2_cp_projxyz->GetZaxis()->SetRangeUser(centmin + 1E-5, centmax);
-  TH1D *tp_V2_cp_proj = dynamic_cast<TH1D *>(tp_V2_cp_projxyz->Project3D("x"));
-  TH1D *hist_mass_proj = dynamic_cast<TH1D *>(
-      tp_V2_cp_proj->Clone(Form("Proj_%s", tp_V2_cp_proj->GetName())));
+  TH3D *tp_V2_cp_projxyz = tp_V2_cp->ProjectionXYZ(Form("Mass_Pt_centrFT0C_V2_%s_Pxyz_%g_%g_%g_%g_%g_%g", flag.c_str(), massmin, massmax, ptmin, ptmax, centmin, centmax), "B");
+  TH3D* tp_V2_cp_projxyz_rebin = dynamic_cast<TH3D*>(tp_V2_cp_projxyz->RebinX(rebin, Form("Mass_Pt_centrFT0C_V2_%s_Pxyz_%g_%g_%g_%g_%g_%g_rebin", flag.c_str(), massmin, massmax, ptmin, ptmax, centmin, centmax)));
+  tp_V2_cp_projxyz_rebin->GetXaxis()->SetRangeUser(massmin + 1E-5, massmax);
+  tp_V2_cp_projxyz_rebin->GetYaxis()->SetRangeUser(ptmin + 1E-5, ptmax);
+  tp_V2_cp_projxyz_rebin->GetZaxis()->SetRangeUser(centmin + 1E-5, centmax);
+  TH1D *tp_V2_cp_proj = dynamic_cast<TH1D *>(tp_V2_cp_projxyz_rebin->Project3D("x"));
+  TH1D *hist_mass_proj = dynamic_cast<TH1D *>(tp_V2_cp_proj->Clone(Form("Proj_%s", tp_V2_cp_proj->GetName())));
 
   delete tp_V2_cp;
   delete tp_V2_cp_projxyz;
+  delete tp_V2_cp_projxyz_rebin;
   delete tp_V2_cp_proj;
 
   return hist_mass_proj;
@@ -469,37 +465,33 @@ TH1D *FlowAnalysis_Helper::GetV2(double ptmin, double ptmax, double massmin,
 TH1D *FlowAnalysis_Helper::GetV2Profile(double ptmin, double ptmax,
                                         double massmin, double massmax,
                                         double centmin, double centmax,
-                                        TProfile3D *tp_V2, std::string flag) {
+                                        TProfile3D *tp_V2, std::string flag, int rebin) {
 
   // Copy original profiles for projections
-  TProfile3D *tp_V2_cp = dynamic_cast<TProfile3D *>(tp_V2->Clone(
-      Form("Mass_Pt_centrFT0C_V2_%s_Copy_%g_%g_%g_%g_%g_%g", flag.c_str(),
-           massmin, massmax, ptmin, ptmax, centmin, centmax)));
+  TProfile3D *tp_V2_cp = dynamic_cast<TProfile3D *>(tp_V2->Clone(Form("Mass_Pt_centrFT0C_V2_%s_Copy_%g_%g_%g_%g_%g_%g", flag.c_str(), massmin, massmax, ptmin, ptmax, centmin, centmax)));
   tp_V2_cp->GetXaxis()->SetRangeUser(massmin + 1E-5, massmax);
   tp_V2_cp->GetYaxis()->SetRangeUser(ptmin + 1E-5, ptmax);
   tp_V2_cp->GetZaxis()->SetRangeUser(centmin + 1E-5, centmax);
 
   TProfile2D *tp_V2_cp_projxy = tp_V2_cp->Project3DProfile("yx");
-  TProfile *tp_V2_cp_projx = tp_V2_cp_projxy->ProfileX(
-      Form("Mass_Pt_centrFT0C_V2_%s_Projx_%g_%g_%g_%g_%g_%g", flag.c_str(),
-           massmin, massmax, ptmin, ptmax, centmin, centmax));
+  TProfile *tp_V2_cp_projx = tp_V2_cp_projxy->ProfileX(Form("Mass_Pt_centrFT0C_V2_%s_Projx_%g_%g_%g_%g_%g_%g", flag.c_str(),massmin, massmax, ptmin, ptmax, centmin, centmax));
+  TProfile *tp_V2_cp_projx_rebin = dynamic_cast<TProfile*>(tp_V2_cp_projx->Rebin(rebin, Form("Mass_Pt_centrFT0C_V2_%s_Projx_%g_%g_%g_%g_%g_%g_rebin", flag.c_str(),massmin, massmax, ptmin, ptmax, centmin, centmax)));
 
-  double *Bin_mass_new = CreateBinsFromAxis(tp_V2_cp_projx->GetXaxis());
-  int NBins_mass_new = tp_V2_cp_projx->GetXaxis()->GetNbins();
-  TH1D *hist_v2sp = new TH1D(Form("Proj_%s", tp_V2_cp_projx->GetName()),
-                             Form("Proj_%s", tp_V2_cp_projx->GetName()),
-                             NBins_mass_new, Bin_mass_new);
+  double *Bin_mass_new = CreateBinsFromAxis(tp_V2_cp_projx_rebin->GetXaxis());
+  int NBins_mass_new = tp_V2_cp_projx_rebin->GetXaxis()->GetNbins();
+  TH1D *hist_v2sp = new TH1D(Form("Proj_%s", tp_V2_cp_projx_rebin->GetName()), Form("Proj_%s", tp_V2_cp_projx_rebin->GetName()), NBins_mass_new, Bin_mass_new);
   hist_v2sp->GetXaxis()->SetTitle("mass (GeV/c2)");
   hist_v2sp->GetYaxis()->SetTitle("v^{#mu#mu}_{2}{EP}");
 
   for (int i = 0; i < NBins_mass_new; i++) {
-    hist_v2sp->SetBinContent(i + 1, tp_V2_cp_projx->GetBinContent(i + 1));
-    hist_v2sp->SetBinError(i + 1, tp_V2_cp_projx->GetBinError(i + 1));
+    hist_v2sp->SetBinContent(i + 1, tp_V2_cp_projx_rebin->GetBinContent(i + 1));
+    hist_v2sp->SetBinError(i + 1, tp_V2_cp_projx_rebin->GetBinError(i + 1));
   }
 
   delete tp_V2_cp;
   delete tp_V2_cp_projxy;
   delete tp_V2_cp_projx;
+  delete tp_V2_cp_projx_rebin;
 
   return hist_v2sp;
 }
@@ -2356,13 +2348,13 @@ void FlowAnalysis_Helper::LoadDataMEProfile(
     sublist_v2mepm->ls();
     
     // Get histograms of v2
-    tp_V2SEPM = (TProfile3D *)sublist_v2sepm->FindObject("Mass_Pt_CentFT0C_V2EPwR");
-    tp_V2SEPP = (TProfile3D *)sublist_v2sepp->FindObject("Mass_Pt_CentFT0C_V2EPwR");
-    tp_V2SEMM = (TProfile3D *)sublist_v2semm->FindObject("Mass_Pt_CentFT0C_V2EPwR");
+    tp_V2SEPM = (TProfile3D *)sublist_v2sepm->FindObject("Mass_Pt_CentFT0C_V2SPwR");
+    tp_V2SEPP = (TProfile3D *)sublist_v2sepp->FindObject("Mass_Pt_CentFT0C_V2SPwR");
+    tp_V2SEMM = (TProfile3D *)sublist_v2semm->FindObject("Mass_Pt_CentFT0C_V2SPwR");
 
-    tp_V2MEPM = (TProfile3D *)sublist_v2mepm->FindObject("Mass_Pt_CentFT0C_V2ME_EP");
-    tp_V2MEPP = (TProfile3D *)sublist_v2mepp->FindObject("Mass_Pt_CentFT0C_V2ME_EP");
-    tp_V2MEMM = (TProfile3D *)sublist_v2memm->FindObject("Mass_Pt_CentFT0C_V2ME_EP");
+    tp_V2MEPM = (TProfile3D *)sublist_v2mepm->FindObject("Mass_Pt_CentFT0C_V2ME_SP");
+    tp_V2MEPP = (TProfile3D *)sublist_v2mepp->FindObject("Mass_Pt_CentFT0C_V2ME_SP");
+    tp_V2MEMM = (TProfile3D *)sublist_v2memm->FindObject("Mass_Pt_CentFT0C_V2ME_SP");
     
     Input_File->Close();
   } else {

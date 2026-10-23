@@ -3,5 +3,7 @@ void run_flow_fitter()
     gROOT->ProcessLine(".L FlowAnalysis_Helper.cxx+");
     gROOT->ProcessLine(".L FlowAnalysis_Fitting.cxx+");
     gROOT->ProcessLine(".L flow_fitter.C+");
-    gROOT->ProcessLine("flow_fitter(10,0,4,1,0,0)");
+    gROOT->ProcessLine("flow_fitter(0,4,0)");
+    //gROOT->ProcessLine(".L flow_fitter_syst.C+");
+    //gROOT->ProcessLine("flow_fitter_syst()");
 }
